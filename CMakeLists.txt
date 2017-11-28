@@ -69,10 +69,6 @@ endif()
 ###############################################################################
 # Compile
 ###############################################################################
-# Find requirements
-find_eprosima_package(agent EPROSIMA_BUILD UPDATE_SUBMODULES)
-find_eprosima_package(client EPROSIMA_BUILD UPDATE_SUBMODULES)
-
 # Set C++11
 include(CheckCXXCompilerFlag)
 if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_COMPILER_IS_CLANG OR
@@ -85,11 +81,7 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_COMPILER_IS_CLANG OR
     endif()
 endif()
 
-
-add_subdirectory(${AGENT_DIR})
-add_subdirectory(${CLIENT_DIR})
-
-###############################################################################
+##############################################################################
 # Warning level
 ###############################################################################
 if(MSVC OR MSVC_IDE)
@@ -106,16 +98,5 @@ else()
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -pedantic -Wextra -Wno-unknown-pragmas -std=c++11")
 endif()
 
-###############################################################################
-# Testing
-###############################################################################
-option(EPROSIMA_BUILD_TESTS "Activate the building and execution unit tests and integral tests" OFF)
-if(EPROSIMA_BUILD_TESTS)
-    include(${PROJECT_SOURCE_DIR}/cmake/dev/gtest.cmake)
-    check_gtest()
-    if(GTEST_FOUND)
-        enable_testing()
-        include(CTest)
-        add_subdirectory(test)
-    endif()
-endif()
+add_subdirectory(${AGENT_DIR})
+add_subdirectory(${CLIENT_DIR})
