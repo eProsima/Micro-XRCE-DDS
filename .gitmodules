@@ -1,0 +1,6 @@
+[submodule "client"]
+	path = client
+	url = git@git.sambaserver.eprosima.com:nanortps/micrortps_client_dev.git
+[submodule "agent"]
+	path = agent
+	url = git@git.sambaserver.eprosima.com:nanortps/micrortps_agent_dev.git
