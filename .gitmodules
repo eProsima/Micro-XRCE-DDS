@@ -1,6 +1,6 @@
-[submodule "Micro-RTPS-Client"]
-	path = Micro-RTPS-Client
+[submodule "micro-RTPS-client"]
+	path = micro-RTPS-client
 	url = https://github.com/eProsima/micro-RTPS-client.git
-[submodule "Micro-RTPS-Agent"]
-	path = Micro-RTPS-Agent
+[submodule "micro-RTPS-agent"]
+	path = micro-RTPS-agent
 	url = https://github.com/eProsima/micro-RTPS-agent.git

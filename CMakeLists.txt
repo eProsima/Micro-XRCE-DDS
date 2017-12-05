@@ -30,8 +30,8 @@ endif()
 
 project(micrortps)
 
-set(AGENT_DIR ${PROJECT_SOURCE_DIR}/agent CACHE PATH "Directory for agent submodule")
-set(CLIENT_DIR ${PROJECT_SOURCE_DIR}/client CACHE PATH "Directory for client submodule")
+set(AGENT_DIR ${PROJECT_SOURCE_DIR}/micro-RTPS-agent CACHE PATH "Directory for agent submodule")
+set(CLIENT_DIR ${PROJECT_SOURCE_DIR}/micro-RTPS-client CACHE PATH "Directory for client submodule")
 
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DSERIALIZATION_LOGS")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DMESSAGE_LOGS")
