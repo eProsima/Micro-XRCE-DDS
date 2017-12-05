@@ -106,6 +106,9 @@ The following figure represents the hierarchy of objects you need to instantiate
 Installation from Sources
 =========================
 
+Installing Agent and Client
+---------------------------
+
 Clone the project from Github:
 
     $ git clone --recursive https://github.com/eProsima/micro-RTPS.git
@@ -119,9 +122,47 @@ On Linux, execute:
 
 Now you have Micro-RTPS-Agent and Micro-RTPS-Client installed in your system.
 
+Installing the Agent stand-alone
+--------------------------------
+
+Clone the project from Github: ::
+
+    $ git clone --recursive https://github.com/eProsima/micro-RTPS-agent.git
+    $ mkdir micro-RTPS-agent/build && cd micro-RTPS-agent/build
+
+On Linux, execute: ::
+
+    $ cmake -DTHIRDPARTY=ON ..
+    $ make
+    $ sudo make install
+
+Now you have micrortps_agent installed in your system. Before running it, you need to add /usr/local/lib to the dynamic loader-linker directories. ::
+
+    sudo ldconfig /usr/local/lib/
+
+Installing the Client stand-alone
+---------------------------------
+
+Clone the project from Github: ::
+
+    $ git clone --recursive  https://github.com/eProsima/micro-RTPS-client.git
+    $ mkdir micro-RTPS-client/build && cd micro-RTPS-client/build
+
+On Linux, execute: ::
+
+    $ cmake -DTHIRDPARTY=ON ..
+    $ make
+    $ sudo make install
+
+If you want to install our *Micro RTPS Client* examples you can add "-DEPROSIMA_BUILD_EXAMPLES=ON" to the cmake command line options.
+
 ## Documentation
 
-Coming soon...
+You can access the documentation online, which is hosted on [Read the Docs](http://micro-rtps.readthedocs.io).
+
+* [Start Page](http://micro-rtps.readthedocs.io)
+* [Installation manual](http://micro-rtps.readthedocs.io/en/latest/dependencies.html)
+* [User manual](http://micro-rtps.readthedocs.io/en/latest/introduction.html)
 
 ## Getting Help
 
