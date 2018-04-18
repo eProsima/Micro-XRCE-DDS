@@ -1,6 +1,6 @@
 [submodule "micro-RTPS-client"]
 	path = micro-RTPS-client
-	url = https://github.com/eProsima/micro-RTPS-client.git
+    url = git@gitlab.sambaserver.eprosima.com:eProsima/micrortps-client.git
 [submodule "micro-RTPS-agent"]
 	path = micro-RTPS-agent
-	url = https://github.com/eProsima/micro-RTPS-agent.git
+    url = git@gitlab.sambaserver.eprosima.com:eProsima/micrortps-agent.git

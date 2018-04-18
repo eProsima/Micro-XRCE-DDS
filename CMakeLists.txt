@@ -33,11 +33,6 @@ project(micrortps)
 set(AGENT_DIR ${PROJECT_SOURCE_DIR}/micro-RTPS-agent CACHE PATH "Directory for agent submodule")
 set(CLIENT_DIR ${PROJECT_SOURCE_DIR}/micro-RTPS-client CACHE PATH "Directory for client submodule")
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DSERIALIZATION_LOGS")
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DMESSAGE_LOGS")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DSERIALIZATION_LOGS")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DMESSAGE_LOGS")
-
 ###############################################################################
 # eProsima build options
 ###############################################################################
@@ -64,38 +59,6 @@ if(WIN32)
     set(LICENSE_INSTALL_DIR . CACHE PATH "Installation directory for licenses")
 else()
     set(LICENSE_INSTALL_DIR ${DATA_INSTALL_DIR}/${PROJECT_NAME} CACHE PATH "Installation directory for licenses")
-endif()
-
-###############################################################################
-# Compile
-###############################################################################
-# Set C++11
-include(CheckCXXCompilerFlag)
-if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_COMPILER_IS_CLANG OR
-    CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-    check_cxx_compiler_flag(--std=c++11 SUPPORTS_CXX11)
-    if(SUPPORTS_CXX11)
-        add_compile_options(--std=c++11)
-    else()
-        message(FATAL_ERROR "Compiler doesn't support C++11")
-    endif()
-endif()
-
-##############################################################################
-# Warning level
-###############################################################################
-if(MSVC OR MSVC_IDE)
-if(CMAKE_CXX_FLAGS MATCHES "/W[0-4]")
-    string(REGEX REPLACE "/W[0-4]" "/W4" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
-else()
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4")
-endif()
-
-if(EPROSIMA_EXTRA_CMAKE_CXX_FLAGS)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${EPROSIMA_EXTRA_CMAKE_CXX_FLAGS}")
-endif()
-else()
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -pedantic -Wextra -Wno-unknown-pragmas -std=c++11")
 endif()
 
 add_subdirectory(${AGENT_DIR})
