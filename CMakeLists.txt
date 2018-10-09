@@ -13,7 +13,7 @@
 # limitations under the License.
 
 ###############################################################################
-# CMake build rules for micro RTPS
+# CMake build rules for micro XRCE-DDS
 ###############################################################################
 cmake_minimum_required(VERSION 2.8.12)
 
@@ -30,8 +30,8 @@ endif()
 
 project(micrortps)
 
-set(AGENT_DIR ${PROJECT_SOURCE_DIR}/micro-RTPS-agent CACHE PATH "Directory for agent submodule")
-set(CLIENT_DIR ${PROJECT_SOURCE_DIR}/micro-RTPS-client CACHE PATH "Directory for client submodule")
+set(AGENT_DIR ${PROJECT_SOURCE_DIR}/agent CACHE PATH "Directory for agent submodule")
+set(CLIENT_DIR ${PROJECT_SOURCE_DIR}/client CACHE PATH "Directory for client submodule")
 
 ###############################################################################
 # eProsima build options
