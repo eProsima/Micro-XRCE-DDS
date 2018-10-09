@@ -4,3 +4,6 @@
 [submodule "agent"]
 	path = agent
 	url = https://github.com/eProsima/Micro-XRCE-DDS-Agent.git
+[submodule "gen"]
+	path = gen
+	url = https://github.com/eProsima/Micro-XRCE-DDS-Gen.git
