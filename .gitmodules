@@ -1,9 +1,9 @@
 [submodule "client"]
 	path = client
-	url = https://github.com/eProsima/Micro-XRCE-DDS-Client.git
+	url = git@github.com:eProsima/Micro-XRCE-DDS-Client.git
 [submodule "agent"]
 	path = agent
-	url = https://github.com/eProsima/Micro-XRCE-DDS-Agent.git
+	url = git@github.com:eProsima/Micro-XRCE-DDS-Agent.git
 [submodule "gen"]
 	path = gen
-	url = https://github.com/eProsima/Micro-XRCE-DDS-Gen.git
+	url = git@github.com:eProsima/Micro-XRCE-DDS-Gen.git
