@@ -18,7 +18,7 @@ This repository contains the totality of *Micro XRCE-DDS* products:
 
 ## Documentation
 
-You can access Micro-XRCE documentation online, which is hosted on Read the Docs.
+You can access Micro XRCE-DDS documentation online, which is hosted on Read the Docs.
 
 * [Start Page](http://micro-xrce-dds.readthedocs.io)
 * [Installation manual](http://micro-xrce-dds.readthedocs.io/en/latest/installation.html)
