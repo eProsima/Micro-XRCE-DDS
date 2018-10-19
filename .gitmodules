@@ -1,6 +1,9 @@
-[submodule "micro-RTPS-client"]
-	path = micro-RTPS-client
-    url = https://github.com/eProsima/micro-RTPS-client.git
-[submodule "micro-RTPS-agent"]
-	path = micro-RTPS-agent
-    url = https://github.com/eProsima/micro-RTPS-agent.git
+[submodule "client"]
+	path = client
+	url = git@github.com:eProsima/Micro-XRCE-DDS-Client.git
+[submodule "agent"]
+	path = agent
+	url = git@github.com:eProsima/Micro-XRCE-DDS-Agent.git
+[submodule "gen"]
+	path = gen
+	url = git@github.com:eProsima/Micro-XRCE-DDS-Gen.git
