@@ -10,11 +10,11 @@
 The *Micro XRCE-DDS Agent* acts on behalf of the *Micro XRCE-DDS Clients* and enables them to take part as DDS publishers and/or subscribers in the DDS Global Data Space.
 *Micro XRCE-DDS* provides both, a plug and play *Micro XRCE-DDS Agent* and an API layer which allows you to implement your *Micro XRCE-DDS Clients*.
 
-<p align="center"> <img src="docs/xrcedds_architecture.svg" alt="Image"/> </p>
+<p align="center"> <img src="docs/xrcedds_architecture.png" alt="Image"/> </p>
 
 This repository contains the totality of *Micro XRCE-DDS* products:
 
-<p align="center"> <img src="docs/general_architecture.svg" alt="Image"/> </p>
+<p align="center"> <img src="docs/general_architecture.png" alt="Image"/> </p>
 
 ## Documentation
 
