@@ -28,7 +28,7 @@ else()
         )
 endif()
 
-project(micrortps)
+project(microxrcedds)
 
 set(AGENT_DIR ${PROJECT_SOURCE_DIR}/agent CACHE PATH "Directory for agent submodule")
 set(CLIENT_DIR ${PROJECT_SOURCE_DIR}/client CACHE PATH "Directory for client submodule")
