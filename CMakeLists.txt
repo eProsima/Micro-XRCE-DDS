@@ -99,5 +99,6 @@ if(EXISTS ${CMAKE_BINARY_DIR}/temp_install/)
             ${CMAKE_BINARY_DIR}/temp_install/
         DESTINATION
             ${CMAKE_INSTALL_PREFIX}
+        USE_SOURCE_PERMISSIONS
         )
 endif()
