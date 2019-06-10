@@ -92,3 +92,13 @@ ExternalProject_Add(agent
     DEPENDS
         client
     )
+
+# Install dependencies.
+if(EXISTS ${CMAKE_BINARY_DIR}/temp_install/)
+    install(
+        DIRECTORY
+            ${CMAKE_BINARY_DIR}/temp_install/
+        DESTINATION
+            ${CMAKE_INSTALL_PREFIX}
+        )
+endif()
