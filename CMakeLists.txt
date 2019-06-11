@@ -51,6 +51,24 @@ option(UXRCE_BUILD_EXAMPLES "Build examples." OFF)
 ###############################################################################
 include(ExternalProject)
 
+ExternalProject_Add(cdr
+    DOWNLOAD_COMMAND
+        cd ${PROJECT_SOURCE_DIR} && git submodule update --init cdr
+    PREFIX
+        ${PROJECT_BINARY_DIR}/ucdr
+    SOURCE_DIR
+        ${PROJECT_SOURCE_DIR}/cdr
+    INSTALL_DIR
+        ${PROJECT_BINARY_DIR}/temp_install
+    CMAKE_ARGS
+        -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>
+        -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
+        -DBIN_INSTALL_DIR:PATH=${BIN_INSTALL_DIR}
+        -DINCLUDE_INSTALL_DIR:PATH=${INCLUDE_INSTALL_DIR}
+        -DLIB_INSTALL_DIR:PATH=${LIB_INSTALL_DIR}
+        -DDATA_INSTALL_DIR:PATH=${DATA_INSTALL_DIR}
+    )
+
 ExternalProject_Add(client
     DOWNLOAD_COMMAND
         cd ${PROJECT_SOURCE_DIR} && git submodule update --init client
@@ -64,11 +82,13 @@ ExternalProject_Add(client
         -DUCLIENT_BUILD_EXAMPLES:BOOL=${UXRCE_BUILD_EXAMPLES}
         -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>
         -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
-        -DBUILD_SHARED_LIBS:BOOL=ON
+        -DCMAKE_PREFIX_PATH:PATH=<INSTALL_DIR>
         -DBIN_INSTALL_DIR:PATH=${BIN_INSTALL_DIR}
         -DINCLUDE_INSTALL_DIR:PATH=${INCLUDE_INSTALL_DIR}
         -DLIB_INSTALL_DIR:PATH=${LIB_INSTALL_DIR}
         -DDATA_INSTALL_DIR:PATH=${DATA_INSTALL_DIR}
+    DEPENDS
+        cdr
     )
 
 ExternalProject_Add(agent
