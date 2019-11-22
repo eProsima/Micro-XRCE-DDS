@@ -29,6 +29,9 @@ endif()
 
 project(microxrcedds VERSION "1.2.0")
 
+set(_client_tag v1.1.3)
+set(_agent_tag v1.1.4)
+
 ###############################################################################
 # Config
 ###############################################################################
@@ -47,36 +50,17 @@ endif()
 option(UXRCE_BUILD_EXAMPLES "Build examples." OFF)
 
 ###############################################################################
-# Projects
+# Dependencies
 ###############################################################################
 include(ExternalProject)
 
-ExternalProject_Add(cdr
-    DOWNLOAD_COMMAND
-        cd ${PROJECT_SOURCE_DIR} && git submodule update --init cdr
-    PREFIX
-        ${PROJECT_BINARY_DIR}/ucdr
-    SOURCE_DIR
-        ${PROJECT_SOURCE_DIR}/cdr
-    INSTALL_DIR
-        ${PROJECT_BINARY_DIR}/temp_install
-    CMAKE_ARGS
-        -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>
-        -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
-        -DCMAKE_POSITION_INDEPENDENT_CODE:BOOL=ON
-        -DBIN_INSTALL_DIR:PATH=${BIN_INSTALL_DIR}
-        -DINCLUDE_INSTALL_DIR:PATH=${INCLUDE_INSTALL_DIR}
-        -DLIB_INSTALL_DIR:PATH=${LIB_INSTALL_DIR}
-        -DDATA_INSTALL_DIR:PATH=${DATA_INSTALL_DIR}
-    )
-
 ExternalProject_Add(client
-    DOWNLOAD_COMMAND
-        cd ${PROJECT_SOURCE_DIR} && git submodule update --init client
+    GIT_REPOSITORY
+        https://github.com/eProsima/Micro-XRCE-DDS-Client.git
+    GIT_TAG
+        ${_client_tag}
     PREFIX
-        ${PROJECT_BINARY_DIR}/uclient
-    SOURCE_DIR
-        ${PROJECT_SOURCE_DIR}/client
+        ${PROJECT_BINARY_DIR}/client
     INSTALL_DIR
         ${PROJECT_BINARY_DIR}/temp_install
     CMAKE_ARGS
@@ -89,17 +73,15 @@ ExternalProject_Add(client
         -DINCLUDE_INSTALL_DIR:PATH=${INCLUDE_INSTALL_DIR}
         -DLIB_INSTALL_DIR:PATH=${LIB_INSTALL_DIR}
         -DDATA_INSTALL_DIR:PATH=${DATA_INSTALL_DIR}
-    DEPENDS
-        cdr
     )
 
 ExternalProject_Add(agent
-    DOWNLOAD_COMMAND
-        cd ${PROJECT_SOURCE_DIR} && git submodule update --init agent
+    GIT_REPOSITORY
+        https://github.com/eProsima/Micro-XRCE-DDS-Agent.git
+    GIT_TAG
+        ${_agent_tag}
     PREFIX
-        ${PROJECT_BINARY_DIR}/uagent
-    SOURCE_DIR
-        ${PROJECT_SOURCE_DIR}/agent
+        ${PROJECT_BINARY_DIR}/agent
     INSTALL_DIR
         ${PROJECT_BINARY_DIR}/temp_install
     CMAKE_ARGS
@@ -114,7 +96,9 @@ ExternalProject_Add(agent
         client
     )
 
-# Install dependencies.
+###############################################################################
+# Install
+###############################################################################
 if(EXISTS ${CMAKE_BINARY_DIR}/temp_install/)
     install(
         DIRECTORY
