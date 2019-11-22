@@ -29,7 +29,7 @@ endif()
 
 project(microxrcedds VERSION "1.2.0")
 
-set(_client_tag v1.1.3)
+set(_client_tag feature/pic)
 set(_agent_tag v1.1.4)
 set(_gen_tag master)
 
@@ -65,7 +65,6 @@ ExternalProject_Add(client
     INSTALL_DIR
         ${PROJECT_BINARY_DIR}/temp_install
     CMAKE_ARGS
-        -DUCLIENT_BUILD_EXAMPLES:BOOL=${UXRCE_BUILD_EXAMPLES}
         -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>
         -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
         -DCMAKE_PREFIX_PATH:PATH=<INSTALL_DIR>
@@ -74,6 +73,8 @@ ExternalProject_Add(client
         -DINCLUDE_INSTALL_DIR:PATH=${INCLUDE_INSTALL_DIR}
         -DLIB_INSTALL_DIR:PATH=${LIB_INSTALL_DIR}
         -DDATA_INSTALL_DIR:PATH=${DATA_INSTALL_DIR}
+        -DUCLIENT_BUILD_EXAMPLES:BOOL=${UXRCE_BUILD_EXAMPLES}
+        -DUCLIENT_PIC=ON
     )
 
 ExternalProject_Add(agent
