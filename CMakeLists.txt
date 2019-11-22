@@ -31,11 +31,14 @@ project(microxrcedds VERSION "1.2.0")
 
 set(_client_tag v1.1.3)
 set(_agent_tag v1.1.4)
+set(_gen_tag master)
 
 ###############################################################################
-# Config
+# Build options.
 ###############################################################################
-# Install path
+option(UXRCE_BUILD_EXAMPLES "Build examples." OFF)
+option(UXRCE_ENABLE_GEN "Enable the building and installation of Micro XRCE-DDS Gen." OFF)
+
 include(GNUInstallDirs)
 set(BIN_INSTALL_DIR     ${CMAKE_INSTALL_BINDIR}     CACHE PATH "Installation directory for binaries")
 set(INCLUDE_INSTALL_DIR ${CMAKE_INSTALL_INCLUDEDIR} CACHE PATH "Installation directory for C headers")
@@ -46,8 +49,6 @@ if(WIN32)
 else()
     set(LICENSE_INSTALL_DIR ${DATA_INSTALL_DIR}/${PROJECT_NAME} CACHE PATH "Installation directory for licenses")
 endif()
-
-option(UXRCE_BUILD_EXAMPLES "Build examples." OFF)
 
 ###############################################################################
 # Dependencies
@@ -95,6 +96,29 @@ ExternalProject_Add(agent
     DEPENDS
         client
     )
+
+if(UXRCE_ENABLE_GEN)
+    ExternalProject_Add(gen
+        GIT_REPOSITORY
+            https://github.com/eProsima/Micro-XRCE-DDS-Gen.git
+        GIT_TAG
+            ${_gen_tag}
+        PREFIX
+            ${PROJECT_BINARY_DIR}/gen
+        INSTALL_DIR
+            ${PROJECT_BINARY_DIR}/temp_install
+        CONFIGURE_COMMAND
+            ""
+        BUILD_COMMAND
+            cd <SOURCE_DIR> && gradle build
+        INSTALL_COMMAND
+            COMMAND ${CMAKE_COMMAND} -E make_directory <INSTALL_DIR>/${BIN_INSTALL_DIR}
+            COMMAND ${CMAKE_COMMAND} -E copy <SOURCE_DIR>/scripts/microxrceddsgen <INSTALL_DIR>/${BIN_INSTALL_DIR}/
+            COMMAND ${CMAKE_COMMAND} -E copy <SOURCE_DIR>/scripts/microxrceddsgen.bat <INSTALL_DIR>/${BIN_INSTALL_DIR}/
+            COMMAND ${CMAKE_COMMAND} -E make_directory <INSTALL_DIR>/share/microxrcedds
+            COMMAND ${CMAKE_COMMAND} -E copy <SOURCE_DIR>/share/microxrcedds/microxrceddsgen.jar <INSTALL_DIR>/share/microxrcedds/
+        )
+endif()
 
 ###############################################################################
 # Install
