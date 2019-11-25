@@ -41,6 +41,13 @@ option(UXRCE_BUILD_EXAMPLES "Build examples." OFF)
 option(UXRCE_ENABLE_GEN "Enable the building and installation of Micro XRCE-DDS Gen." OFF)
 option(UXRCE_BUILD_TESTS "Built tests." OFF)
 
+set(_client_test_command "")
+set(_agent_test_command "")
+if(UXRCE_BUILD_TESTS)
+    set(_client_test_command COMMAND ${CMAKE_CTEST_COMMAND} -VV --no-compress-output --output-on-failure -T Test)
+    set(_agent_test_command COMMAND ${CMAKE_CTEST_COMMAND} -VV --no-compress-output --output-on-failure -T Test)
+endif()
+
 include(GNUInstallDirs)
 set(BIN_INSTALL_DIR     ${CMAKE_INSTALL_BINDIR}     CACHE PATH "Installation directory for binaries")
 set(INCLUDE_INSTALL_DIR ${CMAKE_INSTALL_INCLUDEDIR} CACHE PATH "Installation directory for C headers")
@@ -76,6 +83,10 @@ ExternalProject_Add(client
         -DDATA_INSTALL_DIR:PATH=${DATA_INSTALL_DIR}
         -DUCLIENT_BUILD_EXAMPLES:BOOL=${UXRCE_BUILD_EXAMPLES}
         -DUCLIENT_PIC:BOOL=ON
+        -DUCLIENT_BUILD_TESTS:BOOL=${UXRCE_BUILD_TESTS}
+        -DGTEST_INDIVIDUAL:BOOL=ON
+    TEST_COMMAND
+        ${_client_test_command}
     )
 ExternalProject_Get_Property(client SOURCE_DIR)
 set(_client_source_dir ${SOURCE_DIR})
@@ -97,6 +108,10 @@ ExternalProject_Add(agent
         -DINCLUDE_INSTALL_DIR:PATH=${INCLUDE_INSTALL_DIR}
         -DLIB_INSTALL_DIR:PATH=${LIB_INSTALL_DIR}
         -DDATA_INSTALL_DIR:PATH=${DATA_INSTALL_DIR}
+        -DUAGENT_BUILD_TESTS:BOOL=${UXRCE_BUILD_TESTS}
+        -DGTEST_INDIVIDUAL:BOOL=ON
+    TEST_COMMAND
+        ${_agent_test_command}
     DEPENDS
         client
     )
@@ -137,7 +152,7 @@ if(UXRCE_BUILD_TESTS)
         INSTALL_COMMAND
             ""
         TEST_COMMAND
-            COMMAND ${CMAKE_CTEST_COMMAND} -VV --no-compress-output --output-on-failure
+            COMMAND ${CMAKE_CTEST_COMMAND} -VV --no-compress-output --output-on-failure -T Test
         CMAKE_CACHE_ARGS
             -DCMAKE_PREFIX_PATH:PATH=${PROJECT_BINARY_DIR}/temp_install
             -DGTEST_INDIVIDUAL:BOOL=ON
