@@ -44,8 +44,8 @@ option(UXRCE_BUILD_TESTS "Built tests." OFF)
 set(_client_test_command "")
 set(_agent_test_command "")
 if(UXRCE_BUILD_TESTS)
-    set(_client_test_command COMMAND ${CMAKE_CTEST_COMMAND} -VV --no-compress-output --output-on-failure -T Test)
-    set(_agent_test_command COMMAND ${CMAKE_CTEST_COMMAND} -VV --no-compress-output --output-on-failure -T Test)
+    set(_client_test_command COMMAND ${CMAKE_CTEST_COMMAND} -VV -C ${CMAKE_BUILD_TYPE} --no-compress-output --output-on-failure -T Test)
+    set(_agent_test_command COMMAND ${CMAKE_CTEST_COMMAND} -VV -C ${CMAKE_BUILD_TYPE} --no-compress-output --output-on-failure -T Test)
 endif()
 
 include(GNUInstallDirs)
@@ -152,7 +152,7 @@ if(UXRCE_BUILD_TESTS)
         INSTALL_COMMAND
             ""
         TEST_COMMAND
-            COMMAND ${CMAKE_CTEST_COMMAND} -VV --no-compress-output --output-on-failure -T Test
+            COMMAND ${CMAKE_CTEST_COMMAND} -VV -C ${CMAKE_BUILD_TYPE} --no-compress-output --output-on-failure -T Test
         CMAKE_CACHE_ARGS
             -DCMAKE_PREFIX_PATH:PATH=${PROJECT_BINARY_DIR}/temp_install
             -DGTEST_INDIVIDUAL:BOOL=ON
