@@ -32,12 +32,14 @@ project(microxrcedds VERSION "1.2.0")
 set(_client_tag feature/pic)
 set(_agent_tag v1.1.4)
 set(_gen_tag master)
+set(_tests_tag feature/move)
 
 ###############################################################################
 # Build options.
 ###############################################################################
 option(UXRCE_BUILD_EXAMPLES "Build examples." OFF)
 option(UXRCE_ENABLE_GEN "Enable the building and installation of Micro XRCE-DDS Gen." OFF)
+option(UXRCE_BUILD_TESTS "Built tests." OFF)
 
 include(GNUInstallDirs)
 set(BIN_INSTALL_DIR     ${CMAKE_INSTALL_BINDIR}     CACHE PATH "Installation directory for binaries")
@@ -73,8 +75,10 @@ ExternalProject_Add(client
         -DLIB_INSTALL_DIR:PATH=${LIB_INSTALL_DIR}
         -DDATA_INSTALL_DIR:PATH=${DATA_INSTALL_DIR}
         -DUCLIENT_BUILD_EXAMPLES:BOOL=${UXRCE_BUILD_EXAMPLES}
-        -DUCLIENT_PIC=ON
+        -DUCLIENT_PIC:BOOL=ON
     )
+ExternalProject_Get_Property(client SOURCE_DIR)
+set(_client_source_dir ${SOURCE_DIR})
 
 ExternalProject_Add(agent
     GIT_REPOSITORY
@@ -96,6 +100,8 @@ ExternalProject_Add(agent
     DEPENDS
         client
     )
+ExternalProject_Get_Property(agent SOURCE_DIR)
+set(_agent_source_dir ${SOURCE_DIR})
 
 if(UXRCE_ENABLE_GEN)
     ExternalProject_Add(gen
@@ -117,6 +123,29 @@ if(UXRCE_ENABLE_GEN)
             COMMAND ${CMAKE_COMMAND} -E copy <SOURCE_DIR>/scripts/microxrceddsgen.bat <INSTALL_DIR>/${BIN_INSTALL_DIR}/
             COMMAND ${CMAKE_COMMAND} -E make_directory <INSTALL_DIR>/share/microxrcedds
             COMMAND ${CMAKE_COMMAND} -E copy <SOURCE_DIR>/share/microxrcedds/microxrceddsgen.jar <INSTALL_DIR>/share/microxrcedds/
+        )
+endif()
+
+if(UXRCE_BUILD_TESTS)
+    ExternalProject_Add(itests
+        GIT_REPOSITORY
+            https://github.com/eProsima/Micro-XRCE-DDS-Integration-Tests.git
+        GIT_TAG
+            ${_tests_tag}
+        PREFIX
+            ${PROJECT_BINARY_DIR}/itests
+        INSTALL_COMMAND
+            ""
+        TEST_COMMAND
+            COMMAND ${CMAKE_CTEST_COMMAND} -VV --no-compress-output --output-on-failure
+        CMAKE_CACHE_ARGS
+            -DCMAKE_PREFIX_PATH:PATH=${PROJECT_BINARY_DIR}/temp_install
+            -DGTEST_INDIVIDUAL:BOOL=ON
+            -DUCLIENT_SOURCE_DIR:PATH=${_client_source_dir}
+            -DUAGENT_SOURCE_DIR:PATH=${_agent_source_dir}
+        DEPENDS
+            client
+            agent
         )
 endif()
 
