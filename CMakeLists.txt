@@ -30,7 +30,7 @@ endif()
 project(microxrcedds VERSION "1.2.0")
 
 set(_client_tag feature/pic)
-set(_agent_tag v1.1.4)
+set(_agent_tag feature/spdlog)
 set(_gen_tag master)
 set(_tests_tag feature/move)
 
