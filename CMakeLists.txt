@@ -1,4 +1,4 @@
-# Copyright 2017 Proyectos y Sistemas de Mantenimiento SL (eProsima).
+# Copyright 2019 Proyectos y Sistemas de Mantenimiento SL (eProsima).
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -29,23 +29,21 @@ endif()
 
 project(microxrcedds VERSION "1.2.0")
 
-set(_client_tag feature/pic)
-set(_agent_tag feature/spdlog)
-set(_gen_tag master)
-set(_tests_tag feature/move)
+set(_client_tag hotfix/serial_test)
+set(_agent_tag feature/ci)
+set(_gen_tag v1.0.2)
+set(_tests_tag v1.1.1)
 
 ###############################################################################
 # Build options.
 ###############################################################################
 option(UXRCE_BUILD_EXAMPLES "Build examples." OFF)
 option(UXRCE_ENABLE_GEN "Enable the building and installation of Micro XRCE-DDS Gen." OFF)
-option(UXRCE_BUILD_TESTS "Built tests." OFF)
+option(UXRCE_BUILD_TESTS "Build tests." OFF)
 
-set(_client_test_command "")
-set(_agent_test_command "")
-if(UXRCE_BUILD_TESTS)
-    set(_client_test_command COMMAND ${CMAKE_CTEST_COMMAND} -VV -C ${CMAKE_BUILD_TYPE} --no-compress-output --output-on-failure -T Test)
-    set(_agent_test_command COMMAND ${CMAKE_CTEST_COMMAND} -VV -C ${CMAKE_BUILD_TYPE} --no-compress-output --output-on-failure -T Test)
+option(UXRCE_BUILD_CI_TESTS "Build CI tests." OFF)
+if(UXRCE_BUILD_CI_TESTS)
+    set(UXRCE_BUILD_TESTS ON)
 endif()
 
 include(GNUInstallDirs)
@@ -57,6 +55,25 @@ if(WIN32)
     set(LICENSE_INSTALL_DIR . CACHE PATH "Installation directory for licenses")
 else()
     set(LICENSE_INSTALL_DIR ${DATA_INSTALL_DIR}/${PROJECT_NAME} CACHE PATH "Installation directory for licenses")
+endif()
+
+###############################################################################
+# Tests
+###############################################################################
+set(_run_tests OFF)
+set(_test_command "")
+
+if(UXRCE_BUILD_TESTS)
+    set(_run_tests ON)
+    list(APPEND _test_command COMMAND ${CMAKE_CTEST_COMMAND} -VV -C ${CMAKE_BUILD_TYPE} -T Test)
+endif()
+
+if(UXRCE_BUILD_CI_TESTS)
+    include(CTest)
+    if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+        list(APPEND _test_command COMMAND ${CMAKE_CTEST_COMMAND} -VV -T MemCheck)
+        list(APPEND _test_command COMMAND ${CMAKE_CTEST_COMMAND} -VV -T Coverage)
+    endif()
 endif()
 
 ###############################################################################
@@ -73,9 +90,19 @@ ExternalProject_Add(client
         ${PROJECT_BINARY_DIR}/client
     INSTALL_DIR
         ${PROJECT_BINARY_DIR}/temp_install
+    TEST_AFTER_INSTALL
+        ${_run_tests}
+    TEST_COMMAND
+        ${_test_command}
     CMAKE_CACHE_ARGS
-        -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>
+        -DCMAKE_CXX_COMPILER:FILEPATH=${CMAKE_CXX_COMPILER}
+        -DCMAKE_C_COMPILER:FILEPATH=${CMAKE_C_COMPILER}
         -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
+        -DCMAKE_C_FLAGS:STRING=${CMAKE_C_FLAGS}
+        -DCMAKE_CXX_FLAGS:STRING=${CMAKE_CXX_FLAGS}
+        -DCMAKE_EXE_LINKER_FLAGS:STRING=${CMAKE_EXE_LINKER_FLAGS}
+        -DCMAKE_SHARED_LINKER_FLAGS:STRING=${CMAKE_SHARED_LINKER_FLAGS}
+        -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>
         -DCMAKE_PREFIX_PATH:PATH=<INSTALL_DIR>
         -DBIN_INSTALL_DIR:PATH=${BIN_INSTALL_DIR}
         -DINCLUDE_INSTALL_DIR:PATH=${INCLUDE_INSTALL_DIR}
@@ -85,8 +112,6 @@ ExternalProject_Add(client
         -DUCLIENT_PIC:BOOL=ON
         -DUCLIENT_BUILD_TESTS:BOOL=${UXRCE_BUILD_TESTS}
         -DGTEST_INDIVIDUAL:BOOL=ON
-    TEST_COMMAND
-        ${_client_test_command}
     )
 ExternalProject_Get_Property(client SOURCE_DIR)
 set(_client_source_dir ${SOURCE_DIR})
@@ -100,7 +125,18 @@ ExternalProject_Add(agent
         ${PROJECT_BINARY_DIR}/agent
     INSTALL_DIR
         ${PROJECT_BINARY_DIR}/temp_install
+    TEST_AFTER_INSTALL
+        ${_run_tests}
+    TEST_COMMAND
+        ${_test_command}
     CMAKE_CACHE_ARGS
+        -DCMAKE_CXX_COMPILER:FILEPATH=${CMAKE_CXX_COMPILER}
+        -DCMAKE_C_COMPILER:FILEPATH=${CMAKE_C_COMPILER}
+        -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
+        -DCMAKE_C_FLAGS:STRING=${CMAKE_C_FLAGS}
+        -DCMAKE_CXX_FLAGS:STRING=${CMAKE_CXX_FLAGS}
+        -DCMAKE_EXE_LINKER_FLAGS:STRING=${CMAKE_EXE_LINKER_FLAGS}
+        -DCMAKE_SHARED_LINKER_FLAGS:STRING=${CMAKE_SHARED_LINKER_FLAGS}
         -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>
         -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
         -DCMAKE_PREFIX_PATH:PATH=<INSTALL_DIR>
@@ -110,8 +146,6 @@ ExternalProject_Add(agent
         -DDATA_INSTALL_DIR:PATH=${DATA_INSTALL_DIR}
         -DUAGENT_BUILD_TESTS:BOOL=${UXRCE_BUILD_TESTS}
         -DGTEST_INDIVIDUAL:BOOL=ON
-    TEST_COMMAND
-        ${_agent_test_command}
     DEPENDS
         client
     )
@@ -152,9 +186,17 @@ if(UXRCE_BUILD_TESTS)
         INSTALL_COMMAND
             ""
         TEST_COMMAND
-            COMMAND ${CMAKE_CTEST_COMMAND} -VV -C ${CMAKE_BUILD_TYPE} --no-compress-output --output-on-failure -T Test
+            COMMAND ${CMAKE_CTEST_COMMAND} -VV -C ${CMAKE_BUILD_TYPE} -T Test
         CMAKE_CACHE_ARGS
+            -DCMAKE_CXX_COMPILER:FILEPATH=${CMAKE_CXX_COMPILER}
+            -DCMAKE_C_COMPILER:FILEPATH=${CMAKE_C_COMPILER}
+            -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
+            -DCMAKE_C_FLAGS:STRING=${CMAKE_C_FLAGS}
+            -DCMAKE_CXX_FLAGS:STRING=${CMAKE_CXX_FLAGS}
+            -DCMAKE_EXE_LINKER_FLAGS:STRING=${CMAKE_EXE_LINKER_FLAGS}
+            -DCMAKE_SHARED_LINKER_FLAGS:STRING=${CMAKE_SHARED_LINKER_FLAGS}
             -DCMAKE_PREFIX_PATH:PATH=${PROJECT_BINARY_DIR}/temp_install
+            -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
             -DGTEST_INDIVIDUAL:BOOL=ON
             -DUCLIENT_SOURCE_DIR:PATH=${_client_source_dir}
             -DUAGENT_SOURCE_DIR:PATH=${_agent_source_dir}
