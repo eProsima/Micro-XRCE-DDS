@@ -25,6 +25,8 @@ ExternalProject_Add(microxrcedds
         ${PROJECT_BINARY_DIR}/microxrcedds-build
     INSTALL_DIR
         ${PROJECT_BINARY_DIR}/temp_install
+    BUILD_COMMAND
+        ""
     CMAKE_CACHE_ARGS
         -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
         -DCMAKE_GENERATOR_TOOLSET:STRING=${CMAKE_GENERATOR_TOOLSET}

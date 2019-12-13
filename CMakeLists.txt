@@ -186,7 +186,7 @@ if(UXRCE_BUILD_TESTS)
         INSTALL_COMMAND
             ""
         TEST_COMMAND
-            COMMAND ${CMAKE_CTEST_COMMAND} -VV -C ${CMAKE_BUILD_TYPE} -T Test
+            ${_test_command}
         CMAKE_CACHE_ARGS
             -DCMAKE_CXX_COMPILER:FILEPATH=${CMAKE_CXX_COMPILER}
             -DCMAKE_C_COMPILER:FILEPATH=${CMAKE_C_COMPILER}

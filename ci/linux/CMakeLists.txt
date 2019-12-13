@@ -41,6 +41,8 @@ ExternalProject_Add(microxrcedds
         ${PROJECT_BINARY_DIR}/microxrcedds-build
     INSTALL_DIR
         ${PROJECT_BINARY_DIR}/temp_install
+    BUILD_COMMAND
+        ""
     CMAKE_CACHE_ARGS
         -DCMAKE_CXX_COMPILER:STRING=${CMAKE_CXX_COMPILER}
         -DCMAKE_C_COMPILER:STRING=${CMAKE_C_COMPILER}
