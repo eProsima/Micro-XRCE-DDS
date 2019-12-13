@@ -69,7 +69,6 @@ if(UXRCE_BUILD_TESTS)
 endif()
 
 if(UXRCE_BUILD_CI_TESTS)
-    include(CTest)
     if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
         list(APPEND _test_command COMMAND ${CMAKE_CTEST_COMMAND} -VV -T MemCheck)
         list(APPEND _test_command COMMAND ${CMAKE_CTEST_COMMAND} -VV -T Coverage)
