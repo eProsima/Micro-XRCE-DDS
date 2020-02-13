@@ -1,0 +1,10 @@
+.cproject
+.project
+.pydevproject
+CMakeLists.txt.user
+
+# Directories
+build
+.ycm_extra_conf.py
+.color_coded
+.vscode
