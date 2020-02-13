@@ -31,8 +31,7 @@ project(microxrcedds VERSION "1.2.0")
 
 set(_client_tag v1.1.5)
 set(_agent_tag v1.1.6)
-set(_gen_tag v1.0.2)
-set(_tests_tag v1.1.1)
+set(_gen_tag develop)
 
 ###############################################################################
 # Build options.
@@ -176,10 +175,8 @@ endif()
 
 if(UXRCE_BUILD_TESTS)
     ExternalProject_Add(itests
-        GIT_REPOSITORY
-            https://github.com/eProsima/Micro-XRCE-DDS-Integration-Tests.git
-        GIT_TAG
-            ${_tests_tag}
+        SOURCE_DIR
+            ${CMAKE_CURRENT_SOURCE_DIR}/test
         PREFIX
             ${PROJECT_BINARY_DIR}/itests
         INSTALL_COMMAND
