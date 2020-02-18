@@ -40,8 +40,8 @@ std::vector<uint8_t> ClientSerialization::create_payload()
     CREATE_Payload payload;
     payload.base.request_id = RequestId{0x01, 0x23};
     payload.base.object_id = ObjectId{0x45, 0x67};
-    payload.object_representation.kind = OBJK_PARTICIPANT;
-    payload.object_representation._.participant.base.representation.format = REPRESENTATION_BY_REFERENCE;
+    payload.object_representation.kind = DDS_XRCE_OBJK_PARTICIPANT;
+    payload.object_representation._.participant.base.representation.format = DDS_XRCE_REPRESENTATION_BY_REFERENCE;
     payload.object_representation._.participant.domain_id = int16_t(0x09AB);
     payload.object_representation._.participant.base.representation._.object_reference = const_cast<char*>("ABCDE");
 
@@ -142,12 +142,12 @@ std::vector<uint8_t> ClientSerialization::info_payload()
     payload.base.result.status = 0xAB;
     payload.object_info.optional_activity = 0x01;
     payload.object_info.optional_config = 0x01;
-    payload.object_info.config.kind = OBJK_AGENT;
+    payload.object_info.config.kind = DDS_XRCE_OBJK_AGENT;
     payload.object_info.config._.agent.optional_properties = 0x00;
     payload.object_info.config._.agent.xrce_cookie = XrceCookie{0x89, 0xAB, 0xCD, 0xEF};
     payload.object_info.config._.agent.xrce_version = XrceVersion{0x01, 0x23};
     payload.object_info.config._.agent.xrce_vendor_id = XrceVendorId{0x45, 0x67};
-    payload.object_info.activity.kind = OBJK_AGENT;
+    payload.object_info.activity.kind = DDS_XRCE_OBJK_AGENT;
     payload.object_info.activity._.agent.availibility = 1;
     payload.object_info.activity._.agent.address_seq.size = 0x01;
     payload.object_info.activity._.agent.address_seq.data[0].format = ADDRESS_FORMAT_MEDIUM;
