@@ -11,8 +11,12 @@
 #include <iostream>
 #include <thread>
 
-#define UDP_TRANSPORT 1
-#define TCP_TRANSPORT 2
+enum class Transport {
+    UDP_IPV4_TRANSPORT,
+    UDP_IPV6_TRANSPORT,
+    TCP_IPV4_TRANSPORT,
+    TCP_IPV6_TRANSPORT
+};
 
 inline bool operator == (const uxrObjectId& obj1, const uxrObjectId& obj2)
 {
@@ -206,18 +210,28 @@ public:
         }
     }
 
-    void init_transport(int transport, const char* ip, uint16_t port)
+    void init_transport(Transport transport, const char* ip, const char* port)
     {
         switch(transport)
         {
-            case UDP_TRANSPORT:
+            case Transport::UDP_IPV4_TRANSPORT:
                 mtu_ = UXR_CONFIG_UDP_TRANSPORT_MTU;
-                ASSERT_TRUE(uxr_init_udp_transport(&udp_transport_, &udp_platform_, ip, port));
+                ASSERT_TRUE(uxr_init_udp_transport(&udp_transport_, &udp_platform_, UXR_IPv4, ip, port));
                 uxr_init_session(&session_, gateway_.monitorize(&udp_transport_.comm), client_key_);
                 break;
-            case TCP_TRANSPORT:
+            case Transport::UDP_IPV6_TRANSPORT:
+                mtu_ = UXR_CONFIG_UDP_TRANSPORT_MTU;
+                ASSERT_TRUE(uxr_init_udp_transport(&udp_transport_, &udp_platform_, UXR_IPv6, ip, port));
+                uxr_init_session(&session_, gateway_.monitorize(&udp_transport_.comm), client_key_);
+                break;
+            case Transport::TCP_IPV4_TRANSPORT:
                 mtu_ = UXR_CONFIG_TCP_TRANSPORT_MTU;
-                ASSERT_TRUE(uxr_init_tcp_transport(&tcp_transport_, &tcp_platform_, ip, port));
+                ASSERT_TRUE(uxr_init_tcp_transport(&tcp_transport_, &tcp_platform_, UXR_IPv4, ip, port));
+                uxr_init_session(&session_, gateway_.monitorize(&tcp_transport_.comm), client_key_);
+                break;
+            case Transport::TCP_IPV6_TRANSPORT:
+                mtu_ = UXR_CONFIG_TCP_TRANSPORT_MTU;
+                ASSERT_TRUE(uxr_init_tcp_transport(&tcp_transport_, &tcp_platform_, UXR_IPv6, ip, port));
                 uxr_init_session(&session_, gateway_.monitorize(&tcp_transport_.comm), client_key_);
                 break;
         }
@@ -225,7 +239,7 @@ public:
         init_common();
     }
 
-    void close_transport(int transport)
+    void close_transport(Transport transport)
     {
         // Flash incomming messages.
         uxr_run_session_time(&session_, 1000);
@@ -240,10 +254,12 @@ public:
 
         switch(transport)
         {
-            case UDP_TRANSPORT:
+            case Transport::UDP_IPV4_TRANSPORT:
+            case Transport::UDP_IPV6_TRANSPORT:
                 ASSERT_TRUE(uxr_close_udp_transport(&udp_transport_));
                 break;
-            case TCP_TRANSPORT:
+            case Transport::TCP_IPV4_TRANSPORT:
+            case Transport::TCP_IPV6_TRANSPORT:
                 ASSERT_TRUE(uxr_close_tcp_transport(&tcp_transport_));
                 break;
         }

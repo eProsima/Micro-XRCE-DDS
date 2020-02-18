@@ -15,7 +15,7 @@
 class Discovery
 {
 public:
-    Discovery(int transport, const std::vector<uint16_t>& agent_ports)
+    Discovery(Transport transport, const std::vector<uint16_t>& agent_ports)
     : ip_("127.0.0.1")
     , agent_ports_(agent_ports)
     , transport_(transport)
@@ -61,7 +61,7 @@ private:
         {
             Client client(0.0f, 1);
             std::cout << "Client connecting to " << address->port << std::endl;
-            client.init_transport(transport_, address->ip, address->port);
+            client.init_transport(transport_, address->ip, std::to_string(address->port).data());
             client.close_transport(transport_);
 
             agent_ports_.erase(it);
@@ -72,7 +72,7 @@ private:
 
     std::string ip_;
     std::vector<uint16_t> agent_ports_;
-    int transport_;
+    Transport transport_;
 };
 
 #endif //IN_TEST_DISCOVERY_HPP

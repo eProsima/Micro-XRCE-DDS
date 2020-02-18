@@ -1,27 +1,32 @@
 #include <gtest/gtest.h>
 
 #include <Client.hpp>
-#if defined(PLATFORM_NAME_LINUX)
-#include <uxr/agent/transport/udp/UDPServerLinux.hpp>
-#include <uxr/agent/transport/tcp/TCPServerLinux.hpp>
-#elif defined(PLATFORM_NAME_WINDOWS)
-#include <uxr/agent/transport/udp/UDPServerWindows.hpp>
-#include <uxr/agent/transport/tcp/TCPServerWindows.hpp>
+#ifdef _WIN32
+#include <uxr/agent/transport/udp/UDPv4AgentWindows.hpp>
+#include <uxr/agent/transport/udp/UDPv6AgentWindows.hpp>
+#include <uxr/agent/transport/tcp/TCPv4AgentWindows.hpp>
+#include <uxr/agent/transport/tcp/TCPv6AgentWindows.hpp>
+#else
+#include <uxr/agent/transport/udp/UDPv4AgentLinux.hpp>
+// #include <uxr/agent/transport/udp/UDPv6AgentLinux.hpp>
+// #include <uxr/agent/transport/tcp/TCPv4AgentLinux.hpp>
+// #include <uxr/agent/transport/tcp/TCPv6AgentLinux.hpp>
 #endif
+
 
 #include <thread>
 
-class PublisherSubscriberInteraction : public ::testing::TestWithParam<std::tuple<int, float>>
+class PublisherSubscriberInteraction : public ::testing::TestWithParam<std::tuple<Transport, float>>
 {
 public:
-    const uint16_t AGENT_PORT = 2018;
+    const char* AGENT_PORT = "2018";
 
     PublisherSubscriberInteraction()
     : transport_(std::get<0>(GetParam()))
     , publisher_(std::get<1>(GetParam()), 8)
     , subscriber_(std::get<1>(GetParam()), 8)
     {
-        init_agent(AGENT_PORT);
+        init_agent(std::stoi(AGENT_PORT));
     }
 
     ~PublisherSubscriberInteraction()
@@ -46,11 +51,18 @@ public:
     {
         switch(transport_)
         {
-            case UDP_TRANSPORT:
+            case Transport::UDP_IPV4_TRANSPORT:
                 agent_.reset(new eprosima::uxr::UDPv4Agent(port, eprosima::uxr::Middleware::Kind::FAST));
                 break;
-            case TCP_TRANSPORT:
-                agent_.reset(new eprosima::uxr::TCPv4Agent(port, eprosima::uxr::Middleware::Kind::FAST));
+            case Transport::UDP_IPV6_TRANSPORT:
+                // agent_.reset(new eprosima::uxr::UDPv6Agent(port, eprosima::uxr::Middleware::Kind::FAST));
+                // break;
+            case Transport::TCP_IPV4_TRANSPORT:
+                // agent_.reset(new eprosima::uxr::TCPv4Agent(port, eprosima::uxr::Middleware::Kind::FAST));
+                // break;
+            case Transport::TCP_IPV6_TRANSPORT:
+        //         agent_.reset(new eprosima::uxr::v4Agent(port, eprosima::uxr::Middleware::Kind::FAST));
+        //         break;
                 break;
         }
         agent_->run();
@@ -67,8 +79,8 @@ public:
     }
 
 protected:
-    int transport_;
-    std::unique_ptr<eprosima::uxr::Server> agent_;
+    Transport transport_;
+    std::unique_ptr<eprosima::uxr::UDPv4Agent> agent_;
     Client publisher_;
     Client subscriber_;
     static const std::string SMALL_MESSAGE;
@@ -77,7 +89,7 @@ protected:
 const std::string PublisherSubscriberInteraction::SMALL_MESSAGE("Hello DDS world!");
 
 INSTANTIATE_TEST_CASE_P(TransportAndLost, PublisherSubscriberInteraction,
-        ::testing::Combine(::testing::Values(UDP_TRANSPORT, TCP_TRANSPORT), ::testing::Values(0.0f, 0.05f, 0.1f)));
+        ::testing::Combine(::testing::Values(Transport::UDP_IPV4_TRANSPORT, Transport::UDP_IPV6_TRANSPORT, Transport::TCP_IPV4_TRANSPORT, Transport::TCP_IPV6_TRANSPORT), ::testing::Values(0.0f, 0.05f, 0.1f)));
 
 TEST_P(PublisherSubscriberInteraction, PubSub1TopicsBestEffort)
 {

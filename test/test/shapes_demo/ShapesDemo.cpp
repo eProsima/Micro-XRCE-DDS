@@ -33,21 +33,21 @@
 #include <shapesdemo/config.hpp>
 
 #include <uxr/agent/Agent.hpp>
-#if defined(PLATFORM_NAME_LINUX)
-#include <uxr/agent/transport/udp/UDPServerLinux.hpp>
-#include <uxr/agent/transport/tcp/TCPServerLinux.hpp>
-#elif defined(PLATFORM_NAME_WINDOWS)
-#include <uxr/agent/transport/udp/UDPServerWindows.hpp>
-#include <uxr/agent/transport/tcp/TCPServerWindows.hpp>
+#ifdef _WIN32
+#include <uxr/agent/transport/udp/UDPv4AgentWindows.hpp>
+#include <uxr/agent/transport/udp/UDPv6AgentWindows.hpp>
+#include <uxr/agent/transport/tcp/TCPv4AgentWindows.hpp>
+#include <uxr/agent/transport/tcp/TCPv6AgentWindows.hpp>
+#else
+#include <uxr/agent/transport/udp/UDPv4AgentLinux.hpp>
+#include <uxr/agent/transport/udp/UDPv6AgentLinux.hpp>
+#include <uxr/agent/transport/tcp/TCPv4AgentLinux.hpp>
+#include <uxr/agent/transport/tcp/TCPv6AgentLinux.hpp>
 #endif
-
 #include <gtest/gtest.h>
 #include <cstdlib>
 
-#define UDP_TRANSPORT 1
-#define TCP_TRANSPORT 2
-
-class ShapesDemoTest : public ::testing::TestWithParam<int>
+class ShapesDemoTest : public ::testing::TestWithParam<Transport>
 {
 public:
     const uint16_t AGENT_PORT = 2018;
@@ -63,7 +63,7 @@ public:
     {
         std::string echo = "echo '";
         std::string executable = UTEST_SHAPESDEMO_COMMAND;
-        std::string args = ((UDP_TRANSPORT == transport_) ? "--udp" : "--tcp") + std::string(" 127.0.0.1 ") + std::to_string(AGENT_PORT);
+        std::string args = ((Transport::UDP_IPV4_TRANSPORT == transport_) ? "--udp" : "--tcp") + std::string(" 127.0.0.1 ") + std::to_string(AGENT_PORT);
 
         std::string commands = "";
         for(std::vector<std::string>::iterator it = commands_.begin() ; it != commands_.end(); ++it)
@@ -97,7 +97,7 @@ protected:
         return agent;
     }
 
-    int transport_;
+    Transport transport_;
     std::unique_ptr<eprosima::uxr::Server> agent_;
     std::vector<std::string> commands_;
 };

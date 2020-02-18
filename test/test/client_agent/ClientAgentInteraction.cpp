@@ -1,27 +1,32 @@
 #include <gtest/gtest.h>
 
-#include <Client.hpp>
-#if defined(PLATFORM_NAME_LINUX)
-#include <uxr/agent/transport/udp/UDPServerLinux.hpp>
-#include <uxr/agent/transport/tcp/TCPServerLinux.hpp>
-#elif defined(PLATFORM_NAME_WINDOWS)
-#include <uxr/agent/transport/udp/UDPServerWindows.hpp>
-#include <uxr/agent/transport/tcp/TCPServerWindows.hpp>
+#ifdef _WIN32
+#include <uxr/agent/transport/udp/UDPv4AgentWindows.hpp>
+#include <uxr/agent/transport/udp/UDPv6AgentWindows.hpp>
+#include <uxr/agent/transport/tcp/TCPv4AgentWindows.hpp>
+#include <uxr/agent/transport/tcp/TCPv6AgentWindows.hpp>
+#else
+#include <uxr/agent/transport/udp/UDPv4AgentLinux.hpp>
+#include <uxr/agent/transport/udp/UDPv6AgentLinux.hpp>
+#include <uxr/agent/transport/tcp/TCPv4AgentLinux.hpp>
+#include <uxr/agent/transport/tcp/TCPv6AgentLinux.hpp>
 #endif
+
+#include <Client.hpp>
 
 #include <thread>
 
-class ClientAgentInteraction : public ::testing::TestWithParam<int>
+class ClientAgentInteraction : public ::testing::TestWithParam<Transport>
 {
 public:
-    const uint16_t AGENT_PORT = 2018;
+    const char* AGENT_PORT = "2018";
     const float LOST = 0.1f;
 
     ClientAgentInteraction()
     : transport_(GetParam())
     , client_(0.0f, 8)
     {
-        init_agent(AGENT_PORT);
+        init_agent(std::stoi(AGENT_PORT));
     }
 
     ~ClientAgentInteraction()
@@ -42,24 +47,31 @@ public:
     {
         switch(transport_)
         {
-            case UDP_TRANSPORT:
+            case Transport::UDP_IPV4_TRANSPORT:
                 agent_.reset(new eprosima::uxr::UDPv4Agent(port, eprosima::uxr::Middleware::Kind::FAST));
                 break;
-            case TCP_TRANSPORT:
-                agent_.reset(new eprosima::uxr::TCPv4Agent(port, eprosima::uxr::Middleware::Kind::FAST));
-                break;
+            case Transport::UDP_IPV6_TRANSPORT:
+                // agent_.reset(new eprosima::uxr::UDPv6Agent(port, eprosima::uxr::Middleware::Kind::FAST));
+                // break;
+            case Transport::TCP_IPV4_TRANSPORT:
+                // agent_.reset(new eprosima::uxr::TCPv4Agent(port, eprosima::uxr::Middleware::Kind::FAST));
+                // break;
+            case Transport::TCP_IPV6_TRANSPORT:
+                //agent_.reset(new eprosima::uxr::TCPv6Agent(port, eprosima::uxr::Middleware::Kind::FAST));
+                break; 
         }
         agent_->run();
         agent_->set_verbose_level(6);
     }
 
 protected:
-    int transport_;
-    std::unique_ptr<eprosima::uxr::Server> agent_;
+    Transport transport_;
+    std::unique_ptr<eprosima::uxr::UDPv4Agent> agent_;
     Client client_;
 };
 
-INSTANTIATE_TEST_CASE_P(Transport, ClientAgentInteraction, ::testing::Values(UDP_TRANSPORT, TCP_TRANSPORT), ::testing::PrintToStringParamName());
+INSTANTIATE_TEST_CASE_P(Transports, ClientAgentInteraction, ::testing::Values(Transport::UDP_IPV4_TRANSPORT, Transport::UDP_IPV6_TRANSPORT, Transport::TCP_IPV4_TRANSPORT, Transport::TCP_IPV6_TRANSPORT),
+    ::testing::PrintToStringParamName());
 
 TEST_P(ClientAgentInteraction, InitCloseSession)
 {
