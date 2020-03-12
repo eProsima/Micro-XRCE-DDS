@@ -75,105 +75,99 @@ macro(check_gmock)
 endmacro()
 
 macro(add_gtest test)
-    # Separate arguments
-    set(GTEST_SOURCE_FILES "")
-    set(GTEST_ENVIRONMENTS "")
-    set(NEXT_ENV FALSE)
-    foreach(arg ${ARGN})
-        if(NOT NEXT_ENV)
-            if("${arg}" STREQUAL "ENVIRONMENT")
-                set(NEXT_ENV TRUE)
-            else()
-                set(GTEST_SOURCE_FILES ${GTEST_SOURCE_FILES} ${arg})
-            endif()
-        elseif(NEXT_ENV)
-            set(GTEST_ENVIRONMENTS ${GTEST_ENVIRONMENTS} ${arg})
-            set(NEXT_ENV FALSE)
-        endif()
-    endforeach()
+    # Parse arguments
+    set(multiValueArgs SOURCES ENVIRONMENTS DEPENDENCIES)
+    cmake_parse_arguments(GTEST "" "" "${multiValueArgs}" ${ARGN})
 
     if(GTEST_INDIVIDUAL)
-        foreach(GTEST_SOURCE_FILE ${GTEST_SOURCE_FILES})
+        if(WIN32)
+            set(WIN_PATH "$ENV{PATH}")
+            get_target_property(LINK_LIBRARIES_ ${test} LINK_LIBRARIES)
+            if(NOT "${LINK_LIBRARIES_}" STREQUAL "LINK_LIBRARIES_-NOTFOUND")
+                foreach(LIBRARY_LINKED ${LINK_LIBRARIES_})
+                    if(TARGET ${LIBRARY_LINKED})
+                        set(WIN_PATH "$<TARGET_FILE_DIR:${LIBRARY_LINKED}>;${WIN_PATH}")
+                    endif()
+                endforeach()
+            endif()
+            foreach(DEP ${GTEST_DEPENDENCIES})
+                set(WIN_PATH "$<TARGET_FILE_DIR:${DEP}>;${WIN_PATH}")
+            endforeach()
+            string(REPLACE ";" "\\;" WIN_PATH "${WIN_PATH}")
+        endif()
+
+        foreach(GTEST_SOURCE_FILE ${GTEST_SOURCES})
             file(STRINGS ${GTEST_SOURCE_FILE} GTEST_NAMES REGEX ^TEST)
+
+            # Search for google value-parameterized tests instantiations
+            unset(GTEST_INSTANTATIONS) # list of instantiations names
+            file(STRINGS ${GTEST_SOURCE_FILE} GTEST_INSTANTIATION_NAMES REGEX ^INSTANTIATE_TEST_CASE_P)
+            foreach(GTEST_INSTANTIATION_NAME ${GTEST_INSTANTIATION_NAMES})
+                # Search and append all instantiation names
+                string(REGEX REPLACE ["\) \(,"] ";" GTEST_INSTANTIATION_NAME ${GTEST_INSTANTIATION_NAME})
+                list(GET GTEST_INSTANTIATION_NAME 1 GTEST_INSTANTIATION_NAME)
+                list(APPEND GTEST_INSTANTATIONS ${GTEST_INSTANTIATION_NAME})
+            endforeach()
+
             foreach(GTEST_NAME ${GTEST_NAMES})
+                unset(GTEST_TEMPLATE_TEST) # flag if current test is a value-parametrized one
+                string(REGEX MATCH ^TEST_P GTEST_TEMPLATE_TEST ${GTEST_NAME})
                 string(REGEX REPLACE ["\) \(,"] ";" GTEST_NAME ${GTEST_NAME})
+
                 list(GET GTEST_NAME 1 GTEST_GROUP_NAME)
                 list(GET GTEST_NAME 3 GTEST_NAME)
-                add_test(NAME ${GTEST_GROUP_NAME}.${GTEST_NAME}
-                    COMMAND ${test}
-                    --gtest_filter=${GTEST_GROUP_NAME}.${GTEST_NAME})
-                # Add environment
-                if(WIN32)
-                    string(REPLACE ";" "\\;" WIN_PATH "$ENV{PATH}")
-                    set_tests_properties(${GTEST_GROUP_NAME}.${GTEST_NAME} PROPERTIES ENVIRONMENT
-                        "PATH=$<TARGET_FILE_DIR:${PROJECT_NAME}>\\;$<TARGET_FILE_DIR:fastcdr>\\;${WIN_PATH}")
+                if (GTEST_INSTANTATIONS AND GTEST_TEMPLATE_TEST)
+                    # In case is a value-paremetrized test and there are instantiations generate test calls per instantiation
+                    # Note the /*. This test will execute all the parameters combinations
+                    foreach(GTEST_INSTATATION_NAME ${GTEST_INSTANTATIONS})
+                        add_test(NAME ${GTEST_INSTATATION_NAME}.${GTEST_GROUP_NAME}.${GTEST_NAME}
+                            COMMAND ${test}
+                            --gtest_filter=${GTEST_INSTATATION_NAME}/${GTEST_GROUP_NAME}.${GTEST_NAME}/*)
+                        # Add environment
+                        if(WIN32)
+                            set_property(TEST ${GTEST_INSTATATION_NAME}.${GTEST_GROUP_NAME}.${GTEST_NAME} APPEND PROPERTY ENVIRONMENT "PATH=${WIN_PATH}")
+                        endif()
+                        foreach(property ${GTEST_ENVIRONMENTS})
+                            set_property(TEST ${GTEST_INSTATATION_NAME}.${GTEST_GROUP_NAME}.${GTEST_NAME} APPEND PROPERTY ENVIRONMENT "${property}")
+                        endforeach()
+                    endforeach()
+
+                else()
+                    add_test(NAME ${GTEST_GROUP_NAME}.${GTEST_NAME}
+                        COMMAND ${test}
+                        --gtest_filter=${GTEST_GROUP_NAME}.${GTEST_NAME})
+                    # Add environment
+                    if(WIN32)
+                        set_property(TEST ${GTEST_GROUP_NAME}.${GTEST_NAME} APPEND PROPERTY ENVIRONMENT "PATH=${WIN_PATH}")
+                    endif()
+
+                    foreach(property ${GTEST_ENVIRONMENTS})
+                        set_property(TEST ${GTEST_GROUP_NAME}.${GTEST_NAME} APPEND PROPERTY ENVIRONMENT "${property}")
+                    endforeach()
                 endif()
-                foreach(property ${GTEST_ENVIRONMENTS})
-                    set_property(TEST ${GTEST_GROUP_NAME}.${GTEST_NAME} APPEND PROPERTY ENVIRONMENT "${property}")
-                endforeach()
             endforeach()
         endforeach()
     else()
         add_test(NAME ${test} COMMAND ${test})
+
         # Add environment
         if(WIN32)
-            string(REPLACE ";" "\\;" WIN_PATH "$ENV{PATH}")
-            set_tests_properties(${test} PROPERTIES ENVIRONMENT
-                "PATH=$<TARGET_FILE_DIR:${PROJECT_NAME}>\\;$<TARGET_FILE_DIR:fastcdr>\\;${WIN_PATH}")
-        endif()
-        foreach(property ${GTEST_ENVIRONMENTS})
-            set_property(TEST ${test} APPEND PROPERTY ENVIRONMENT "${property}")
-        endforeach()
-    endif()
-endmacro()
-
-macro(add_blackbox_gtest test memorymode)
-    # Separate arguments
-    set(GTEST_SOURCE_FILES "")
-    set(GTEST_ENVIRONMENTS "")
-    set(NEXT_ENV FALSE)
-    foreach(arg ${ARGN})
-        if(NOT NEXT_ENV)
-            if("${arg}" STREQUAL "ENVIRONMENT")
-                set(NEXT_ENV TRUE)
-            else()
-                set(GTEST_SOURCE_FILES ${GTEST_SOURCE_FILES} ${arg})
+            set(WIN_PATH "$ENV{PATH}")
+            get_target_property(LINK_LIBRARIES_ ${test} LINK_LIBRARIES)
+            if(NOT "${LINK_LIBRARIES_}" STREQUAL "LINK_LIBRARIES_-NOTFOUND")
+                foreach(LIBRARY_LINKED ${LINK_LIBRARIES_})
+                    if(TARGET ${LIBRARY_LINKED})
+                        set(WIN_PATH "$<TARGET_FILE_DIR:${LIBRARY_LINKED}>;${WIN_PATH}")
+                    endif()
+                endforeach()
             endif()
-        elseif(NEXT_ENV)
-            set(GTEST_ENVIRONMENTS ${GTEST_ENVIRONMENTS} ${arg})
-            set(NEXT_ENV FALSE)
-        endif()
-    endforeach()
-
-    if(GTEST_INDIVIDUAL)
-        foreach(GTEST_SOURCE_FILE ${GTEST_SOURCE_FILES})
-            file(STRINGS ${GTEST_SOURCE_FILE} GTEST_NAMES REGEX ^BLACKBOXTEST)
-            foreach(GTEST_NAME ${GTEST_NAMES})
-                string(REGEX REPLACE ["\) \(,"] ";" GTEST_NAME ${GTEST_NAME})
-                list(GET GTEST_NAME 1 GTEST_GROUP_NAME)
-                list(GET GTEST_NAME 3 GTEST_NAME)
-                add_test(NAME ${GTEST_GROUP_NAME}_${memorymode}.${GTEST_NAME}
-                    COMMAND ${test}
-                    --gtest_filter=${GTEST_GROUP_NAME}_${memorymode}.${GTEST_NAME})
-                # Add environment
-                if(WIN32)
-                    string(REPLACE ";" "\\;" WIN_PATH "$ENV{PATH}")
-                    set_tests_properties(${GTEST_GROUP_NAME}_${memorymode}.${GTEST_NAME} PROPERTIES ENVIRONMENT
-                        "PATH=$<TARGET_FILE_DIR:${PROJECT_NAME}>\\;$<TARGET_FILE_DIR:fastcdr>\\;${WIN_PATH}")
-                endif()
-                foreach(property ${GTEST_ENVIRONMENTS})
-                    set_property(TEST ${GTEST_GROUP_NAME}_${memorymode}.${GTEST_NAME} APPEND PROPERTY ENVIRONMENT "${property}")
-                endforeach()
+            foreach(DEP ${GTEST_DEPENDENCIES})
+                set(WIN_PATH "$<TARGET_FILE_DIR:${DEP}>;${WIN_PATH}")
             endforeach()
-        endforeach()
-    else()
-        add_test(NAME ${test} COMMAND ${test})
-        # Add environment
-        if(WIN32)
-            string(REPLACE ";" "\\;" WIN_PATH "$ENV{PATH}")
-            set_tests_properties(${test} PROPERTIES ENVIRONMENT
-                "PATH=$<TARGET_FILE_DIR:${PROJECT_NAME}>\\;$<TARGET_FILE_DIR:fastcdr>\\;${WIN_PATH}")
+            string(REPLACE ";" "\\;" WIN_PATH "${WIN_PATH}")
+            set_property(TEST ${test} APPEND PROPERTY ENVIRONMENT "PATH=${WIN_PATH}")
         endif()
+
         foreach(property ${GTEST_ENVIRONMENTS})
             set_property(TEST ${test} APPEND PROPERTY ENVIRONMENT "${property}")
         endforeach()
