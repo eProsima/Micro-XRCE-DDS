@@ -112,10 +112,9 @@ if(UXRCE_ENABLE_CLIENT)
             -DUCLIENT_BUILD_EXAMPLES:BOOL=${UXRCE_BUILD_EXAMPLES}
             -DUCLIENT_PIC:BOOL=ON
             -DUCLIENT_BUILD_TESTS:BOOL=${UXRCE_BUILD_TESTS}
+            -DUCLIENT_ISOLATED_INSTALL:BOOL=OFF
             -DGTEST_INDIVIDUAL:BOOL=ON
         )
-    ExternalProject_Get_Property(client SOURCE_DIR)
-    set(_client_source_dir ${SOURCE_DIR})
     list(APPEND _deps client)
 endif()
 
@@ -149,12 +148,11 @@ if(UXRCE_ENABLE_AGENT)
             -DLIB_INSTALL_DIR:PATH=${LIB_INSTALL_DIR}
             -DDATA_INSTALL_DIR:PATH=${DATA_INSTALL_DIR}
             -DUAGENT_BUILD_TESTS:BOOL=${UXRCE_BUILD_TESTS}
+            -DUAGENT_ISOLATED_INSTALL:BOOL=OFF
             -DGTEST_INDIVIDUAL:BOOL=ON
         DEPENDS
             client
         )
-    ExternalProject_Get_Property(agent SOURCE_DIR)
-    set(_agent_source_dir ${SOURCE_DIR})
     list(APPEND _deps agent)
 endif()
 
@@ -229,8 +227,6 @@ if(UXRCE_BUILD_TESTS)
             -DCMAKE_PREFIX_PATH:PATH=${PROJECT_BINARY_DIR}/temp_install
             -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
             -DGTEST_INDIVIDUAL:BOOL=ON
-            -DUCLIENT_SOURCE_DIR:PATH=${_client_source_dir}
-            -DUAGENT_SOURCE_DIR:PATH=${_agent_source_dir}
             -DGTEST_ROOT:PATH=${PROJECT_BINARY_DIR}/temp_install/googletest
             -DGMOCK_ROOT:PATH=${PROJECT_BINARY_DIR}/temp_install/googletest
         DEPENDS

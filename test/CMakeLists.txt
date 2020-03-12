@@ -18,8 +18,6 @@ cmake_host_system_information(RESULT HOSTNAME_SUFFIX QUERY HOSTNAME)
 
 project(microxrcedds_itests LANGUAGES C CXX)
 
-set(UCLIENT_SOURCE_DIR . CACHE PATH "Client source dir.")
-set(UAGENT_SOURCE_DIR . CACHE PATH "Agent source dir.")
 set(GTEST_ROOT . CACHE PATH "googletest root.")
 set(GMOCK_ROOT . CACHE PATH "googlemock root")
 
