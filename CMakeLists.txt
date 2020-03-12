@@ -205,8 +205,6 @@ if(NOT GTest_FOUND OR NOT GMock_FOUND)
         INSTALL_COMMAND
             ""
         )
-    set(GTEST_ROOT ${PROJECT_BINARY_DIR}/temp_install/googletest CACHE PATH "" FORCE)
-    set(GMOCK_ROOT ${PROJECT_BINARY_DIR}/temp_install/googletest CACHE PATH "" FORCE)
     list(APPEND _deps googletest)
 endif()
 
@@ -233,6 +231,8 @@ if(UXRCE_BUILD_TESTS)
             -DGTEST_INDIVIDUAL:BOOL=ON
             -DUCLIENT_SOURCE_DIR:PATH=${_client_source_dir}
             -DUAGENT_SOURCE_DIR:PATH=${_agent_source_dir}
+            -DGTEST_ROOT:PATH=${PROJECT_BINARY_DIR}/temp_install/googletest
+            -DGMOCK_ROOT:PATH=${PROJECT_BINARY_DIR}/temp_install/googletest
         DEPENDS
             ${_deps}
         )
