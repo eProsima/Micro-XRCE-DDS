@@ -116,6 +116,7 @@ if(UXRCE_ENABLE_CLIENT)
         )
     ExternalProject_Get_Property(client SOURCE_DIR)
     set(_client_source_dir ${SOURCE_DIR})
+    list(APPEND _deps client)
 endif()
 
 if(UXRCE_ENABLE_AGENT)
@@ -154,6 +155,7 @@ if(UXRCE_ENABLE_AGENT)
         )
     ExternalProject_Get_Property(agent SOURCE_DIR)
     set(_agent_source_dir ${SOURCE_DIR})
+    list(APPEND _deps agent)
 endif()
 
 if(UXRCE_ENABLE_GEN)
@@ -177,6 +179,35 @@ if(UXRCE_ENABLE_GEN)
             COMMAND ${CMAKE_COMMAND} -E make_directory <INSTALL_DIR>/share/microxrcedds
             COMMAND ${CMAKE_COMMAND} -E copy <SOURCE_DIR>/share/microxrcedds/microxrceddsgen.jar <INSTALL_DIR>/share/microxrcedds/
         )
+    list(APPEND _deps gen)
+endif()
+
+find_package(GTest QUIET)
+find_package(GMock QUIET)
+if(NOT GTest_FOUND OR NOT GMock_FOUND)
+    unset(GTEST_ROOT CACHE)
+    unset(GMOCK_ROOT CACHE)
+    ExternalProject_Add(googletest
+        GIT_REPOSITORY
+            https://github.com/google/googletest.git
+        GIT_TAG
+            2fe3bd994b3189899d93f1d5a881e725e046fdc2
+        PREFIX
+            ${PROJECT_BINARY_DIR}/googletest
+        INSTALL_DIR
+            ${PROJECT_BINARY_DIR}/temp_install/googletest
+        CMAKE_ARGS
+            -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>
+            $<$<PLATFORM_ID:Windows>:-Dgtest_force_shared_crt:BOOL=ON>
+        BUILD_COMMAND
+            COMMAND ${CMAKE_COMMAND} --build <BINARY_DIR> --config Release --target install
+            COMMAND ${CMAKE_COMMAND} --build <BINARY_DIR> --config Debug --target install
+        INSTALL_COMMAND
+            ""
+        )
+    set(GTEST_ROOT ${PROJECT_BINARY_DIR}/temp_install/googletest CACHE PATH "" FORCE)
+    set(GMOCK_ROOT ${PROJECT_BINARY_DIR}/temp_install/googletest CACHE PATH "" FORCE)
+    list(APPEND _deps googletest)
 endif()
 
 if(UXRCE_BUILD_TESTS)
@@ -203,8 +234,7 @@ if(UXRCE_BUILD_TESTS)
             -DUCLIENT_SOURCE_DIR:PATH=${_client_source_dir}
             -DUAGENT_SOURCE_DIR:PATH=${_agent_source_dir}
         DEPENDS
-            client
-            agent
+            ${_deps}
         )
 endif()
 
