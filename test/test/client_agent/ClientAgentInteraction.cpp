@@ -34,7 +34,14 @@ public:
 
     void SetUp() override
     {
-        ASSERT_NO_FATAL_FAILURE(client_.init_transport(transport_, "127.0.0.1", AGENT_PORT));
+        if (transport_ == Transport::UDP_IPV4_TRANSPORT || transport_ == Transport::TCP_IPV4_TRANSPORT)
+        {
+            ASSERT_NO_FATAL_FAILURE(client_.init_transport(transport_, "127.0.0.1", AGENT_PORT));
+        }
+        else
+        {
+            ASSERT_NO_FATAL_FAILURE(client_.init_transport(transport_, "::1", AGENT_PORT));
+        }
     }
 
     void TearDown() override
@@ -48,30 +55,38 @@ public:
         switch(transport_)
         {
             case Transport::UDP_IPV4_TRANSPORT:
-                agent_.reset(new eprosima::uxr::UDPv4Agent(port, eprosima::uxr::Middleware::Kind::FAST));
+                agent_udp4_.reset(new eprosima::uxr::UDPv4Agent(port, eprosima::uxr::Middleware::Kind::FAST));
+                agent_udp4_->run();
+                agent_udp4_->set_verbose_level(6);
                 break;
             case Transport::UDP_IPV6_TRANSPORT:
-                // agent_.reset(new eprosima::uxr::UDPv6Agent(port, eprosima::uxr::Middleware::Kind::FAST));
-                // break;
+                agent_udp6_.reset(new eprosima::uxr::UDPv6Agent(port, eprosima::uxr::Middleware::Kind::FAST));
+                agent_udp6_->run();
+                agent_udp6_->set_verbose_level(6);
+                break;
             case Transport::TCP_IPV4_TRANSPORT:
-                // agent_.reset(new eprosima::uxr::TCPv4Agent(port, eprosima::uxr::Middleware::Kind::FAST));
-                // break;
+                agent_tcp4_.reset(new eprosima::uxr::TCPv4Agent(port, eprosima::uxr::Middleware::Kind::FAST));
+                agent_tcp4_->run();
+                agent_tcp4_->set_verbose_level(6);
+                break;
             case Transport::TCP_IPV6_TRANSPORT:
-                //agent_.reset(new eprosima::uxr::TCPv6Agent(port, eprosima::uxr::Middleware::Kind::FAST));
+                agent_tcp6_.reset(new eprosima::uxr::TCPv6Agent(port, eprosima::uxr::Middleware::Kind::FAST));
+                agent_tcp6_->run();
+                agent_tcp6_->set_verbose_level(6);
                 break; 
         }
-        agent_->run();
-        agent_->set_verbose_level(6);
     }
 
 protected:
     Transport transport_;
-    std::unique_ptr<eprosima::uxr::UDPv4Agent> agent_;
+    std::unique_ptr<eprosima::uxr::UDPv4Agent> agent_udp4_;
+    std::unique_ptr<eprosima::uxr::UDPv6Agent> agent_udp6_;
+    std::unique_ptr<eprosima::uxr::TCPv4Agent> agent_tcp4_;
+    std::unique_ptr<eprosima::uxr::TCPv6Agent> agent_tcp6_;
     Client client_;
 };
 
-INSTANTIATE_TEST_CASE_P(Transports, ClientAgentInteraction, ::testing::Values(Transport::UDP_IPV4_TRANSPORT, Transport::UDP_IPV6_TRANSPORT, Transport::TCP_IPV4_TRANSPORT, Transport::TCP_IPV6_TRANSPORT),
-    ::testing::PrintToStringParamName());
+INSTANTIATE_TEST_CASE_P(Transports, ClientAgentInteraction, ::testing::Values(Transport::UDP_IPV4_TRANSPORT, Transport::TCP_IPV4_TRANSPORT, Transport::UDP_IPV6_TRANSPORT, Transport::TCP_IPV6_TRANSPORT));
 
 TEST_P(ClientAgentInteraction, InitCloseSession)
 {

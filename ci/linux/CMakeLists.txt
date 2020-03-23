@@ -54,6 +54,6 @@ ExternalProject_Add(microxrcedds
         -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>
         -DCMAKE_PREFIX_PATH:PATH=${CMAKE_PREFIX_PATH}
         -DUXRCE_BUILD_CI_TESTS:BOOL=ON
-        -DUXRCE_ENABLE_GEN:BOOL=ON
+        -DUXRCE_ENABLE_GEN:BOOL=OFF # TODO (juliber): move test away from Gradle.
         -DGTEST_INDIVIDUAL:BOOL=ON
     )

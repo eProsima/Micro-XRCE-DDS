@@ -12,66 +12,112 @@
 #include <iostream>
 #include <thread>
 
+inline
+bool operator==(TransportLocator const & lhs, TransportLocator const & rhs)
+{
+    bool result = false;
+    if (lhs.format == rhs.format)
+    {
+        result = true;
+        switch (rhs.format)
+        {
+        case ADDRESS_FORMAT_MEDIUM:
+            for (size_t i = 0; i < sizeof(TransportLocatorMedium::address); ++i)
+            {
+                result &= lhs._.medium_locator.address[i] == rhs._.medium_locator.address[i];
+            }
+            result &= lhs._.medium_locator.locator_port == rhs._.medium_locator.locator_port;
+            break;
+        case ADDRESS_FORMAT_LARGE:
+            for (size_t i = 0; i < sizeof(TransportLocatorLarge::address); ++i)
+            {
+                result &= lhs._.large_locator.address[i] == rhs._.large_locator.address[i];
+            }
+            result &= lhs._.large_locator.locator_port == rhs._.large_locator.locator_port;
+            break;
+        default:
+            break;
+        }
+    }
+    return result;
+}
+
 class Discovery
 {
 public:
-    Discovery(Transport transport, const std::vector<uint16_t>& agent_ports)
-    : ip_("127.0.0.1")
-    , agent_ports_(agent_ports)
-    , transport_(transport)
-    {
-    }
+    Discovery(Transport transport, const std::vector<TransportLocator>& agent_locators)
+        : agent_locators_{agent_locators}
+        , transport_(transport)
+    {}
 
-    void unicast(const std::vector<uint16_t>& discovery_ports)
+    void unicast(const std::vector<TransportLocatorMedium>& discovery_locators)
     {
-        std::vector<uxrAgentAddress> agent_list;
-        for(uint16_t it : discovery_ports)
-        {
-            uxrAgentAddress address;
-            strcpy(address.ip, ip_.c_str());
-            address.port = it;
-            agent_list.emplace_back(address);
-        }
-
-        uxr_discovery_agents(1, 15000, on_agent_found, this, agent_list.data(), agent_list.size());
-        ASSERT_TRUE(agent_ports_.empty());
+        uxr_discovery_agents(1, 15000, on_agent_found, this, discovery_locators.data(), discovery_locators.size());
+        ASSERT_TRUE(agent_locators_.empty());
     }
 
     void multicast()
     {
         uxr_discovery_agents_default(1, 1000, on_agent_found, this);
-        ASSERT_TRUE(agent_ports_.empty());
+        ASSERT_TRUE(agent_locators_.empty());
     }
 
 private:
-    static void on_agent_found(const uxrAgentAddress* address, void* args)
+    static void on_agent_found(const TransportLocator* locator, void* args)
     {
-        static_cast<Discovery*>(args)->on_agent_found_member(address);
+        static_cast<Discovery*>(args)->on_agent_found_member(locator);
     }
 
-    void on_agent_found_member(const uxrAgentAddress* address)
+    void on_agent_found_member(const TransportLocator* locator)
     {
-        std::cout << "Agent found on port: " << address->port << std::endl;
 
-
-        std::vector<uint16_t>::iterator it = std::find(agent_ports_.begin(), agent_ports_.end(), address->port);
-
-        bool found = it != agent_ports_.end();
-        if(found)
+        auto it = std::find(agent_locators_.begin(), agent_locators_.end(), *locator);
+        if (it != agent_locators_.end())
         {
-            Client client(0.0f, 1);
-            std::cout << "Client connecting to " << address->port << std::endl;
-            client.init_transport(transport_, address->ip, std::to_string(address->port).data());
-            client.close_transport(transport_);
-
-            agent_ports_.erase(it);
+            switch (locator->format)
+            {
+                case ADDRESS_FORMAT_MEDIUM:
+                {
+                    char ip[16];
+                    uint16_t port;
+                    uxrIpProtocol ip_protocol;
+                    uxr_locator_to_ip(locator, ip, sizeof(ip), &port, &ip_protocol);
+                    std::cout
+                        << "Agent found on IP: " << ip
+                        << " and port: " << port
+                        << std::endl;
+                    std::cout << "Client connecting to Agent" << std::endl;
+                    Client client(0.0f, 1);
+                    client.init_transport(transport_, ip, std::to_string(port).data());
+                    client.close_transport(transport_);
+                    break;
+                }
+                case ADDRESS_FORMAT_LARGE:
+                {
+                    char ip[46];
+                    uint16_t port;
+                    uxrIpProtocol ip_protocol;
+                    uxr_locator_to_ip(locator, ip, sizeof(ip), &port, &ip_protocol);
+                    std::cout
+                        << "Agent found on IP: " << ip
+                        << " and port: " << port
+                        << std::endl;
+                    std::cout << "Client connecting to Agent..." << std::endl;
+                    Client client(0.0f, 1);
+                    client.init_transport(transport_, ip, std::to_string(port).data());
+                    client.close_transport(transport_);
+                    break;
+                }
+                default:
+                    break;
+            }
+            agent_locators_.erase(it);
         }
 
         //ASSERT_TRUE(found); //in multicast, it is possible to read agents out of the tests that will not be found.
     }
 
-    std::string ip_;
-    std::vector<uint16_t> agent_ports_;
+    std::vector<TransportLocator> agent_locators_;
     Transport transport_;
 };
 
