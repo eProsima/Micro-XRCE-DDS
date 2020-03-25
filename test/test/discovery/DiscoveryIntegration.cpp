@@ -31,10 +31,10 @@ public:
 
     ~DiscoveryIntegration() = default;
 
-    std::vector<TransportLocatorMedium> init_scenario(size_t number)
+    std::vector<TransportLocator> init_scenario(size_t number)
     {
         std::vector<TransportLocator> agent_locators{};
-        std::vector<TransportLocatorMedium> discovery_locators{};
+        std::vector<TransportLocator> discovery_locators{};
 
         if (Transport::UDP_IPV4_TRANSPORT == transport_ || Transport::TCP_IPV4_TRANSPORT == transport_)
         {
@@ -48,7 +48,7 @@ public:
                 current_agent_locator._.medium_locator.locator_port = AGENT_PORT + i;
                 agent_locators.push_back(current_agent_locator);
                 current_discovery_locator._.medium_locator.locator_port = DISCOVERY_PORT + i;
-                discovery_locators.push_back(current_discovery_locator._.medium_locator);
+                discovery_locators.push_back(current_discovery_locator);
                 create_agent(AGENT_PORT + i, DISCOVERY_PORT + i);
             }
         }
@@ -64,7 +64,7 @@ public:
                 current_agent_locator._.large_locator.locator_port = AGENT_PORT + i;
                 agent_locators.push_back(current_agent_locator);
                 current_discovery_locator._.medium_locator.locator_port = DISCOVERY_PORT + i;
-                discovery_locators.push_back(current_discovery_locator._.medium_locator);
+                discovery_locators.push_back(current_discovery_locator);
                 create_agent(AGENT_PORT + i, DISCOVERY_PORT + i);
             }
         }
@@ -133,7 +133,7 @@ INSTANTIATE_TEST_CASE_P(Transports, DiscoveryIntegration, ::testing::Values(Tran
 
 TEST_P(DiscoveryIntegration, DiscoveryUnicast)
 {
-    std::vector<TransportLocatorMedium> discovery_locators = init_scenario(4);
+    std::vector<TransportLocator> discovery_locators = init_scenario(4);
     discovery_->unicast(discovery_locators);
 }
 
