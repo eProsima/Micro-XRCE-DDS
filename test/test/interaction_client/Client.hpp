@@ -306,14 +306,15 @@ private:
         }
     }
 
-    static void on_topic_dispatcher(uxrSession* session_, uxrObjectId object_id, uint16_t request_id, uxrStreamId stream_id, struct ucdrBuffer* serialization, void* args)
+    static void on_topic_dispatcher(uxrSession* session_, uxrObjectId object_id, uint16_t request_id, uxrStreamId stream_id, struct ucdrBuffer* serialization, uint16_t length, void* args)
     {
-        static_cast<Client*>(args)->on_topic(session_, object_id, request_id, stream_id, serialization);
+        static_cast<Client*>(args)->on_topic(session_, object_id, request_id, stream_id, serialization, length);
     }
 
-    void on_topic(uxrSession* session, uxrObjectId object_id, uint16_t request_id, uxrStreamId stream_id, struct ucdrBuffer* serialization)
+    void on_topic(uxrSession* session, uxrObjectId object_id, uint16_t request_id, uxrStreamId stream_id, struct ucdrBuffer* serialization, uint16_t length)
     {
         (void) session;
+        (void) length;
 
         BigHelloWorld topic;
         BigHelloWorld_deserialize_topic(serialization, &topic);
