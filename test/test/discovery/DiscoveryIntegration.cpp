@@ -45,11 +45,13 @@ public:
 
             for (size_t i = 0; i < number; i++)
             {
-                current_agent_locator._.medium_locator.locator_port = AGENT_PORT + i;
+                uint16_t agent_port = uint16_t(AGENT_PORT + i);
+                uint16_t discovery_port = uint16_t(DISCOVERY_PORT + i);
+                current_agent_locator._.medium_locator.locator_port = agent_port;
                 agent_locators.push_back(current_agent_locator);
-                current_discovery_locator._.medium_locator.locator_port = DISCOVERY_PORT + i;
+                current_discovery_locator._.medium_locator.locator_port = discovery_port;
                 discovery_locators.push_back(current_discovery_locator);
-                create_agent(AGENT_PORT + i, DISCOVERY_PORT + i);
+                create_agent(agent_port, discovery_port);
             }
         }
         else
@@ -61,11 +63,13 @@ public:
 
             for (size_t i = 0; i < number; i++)
             {
-                current_agent_locator._.large_locator.locator_port = AGENT_PORT + i;
+                uint16_t agent_port = uint16_t(AGENT_PORT + i);
+                uint16_t discovery_port = uint16_t(DISCOVERY_PORT + i);
+                current_agent_locator._.large_locator.locator_port = agent_port;
                 agent_locators.push_back(current_agent_locator);
-                current_discovery_locator._.medium_locator.locator_port = DISCOVERY_PORT + i;
+                current_discovery_locator._.medium_locator.locator_port = discovery_port;
                 discovery_locators.push_back(current_discovery_locator);
-                create_agent(AGENT_PORT + i, DISCOVERY_PORT + i);
+                create_agent(agent_port, discovery_port);
             }
         }
 
