@@ -32,7 +32,7 @@ project(microxrcedds VERSION "1.2.0")
 set(_client_tag v1.1.5)
 set(_agent_tag v1.1.6)
 set(_gen_tag v1.0.2)
-set(_tests_tag v1.1.1)
+set(_tests_tag v1.1.2)
 
 ###############################################################################
 # Build options.
