@@ -61,22 +61,22 @@ public:
         {
             case Transport::UDP_IPV4_TRANSPORT:
                 agent_udp4_.reset(new eprosima::uxr::UDPv4Agent(port, eprosima::uxr::Middleware::Kind::FAST));
-                agent_udp4_->run();
+                agent_udp4_->start();
                 agent_udp4_->set_verbose_level(6);
                 break;
             case Transport::UDP_IPV6_TRANSPORT:
                 agent_udp6_.reset(new eprosima::uxr::UDPv6Agent(port, eprosima::uxr::Middleware::Kind::FAST));
-                agent_udp6_->run();
+                agent_udp6_->start();
                 agent_udp6_->set_verbose_level(6);
                 break;
             case Transport::TCP_IPV4_TRANSPORT:
                 agent_tcp4_.reset(new eprosima::uxr::TCPv4Agent(port, eprosima::uxr::Middleware::Kind::FAST));
-                agent_tcp4_->run();
+                agent_tcp4_->start();
                 agent_tcp4_->set_verbose_level(6);
                 break;
             case Transport::TCP_IPV6_TRANSPORT:
                 agent_tcp6_.reset(new eprosima::uxr::TCPv6Agent(port, eprosima::uxr::Middleware::Kind::FAST));
-                agent_tcp6_->run();
+                agent_tcp6_->start();
                 agent_tcp6_->set_verbose_level(6);
                 break;
         }

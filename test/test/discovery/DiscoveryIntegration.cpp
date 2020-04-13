@@ -86,7 +86,7 @@ public:
             {
                 std::unique_ptr<eprosima::uxr::UDPv4Agent> agent;
                 agent.reset(new eprosima::uxr::UDPv4Agent(port, eprosima::uxr::Middleware::Kind::FAST));
-                agent->run();
+                agent->start();
                 agent->set_verbose_level(6);
                 agent->enable_discovery(discovery_port);
                 agents_udp4_.push_back(std::move(agent));
@@ -96,7 +96,7 @@ public:
             {
                 std::unique_ptr<eprosima::uxr::UDPv6Agent> agent;
                 agent.reset(new eprosima::uxr::UDPv6Agent(port, eprosima::uxr::Middleware::Kind::FAST));
-                agent->run();
+                agent->start();
                 agent->set_verbose_level(6);
                 agent->enable_discovery(discovery_port);
                 agents_udp6_.push_back(std::move(agent));
@@ -106,7 +106,7 @@ public:
             {
                 std::unique_ptr<eprosima::uxr::TCPv4Agent> agent;
                 agent.reset(new eprosima::uxr::TCPv4Agent(port, eprosima::uxr::Middleware::Kind::FAST));
-                agent->run();
+                agent->start();
                 agent->set_verbose_level(6);
                 agent->enable_discovery(discovery_port);
                 agents_tcp4_.push_back(std::move(agent));
@@ -116,7 +116,7 @@ public:
             {
                 std::unique_ptr<eprosima::uxr::TCPv6Agent> agent;
                 agent.reset(new eprosima::uxr::TCPv6Agent(port, eprosima::uxr::Middleware::Kind::FAST));
-                agent->run();
+                agent->start();
                 agent->set_verbose_level(6);
                 agent->enable_discovery(discovery_port);
                 agents_tcp6_.push_back(std::move(agent));
