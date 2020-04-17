@@ -141,12 +141,14 @@ INSTANTIATE_TEST_CASE_P(Transports, DiscoveryIntegration, ::testing::Values(Tran
 TEST_P(DiscoveryIntegration, DiscoveryUnicast)
 {
     std::vector<TransportLocator> discovery_locators = init_scenario(4);
+    std::this_thread::sleep_for(std::chrono::seconds(1));
     discovery_->unicast(discovery_locators);
 }
 
 TEST_P(DiscoveryIntegration, DiscoveryMulticast)
 {
     init_scenario(1);
+    std::this_thread::sleep_for(std::chrono::seconds(1));
     discovery_->multicast();
 }
 
