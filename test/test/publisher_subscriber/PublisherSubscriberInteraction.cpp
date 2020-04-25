@@ -19,14 +19,14 @@
 class PublisherSubscriberInteraction : public ::testing::TestWithParam<std::tuple<Transport, float>>
 {
 public:
-    const char* AGENT_PORT = "2018";
+    const uint16_t AGENT_PORT = 2018 + uint16_t(std::get<0>(this->GetParam()));
 
     PublisherSubscriberInteraction()
     : transport_(std::get<0>(GetParam()))
     , publisher_(std::get<1>(GetParam()), 8)
     , subscriber_(std::get<1>(GetParam()), 8)
     {
-        init_agent(std::stoi(AGENT_PORT));
+        init_agent(AGENT_PORT);
     }
 
     ~PublisherSubscriberInteraction()
@@ -36,13 +36,13 @@ public:
     {
         if (transport_ == Transport::UDP_IPV4_TRANSPORT || transport_ == Transport::TCP_IPV4_TRANSPORT)
         {
-            ASSERT_NO_FATAL_FAILURE(publisher_.init_transport(transport_, "127.0.0.1", AGENT_PORT));
-            ASSERT_NO_FATAL_FAILURE(subscriber_.init_transport(transport_, "127.0.0.1", AGENT_PORT));
+            ASSERT_NO_FATAL_FAILURE(publisher_.init_transport(transport_, "127.0.0.1", std::to_string(AGENT_PORT).c_str()));
+            ASSERT_NO_FATAL_FAILURE(subscriber_.init_transport(transport_, "127.0.0.1", std::to_string(AGENT_PORT).c_str()));
         }
         else
         {
-            ASSERT_NO_FATAL_FAILURE(publisher_.init_transport(transport_, "::1", AGENT_PORT));
-            ASSERT_NO_FATAL_FAILURE(subscriber_.init_transport(transport_, "::1", AGENT_PORT));
+            ASSERT_NO_FATAL_FAILURE(publisher_.init_transport(transport_, "::1", std::to_string(AGENT_PORT).c_str()));
+            ASSERT_NO_FATAL_FAILURE(subscriber_.init_transport(transport_, "::1", std::to_string(AGENT_PORT).c_str()));
         }
 
         ASSERT_NO_FATAL_FAILURE(publisher_.create_entities_xml(1, 0x80, UXR_STATUS_OK, 0));

@@ -19,14 +19,14 @@
 class ClientAgentInteraction : public ::testing::TestWithParam<Transport>
 {
 public:
-    const char* AGENT_PORT = "2018";
+    const uint16_t AGENT_PORT = 2018 + uint16_t(this->GetParam());
     const float LOST = 0.1f;
 
     ClientAgentInteraction()
     : transport_(GetParam())
     , client_(0.0f, 8)
     {
-        init_agent(std::stoi(AGENT_PORT));
+        init_agent(AGENT_PORT);
     }
 
     ~ClientAgentInteraction()
@@ -36,11 +36,11 @@ public:
     {
         if (transport_ == Transport::UDP_IPV4_TRANSPORT || transport_ == Transport::TCP_IPV4_TRANSPORT)
         {
-            ASSERT_NO_FATAL_FAILURE(client_.init_transport(transport_, "127.0.0.1", AGENT_PORT));
+            ASSERT_NO_FATAL_FAILURE(client_.init_transport(transport_, "127.0.0.1", std::to_string(AGENT_PORT).c_str()));
         }
         else
         {
-            ASSERT_NO_FATAL_FAILURE(client_.init_transport(transport_, "::1", AGENT_PORT));
+            ASSERT_NO_FATAL_FAILURE(client_.init_transport(transport_, "::1", std::to_string(AGENT_PORT).c_str()));
         }
     }
 
