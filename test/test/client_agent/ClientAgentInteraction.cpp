@@ -25,15 +25,14 @@ public:
     ClientAgentInteraction()
     : transport_(GetParam())
     , client_(0.0f, 8)
-    {
-        init_agent(AGENT_PORT);
-    }
+    {}
 
     ~ClientAgentInteraction()
     {}
 
     void SetUp() override
     {
+        start_agent(AGENT_PORT);
         if (transport_ == Transport::UDP_IPV4_TRANSPORT || transport_ == Transport::TCP_IPV4_TRANSPORT)
         {
             ASSERT_NO_FATAL_FAILURE(client_.init_transport(transport_, "127.0.0.1", std::to_string(AGENT_PORT).c_str()));
@@ -47,32 +46,52 @@ public:
     void TearDown() override
     {
         ASSERT_NO_FATAL_FAILURE(client_.close_transport(transport_));
+        stop_agent(AGENT_PORT);
     }
 
     // TODO (#4334): Add serial tests.
-    void init_agent(uint16_t port)
+    void start_agent(uint16_t port)
     {
         switch(transport_)
         {
             case Transport::UDP_IPV4_TRANSPORT:
                 agent_udp4_.reset(new eprosima::uxr::UDPv4Agent(port, eprosima::uxr::Middleware::Kind::FAST));
-                agent_udp4_->start();
                 agent_udp4_->set_verbose_level(6);
+                ASSERT_TRUE(agent_udp4_->start());
                 break;
             case Transport::UDP_IPV6_TRANSPORT:
                 agent_udp6_.reset(new eprosima::uxr::UDPv6Agent(port, eprosima::uxr::Middleware::Kind::FAST));
-                agent_udp6_->start();
                 agent_udp6_->set_verbose_level(6);
+                ASSERT_TRUE(agent_udp6_->start());
                 break;
             case Transport::TCP_IPV4_TRANSPORT:
                 agent_tcp4_.reset(new eprosima::uxr::TCPv4Agent(port, eprosima::uxr::Middleware::Kind::FAST));
-                agent_tcp4_->start();
                 agent_tcp4_->set_verbose_level(6);
+                ASSERT_TRUE(agent_tcp4_->start());
                 break;
             case Transport::TCP_IPV6_TRANSPORT:
                 agent_tcp6_.reset(new eprosima::uxr::TCPv6Agent(port, eprosima::uxr::Middleware::Kind::FAST));
-                agent_tcp6_->start();
                 agent_tcp6_->set_verbose_level(6);
+                ASSERT_TRUE(agent_tcp6_->start());
+                break;
+        }
+    }
+
+    void stop_agent(uint16_t port)
+    {
+        switch(transport_)
+        {
+            case Transport::UDP_IPV4_TRANSPORT:
+                ASSERT_TRUE(agent_udp4_->stop());
+                break;
+            case Transport::UDP_IPV6_TRANSPORT:
+                ASSERT_TRUE(agent_udp6_->stop());
+                break;
+            case Transport::TCP_IPV4_TRANSPORT:
+                ASSERT_TRUE(agent_tcp4_->stop());
+                break;
+            case Transport::TCP_IPV6_TRANSPORT:
+                ASSERT_TRUE(agent_tcp6_->stop());
                 break; 
         }
     }
@@ -90,7 +109,11 @@ INSTANTIATE_TEST_CASE_P(Transports, ClientAgentInteraction, ::testing::Values(Tr
 
 TEST_P(ClientAgentInteraction, InitCloseSession)
 {
-    //Default behavior
+    for (int i = 0; i < 20; ++i)
+    {
+        TearDown();
+        SetUp();
+    }
 }
 
 TEST_P(ClientAgentInteraction, NewEntitiesCreationXMLBestEffort)
