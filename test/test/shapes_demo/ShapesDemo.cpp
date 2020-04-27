@@ -50,7 +50,7 @@
 class ShapesDemoTest : public ::testing::TestWithParam<Transport>
 {
 public:
-    const uint16_t AGENT_PORT = 2018;
+    const uint16_t AGENT_PORT = 2018 + ::testing::PrintToStringParamName();
     ShapesDemoTest()
         : transport_(GetParam())
         , agent_(init_agent(AGENT_PORT))

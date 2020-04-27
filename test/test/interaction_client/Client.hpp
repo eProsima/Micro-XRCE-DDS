@@ -243,7 +243,7 @@ public:
     void close_transport(Transport transport)
     {
         // Flash incomming messages.
-        uxr_run_session_time(&session_, 1000);
+        uxr_run_session_time(&session_, 100);
 
         bool deleted = uxr_delete_session(&session_);
 
