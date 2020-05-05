@@ -63,9 +63,10 @@ public:
     }
 
 private:
-    static void on_agent_found(const TransportLocator* locator, void* args)
+    static bool on_agent_found(const TransportLocator* locator, void* args)
     {
         static_cast<Discovery*>(args)->on_agent_found_member(locator);
+        return false;
     }
 
     void on_agent_found_member(const TransportLocator* locator)
