@@ -1,0 +1,123 @@
+#ifndef IN_TEST_ENTITIESINFO_HPP
+#define IN_TEST_ENTITIESINFO_HPP
+
+#include <cstdint>
+
+const char fast_participant_xml[] = "<dds>"
+                                        "<participant>"
+                                            "<rtps>"
+                                                "<name>default_xrce_participant</name>"
+                                            "</rtps>"
+                                        "</participant>"
+                                    "</dds>";
+
+const char fast_topic_xml[] = "<dds>"
+                                  "<topic>"
+                                      "<name>BigHelloWorldTopic_@HOSTNAME_SUFFIX@</name>"
+                                      "<dataType>BigHelloWorld</dataType>"
+                                  "</topic>"
+                              "</dds>";
+
+const char fast_publisher_xml[]  = "";
+
+const char fast_datawriter_xml[] = "<dds>"
+                                       "<data_writer>"
+                                           "<historyMemoryPolicy>PREALLOCATED_WITH_REALLOC</historyMemoryPolicy>"
+                                           "<topic>"
+                                               "<kind>NO_KEY</kind>"
+                                               "<name>BigHelloWorldTopic_@HOSTNAME_SUFFIX@</name>"
+                                               "<dataType>BigHelloWorld</dataType>"
+                                               "<historyQos>"
+                                                   "<kind>KEEP_LAST</kind>"
+                                                   "<depth>10</depth>"
+                                               "</historyQos>"
+                                           "</topic>"
+                                           "<qos>"
+                                               "<durability>"
+                                                   "<kind>TRANSIENT_LOCAL</kind>"
+                                               "</durability>"
+                                           "</qos>"
+                                       "</data_writer>"
+                                   "</dds>";
+
+const char fast_subscriber_xml[] = "";
+
+const char fast_datareader_xml[] = "<dds>"
+                                       "<data_reader>"
+                                           "<historyMemoryPolicy>PREALLOCATED_WITH_REALLOC</historyMemoryPolicy>"
+                                           "<topic>"
+                                               "<kind>NO_KEY</kind>"
+                                               "<name>BigHelloWorldTopic_@HOSTNAME_SUFFIX@</name>"
+                                               "<dataType>BigHelloWorld</dataType>"
+                                               "<historyQos>"
+                                                   "<kind>KEEP_LAST</kind>"
+                                                   "<depth>10</depth>"
+                                               "</historyQos>"
+                                           "</topic>"
+                                           "<qos>"
+                                               "<durability>"
+                                                   "<kind>TRANSIENT_LOCAL</kind>"
+                                               "</durability>"
+                                           "</qos>"
+                                       "</data_reader>"
+                                   "</dds>";
+
+
+enum class MiddlewareKind : uint8_t
+{
+    FAST,
+    CED
+};
+
+template<MiddlewareKind Kind>
+struct EntitiesInfo
+{
+    static constexpr const char* participant_ref = "";
+    static constexpr const char* participant_xml = "";
+    static constexpr const char* topic_ref = "";
+    static constexpr const char* topic_xml = "";
+    static constexpr const char* publisher_ref = "";
+    static constexpr const char* publisher_xml = "";
+    static constexpr const char* subscriber_ref = "";
+    static constexpr const char* subscriber_xml = "";
+    static constexpr const char* datawriter_ref = "";
+    static constexpr const char* datawriter_xml = "";
+    static constexpr const char* datareader_ref = "";
+    static constexpr const char* datareader_xml = "";
+};
+
+template<>
+struct EntitiesInfo<MiddlewareKind::FAST>
+{
+    static constexpr const char* participant_ref = "default_xrce_participant";
+    static constexpr const char* participant_xml = fast_participant_xml;
+    static constexpr const char* topic_ref = "bighelloworld_topic";
+    static constexpr const char* topic_xml = fast_topic_xml;
+    static constexpr const char* publisher_ref = "";
+    static constexpr const char* publisher_xml = "";
+    static constexpr const char* subscriber_ref = "";
+    static constexpr const char* subscriber_xml = "";
+    static constexpr const char* datawriter_ref = "bighelloworld_data_writer";
+    static constexpr const char* datawriter_xml = fast_datawriter_xml;
+    static constexpr const char* datareader_ref = "bighelloworld_data_reader";
+    static constexpr const char* datareader_xml = fast_datareader_xml;
+};
+
+template<>
+struct EntitiesInfo<MiddlewareKind::CED>
+{
+    static constexpr const char* participant_ref = "participant";
+    static constexpr const char* participant_xml = "participant";
+    static constexpr const char* topic_ref = "bighelloworld_topic";
+    static constexpr const char* topic_xml = "bighelloworld_topic";
+    static constexpr const char* publisher_ref = "";
+    static constexpr const char* publisher_xml = "";
+    static constexpr const char* subscriber_ref = "";
+    static constexpr const char* subscriber_xml = "";
+    static constexpr const char* datawriter_ref = "bighelloworld_topic";
+    static constexpr const char* datawriter_xml = "bighelloworld_topic";
+    static constexpr const char* datareader_ref = "bighelloworld_topic";
+    static constexpr const char* datareader_xml = "bighelloworld_topic";
+};
+
+#endif // IN_TEST_ENTITIESINFO_HPP
