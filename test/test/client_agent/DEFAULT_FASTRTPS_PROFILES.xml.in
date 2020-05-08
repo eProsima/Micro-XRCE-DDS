@@ -1,0 +1,48 @@
+<profiles>
+    <participant profile_name="default_xrce_participant">
+        <rtps>
+            <builtin>
+                <leaseDuration>INFINITE</leaseDuration>
+                <domainId>0</domainId>
+            </builtin>
+            <name>default_xrce_participant</name>
+        </rtps>
+    </participant>
+    <data_writer profile_name="bighelloworld_data_writer">
+        <topic>
+            <kind>WITH_KEY</kind>
+            <name>BigHelloWorld_@HOSTNAME_SUFFIX@</name>
+            <dataType>BigHelloWorld</dataType>
+            <historyQos>
+                <kind>KEEP_LAST</kind>
+                <depth>5</depth>
+            </historyQos>
+        </topic>
+        <qos>
+            <durability>
+                <kind>TRANSIENT_LOCAL</kind>
+            </durability>
+        </qos>
+    </data_writer>
+    <data_reader profile_name="bighelloworld_data_reader">
+        <topic>
+            <kind>WITH_KEY</kind>
+            <name>BigHelloWorld_@HOSTNAME_SUFFIX@</name>
+            <dataType>BigHelloWorld</dataType>
+            <historyQos>
+                <kind>KEEP_LAST</kind>
+                <depth>5</depth>
+            </historyQos>
+        </topic>
+        <qos>
+            <durability>
+                <kind>TRANSIENT_LOCAL</kind>
+            </durability>
+        </qos>
+    </data_reader>
+    <topic profile_name="bighelloworld_topic">
+        <kind>WITH_KEY</kind>
+        <name>BigHelloWorld_@HOSTNAME_SUFFIX@</name>
+        <dataType>BigHelloWorld</dataType>
+    </topic>
+</profiles>
