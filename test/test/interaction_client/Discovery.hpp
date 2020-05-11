@@ -52,7 +52,7 @@ public:
 
     void unicast(const std::vector<TransportLocator>& discovery_locators)
     {
-        uxr_discovery_agents(1, 30000, on_agent_found, this, discovery_locators.data(), discovery_locators.size());
+        uxr_discovery_agents(1, 2000, on_agent_found, this, discovery_locators.data(), discovery_locators.size());
         ASSERT_TRUE(agent_locators_.empty());
     }
 
