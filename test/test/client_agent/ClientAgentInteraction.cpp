@@ -29,8 +29,11 @@ public:
     {
         switch (std::get<1>(GetParam()))
         {
-        case MiddlewareKind::FAST:
-            middleware_ = eprosima::uxr::Middleware::Kind::FAST;
+        case MiddlewareKind::FASTDDS:
+            middleware_ = eprosima::uxr::Middleware::Kind::FASTDDS;
+            break;
+        case MiddlewareKind::FASTRTPS:
+            middleware_ = eprosima::uxr::Middleware::Kind::FASTRTPS;
             break;
         case MiddlewareKind::CED:
             middleware_ = eprosima::uxr::Middleware::Kind::CED;
@@ -130,8 +133,11 @@ TEST_P(ClientAgentInteraction, NewEntitiesCreationXMLBestEffort)
 {
     switch (std::get<1>(GetParam()))
     {
-    case MiddlewareKind::FAST:
-        ASSERT_NO_FATAL_FAILURE(client_.create_entities_xml<MiddlewareKind::FAST>(1, 0x01, UXR_STATUS_OK, 0));
+    case MiddlewareKind::FASTDDS:
+        ASSERT_NO_FATAL_FAILURE(client_.create_entities_xml<MiddlewareKind::FASTDDS>(1, 0x01, UXR_STATUS_OK, 0));
+        break;
+    case MiddlewareKind::FASTRTPS:
+        ASSERT_NO_FATAL_FAILURE(client_.create_entities_xml<MiddlewareKind::FASTRTPS>(1, 0x01, UXR_STATUS_OK, 0));
         break;
     case MiddlewareKind::CED:
         ASSERT_NO_FATAL_FAILURE(client_.create_entities_xml<MiddlewareKind::CED>(1, 0x01, UXR_STATUS_OK, 0));
@@ -143,8 +149,11 @@ TEST_P(ClientAgentInteraction, NewEntitiesCreationXMLReliable)
 {
     switch (std::get<1>(GetParam()))
     {
-    case MiddlewareKind::FAST:
-        ASSERT_NO_FATAL_FAILURE(client_.create_entities_xml<MiddlewareKind::FAST>(1, 0x80, UXR_STATUS_OK, 0));
+    case MiddlewareKind::FASTDDS:
+        ASSERT_NO_FATAL_FAILURE(client_.create_entities_xml<MiddlewareKind::FASTDDS>(1, 0x80, UXR_STATUS_OK, 0));
+        break;
+    case MiddlewareKind::FASTRTPS:
+        ASSERT_NO_FATAL_FAILURE(client_.create_entities_xml<MiddlewareKind::FASTRTPS>(1, 0x80, UXR_STATUS_OK, 0));
         break;
     case MiddlewareKind::CED:
         ASSERT_NO_FATAL_FAILURE(client_.create_entities_xml<MiddlewareKind::CED>(1, 0x80, UXR_STATUS_OK, 0));
@@ -156,8 +165,11 @@ TEST_P(ClientAgentInteraction, NewEntitiesCreationREFBestEffort)
 {
     switch (std::get<1>(GetParam()))
     {
-    case MiddlewareKind::FAST:
-        ASSERT_NO_FATAL_FAILURE(client_.create_entities_ref<MiddlewareKind::FAST>(1, 0x01, UXR_STATUS_OK, 0));
+    case MiddlewareKind::FASTDDS:
+        ASSERT_NO_FATAL_FAILURE(client_.create_entities_ref<MiddlewareKind::FASTDDS>(1, 0x01, UXR_STATUS_OK, 0));
+        break;
+    case MiddlewareKind::FASTRTPS:
+        ASSERT_NO_FATAL_FAILURE(client_.create_entities_ref<MiddlewareKind::FASTRTPS>(1, 0x01, UXR_STATUS_OK, 0));
         break;
     case MiddlewareKind::CED:
         ASSERT_NO_FATAL_FAILURE(client_.create_entities_ref<MiddlewareKind::CED>(1, 0x01, UXR_STATUS_OK, 0));
@@ -169,8 +181,11 @@ TEST_P(ClientAgentInteraction, NewEntitiesCreationREFReliable)
 {
     switch (std::get<1>(GetParam()))
     {
-    case MiddlewareKind::FAST:
-        ASSERT_NO_FATAL_FAILURE(client_.create_entities_ref<MiddlewareKind::FAST>(1, 0x80, UXR_STATUS_OK, 0));
+    case MiddlewareKind::FASTDDS:
+        ASSERT_NO_FATAL_FAILURE(client_.create_entities_ref<MiddlewareKind::FASTDDS>(1, 0x80, UXR_STATUS_OK, 0));
+        break;
+    case MiddlewareKind::FASTRTPS:
+        ASSERT_NO_FATAL_FAILURE(client_.create_entities_ref<MiddlewareKind::FASTRTPS>(1, 0x80, UXR_STATUS_OK, 0));
         break;
     case MiddlewareKind::CED:
         ASSERT_NO_FATAL_FAILURE(client_.create_entities_ref<MiddlewareKind::CED>(1, 0x80, UXR_STATUS_OK, 0));
@@ -182,9 +197,13 @@ TEST_P(ClientAgentInteraction, ExistantEntitiesCreationReuseXMLXMLReliable)
 {
     switch (std::get<1>(GetParam()))
     {
-    case MiddlewareKind::FAST:
-        ASSERT_NO_FATAL_FAILURE(client_.create_entities_xml<MiddlewareKind::FAST>(1, 0x80, UXR_STATUS_OK, 0));
-        ASSERT_NO_FATAL_FAILURE(client_.create_entities_xml<MiddlewareKind::FAST>(1, 0x80, UXR_STATUS_OK_MATCHED, UXR_REUSE));
+    case MiddlewareKind::FASTDDS:
+        ASSERT_NO_FATAL_FAILURE(client_.create_entities_xml<MiddlewareKind::FASTDDS>(1, 0x80, UXR_STATUS_OK, 0));
+        ASSERT_NO_FATAL_FAILURE(client_.create_entities_xml<MiddlewareKind::FASTDDS>(1, 0x80, UXR_STATUS_OK_MATCHED, UXR_REUSE));
+        break;
+    case MiddlewareKind::FASTRTPS:
+        ASSERT_NO_FATAL_FAILURE(client_.create_entities_xml<MiddlewareKind::FASTRTPS>(1, 0x80, UXR_STATUS_OK, 0));
+        ASSERT_NO_FATAL_FAILURE(client_.create_entities_xml<MiddlewareKind::FASTRTPS>(1, 0x80, UXR_STATUS_OK_MATCHED, UXR_REUSE));
         break;
     case MiddlewareKind::CED:
         ASSERT_NO_FATAL_FAILURE(client_.create_entities_xml<MiddlewareKind::CED>(1, 0x80, UXR_STATUS_OK, 0));
@@ -205,9 +224,13 @@ TEST_P(ClientAgentInteraction, ExistantEntitiesCreationReuseREFREFReliable)
 {
     switch (std::get<1>(GetParam()))
     {
-    case MiddlewareKind::FAST:
-        ASSERT_NO_FATAL_FAILURE(client_.create_entities_ref<MiddlewareKind::FAST>(1, 0x80, UXR_STATUS_OK, 0));
-        ASSERT_NO_FATAL_FAILURE(client_.create_entities_ref<MiddlewareKind::FAST>(1, 0x80, UXR_STATUS_OK_MATCHED, UXR_REUSE));
+    case MiddlewareKind::FASTDDS:
+        ASSERT_NO_FATAL_FAILURE(client_.create_entities_ref<MiddlewareKind::FASTDDS>(1, 0x80, UXR_STATUS_OK, 0));
+        ASSERT_NO_FATAL_FAILURE(client_.create_entities_ref<MiddlewareKind::FASTDDS>(1, 0x80, UXR_STATUS_OK_MATCHED, UXR_REUSE));
+        break;
+    case MiddlewareKind::FASTRTPS:
+        ASSERT_NO_FATAL_FAILURE(client_.create_entities_ref<MiddlewareKind::FASTRTPS>(1, 0x80, UXR_STATUS_OK, 0));
+        ASSERT_NO_FATAL_FAILURE(client_.create_entities_ref<MiddlewareKind::FASTRTPS>(1, 0x80, UXR_STATUS_OK_MATCHED, UXR_REUSE));
         break;
     case MiddlewareKind::CED:
         ASSERT_NO_FATAL_FAILURE(client_.create_entities_ref<MiddlewareKind::CED>(1, 0x80, UXR_STATUS_OK, 0));
@@ -220,9 +243,13 @@ TEST_P(ClientAgentInteraction, ExistantEntitiesCreationReplaceReliable)
 {
     switch (std::get<1>(GetParam()))
     {
-    case MiddlewareKind::FAST:
-        ASSERT_NO_FATAL_FAILURE(client_.create_entities_xml<MiddlewareKind::FAST>(1, 0x80, UXR_STATUS_OK, 0));
-        ASSERT_NO_FATAL_FAILURE(client_.create_entities_xml<MiddlewareKind::FAST>(1, 0x80, UXR_STATUS_OK, UXR_REPLACE));
+    case MiddlewareKind::FASTDDS:
+        ASSERT_NO_FATAL_FAILURE(client_.create_entities_xml<MiddlewareKind::FASTDDS>(1, 0x80, UXR_STATUS_OK, 0));
+        ASSERT_NO_FATAL_FAILURE(client_.create_entities_xml<MiddlewareKind::FASTDDS>(1, 0x80, UXR_STATUS_OK, UXR_REPLACE));
+        break;
+    case MiddlewareKind::FASTRTPS:
+        ASSERT_NO_FATAL_FAILURE(client_.create_entities_xml<MiddlewareKind::FASTRTPS>(1, 0x80, UXR_STATUS_OK, 0));
+        ASSERT_NO_FATAL_FAILURE(client_.create_entities_xml<MiddlewareKind::FASTRTPS>(1, 0x80, UXR_STATUS_OK, UXR_REPLACE));
         break;
     case MiddlewareKind::CED:
         ASSERT_NO_FATAL_FAILURE(client_.create_entities_xml<MiddlewareKind::CED>(1, 0x80, UXR_STATUS_OK, 0));
@@ -235,9 +262,13 @@ TEST_P(ClientAgentInteraction, ExistantEntitiesCreationNoReplaceReliable)
 {
     switch (std::get<1>(GetParam()))
     {
-    case MiddlewareKind::FAST:
-        ASSERT_NO_FATAL_FAILURE(client_.create_entities_xml<MiddlewareKind::FAST>(1, 0x80, UXR_STATUS_OK, 0));
-        ASSERT_NO_FATAL_FAILURE(client_.create_entities_xml<MiddlewareKind::FAST>(1, 0x80, UXR_STATUS_ERR_ALREADY_EXISTS, 0));
+    case MiddlewareKind::FASTDDS:
+        ASSERT_NO_FATAL_FAILURE(client_.create_entities_xml<MiddlewareKind::FASTDDS>(1, 0x80, UXR_STATUS_OK, 0));
+        ASSERT_NO_FATAL_FAILURE(client_.create_entities_xml<MiddlewareKind::FASTDDS>(1, 0x80, UXR_STATUS_ERR_ALREADY_EXISTS, 0));
+        break;
+    case MiddlewareKind::FASTRTPS:
+        ASSERT_NO_FATAL_FAILURE(client_.create_entities_xml<MiddlewareKind::FASTRTPS>(1, 0x80, UXR_STATUS_OK, 0));
+        ASSERT_NO_FATAL_FAILURE(client_.create_entities_xml<MiddlewareKind::FASTRTPS>(1, 0x80, UXR_STATUS_ERR_ALREADY_EXISTS, 0));
         break;
     case MiddlewareKind::CED:
         ASSERT_NO_FATAL_FAILURE(client_.create_entities_xml<MiddlewareKind::CED>(1, 0x80, UXR_STATUS_OK, 0));
@@ -250,9 +281,13 @@ TEST_P(ClientAgentInteraction, ExistantEntitiesCreationReplaceReuseReliable)
 {
     switch (std::get<1>(GetParam()))
     {
-    case MiddlewareKind::FAST:
-        ASSERT_NO_FATAL_FAILURE(client_.create_entities_xml<MiddlewareKind::FAST>(1, 0x80, UXR_STATUS_OK, 0));
-        ASSERT_NO_FATAL_FAILURE(client_.create_entities_xml<MiddlewareKind::FAST>(1, 0x80, UXR_STATUS_OK_MATCHED, UXR_REPLACE | UXR_REUSE));
+    case MiddlewareKind::FASTDDS:
+        ASSERT_NO_FATAL_FAILURE(client_.create_entities_xml<MiddlewareKind::FASTDDS>(1, 0x80, UXR_STATUS_OK, 0));
+        ASSERT_NO_FATAL_FAILURE(client_.create_entities_xml<MiddlewareKind::FASTDDS>(1, 0x80, UXR_STATUS_OK_MATCHED, UXR_REPLACE | UXR_REUSE));
+        break;
+    case MiddlewareKind::FASTRTPS:
+        ASSERT_NO_FATAL_FAILURE(client_.create_entities_xml<MiddlewareKind::FASTRTPS>(1, 0x80, UXR_STATUS_OK, 0));
+        ASSERT_NO_FATAL_FAILURE(client_.create_entities_xml<MiddlewareKind::FASTRTPS>(1, 0x80, UXR_STATUS_OK_MATCHED, UXR_REPLACE | UXR_REUSE));
         break;
     case MiddlewareKind::CED:
         ASSERT_NO_FATAL_FAILURE(client_.create_entities_xml<MiddlewareKind::CED>(1, 0x80, UXR_STATUS_OK, 0));
@@ -266,7 +301,7 @@ INSTANTIATE_TEST_CASE_P(
     ClientAgentInteraction,
     ::testing::Combine(
         ::testing::Values(Transport::UDP_IPV4_TRANSPORT, Transport::TCP_IPV4_TRANSPORT, Transport::UDP_IPV6_TRANSPORT, Transport::TCP_IPV6_TRANSPORT),
-        ::testing::Values(MiddlewareKind::FAST, MiddlewareKind::CED)));
+        ::testing::Values(MiddlewareKind::FASTDDS, MiddlewareKind::FASTRTPS, MiddlewareKind::CED)));
 
 int main(int args, char** argv)
 {
