@@ -29,8 +29,11 @@ public:
     {
         switch (std::get<1>(GetParam()))
         {
-        case MiddlewareKind::FAST:
-            middleware_ = eprosima::uxr::Middleware::Kind::FAST;
+        case MiddlewareKind::FASTDDS:
+            middleware_ = eprosima::uxr::Middleware::Kind::FASTDDS;
+            break;
+        case MiddlewareKind::FASTRTPS:
+            middleware_ = eprosima::uxr::Middleware::Kind::FASTRTPS;
             break;
         case MiddlewareKind::CED:
             middleware_ = eprosima::uxr::Middleware::Kind::CED;
@@ -57,9 +60,13 @@ public:
 
         switch (std::get<1>(GetParam()))
         {
-        case MiddlewareKind::FAST:
-            ASSERT_NO_FATAL_FAILURE(publisher_.create_entities_xml<MiddlewareKind::FAST>(1, 0x80, UXR_STATUS_OK, 0));
-            ASSERT_NO_FATAL_FAILURE(subscriber_.create_entities_xml<MiddlewareKind::FAST>(1, 0x80, UXR_STATUS_OK, 0));
+        case MiddlewareKind::FASTDDS:
+            ASSERT_NO_FATAL_FAILURE(publisher_.create_entities_xml<MiddlewareKind::FASTDDS>(1, 0x80, UXR_STATUS_OK, 0));
+            ASSERT_NO_FATAL_FAILURE(subscriber_.create_entities_xml<MiddlewareKind::FASTDDS>(1, 0x80, UXR_STATUS_OK, 0));
+            break;
+        case MiddlewareKind::FASTRTPS:
+            ASSERT_NO_FATAL_FAILURE(publisher_.create_entities_xml<MiddlewareKind::FASTRTPS>(1, 0x80, UXR_STATUS_OK, 0));
+            ASSERT_NO_FATAL_FAILURE(subscriber_.create_entities_xml<MiddlewareKind::FASTRTPS>(1, 0x80, UXR_STATUS_OK, 0));
             break;
         case MiddlewareKind::CED:
             ASSERT_NO_FATAL_FAILURE(publisher_.create_entities_xml<MiddlewareKind::CED>(1, 0x80, UXR_STATUS_OK, 0));
@@ -186,7 +193,7 @@ INSTANTIATE_TEST_CASE_P(
     PublisherSubscriberInteraction,
     ::testing::Combine(
         ::testing::Values(Transport::UDP_IPV4_TRANSPORT, Transport::UDP_IPV6_TRANSPORT, Transport::TCP_IPV4_TRANSPORT, Transport::TCP_IPV6_TRANSPORT),
-        ::testing::Values(MiddlewareKind::FAST, MiddlewareKind::CED),
+        ::testing::Values(MiddlewareKind::FASTDDS, MiddlewareKind::FASTRTPS, MiddlewareKind::CED),
         ::testing::Values(0.0f, 0.05f, 0.1f)));
 
 
