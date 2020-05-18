@@ -30,7 +30,7 @@ endif()
 project(microxrcedds VERSION "1.3.0")
 
 set(_client_tag develop)
-set(_agent_tag feature/fastrtps_2.0)
+set(_agent_tag develop)
 set(_gen_tag develop)
 
 ###############################################################################
