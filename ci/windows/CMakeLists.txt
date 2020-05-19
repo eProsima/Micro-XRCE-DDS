@@ -22,7 +22,7 @@ ExternalProject_Add(uxrce
     SOURCE_DIR
         ${CMAKE_CURRENT_SOURCE_DIR}/../../
     BINARY_DIR
-        ${PROJECT_BINARY_DIR}/uxrce-build
+        ${PROJECT_BINARY_DIR}/uxrce
     INSTALL_DIR
         ${PROJECT_BINARY_DIR}/temp_install
     BUILD_COMMAND
