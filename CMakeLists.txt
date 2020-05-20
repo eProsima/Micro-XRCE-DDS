@@ -27,7 +27,7 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
     set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
 endif()
 
-project(microxrcedds VERSION "1.2.0")
+project(microxrcedds VERSION "1.3.0")
 
 set(_client_tag develop)
 set(_agent_tag develop)
@@ -36,7 +36,7 @@ set(_gen_tag develop)
 ###############################################################################
 # Build options.
 ###############################################################################
-option(UXRCE_BUILD_EXAMPLES "Build examples." OFF)
+option(UXRCE_BUILD_EXAMPLES "Build and install examples." OFF)
 option(UXRCE_ENABLE_CLIENT "Enable the building and installation of Micro XRCE-DDS Client." ON)
 option(UXRCE_ENABLE_AGENT "Enable the building and installation of Micro XRCE-DDS Agent." ON)
 option(UXRCE_ENABLE_GEN "Enable the building and installation of Micro XRCE-DDS Gen." OFF)
@@ -110,6 +110,7 @@ if(UXRCE_ENABLE_CLIENT)
             -DLIB_INSTALL_DIR:PATH=${LIB_INSTALL_DIR}
             -DDATA_INSTALL_DIR:PATH=${DATA_INSTALL_DIR}
             -DUCLIENT_BUILD_EXAMPLES:BOOL=${UXRCE_BUILD_EXAMPLES}
+            -DUCLIENT_INSTALL_EXAMPLES:BOOL=${UXRCE_BUILD_EXAMPLES}
             -DUCLIENT_PIC:BOOL=ON
             -DUCLIENT_BUILD_TESTS:BOOL=${UXRCE_BUILD_TESTS}
             -DUCLIENT_ISOLATED_INSTALL:BOOL=OFF
@@ -180,33 +181,33 @@ if(UXRCE_ENABLE_GEN)
     list(APPEND _deps gen)
 endif()
 
-find_package(GTest QUIET)
-find_package(GMock QUIET)
-if(NOT GTest_FOUND OR NOT GMock_FOUND)
-    unset(GTEST_ROOT CACHE)
-    unset(GMOCK_ROOT CACHE)
-    ExternalProject_Add(googletest
-        GIT_REPOSITORY
-            https://github.com/google/googletest.git
-        GIT_TAG
-            2fe3bd994b3189899d93f1d5a881e725e046fdc2
-        PREFIX
-            ${PROJECT_BINARY_DIR}/googletest
-        INSTALL_DIR
-            ${PROJECT_BINARY_DIR}/temp_install/googletest
-        CMAKE_ARGS
-            -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>
-            $<$<PLATFORM_ID:Windows>:-Dgtest_force_shared_crt:BOOL=ON>
-        BUILD_COMMAND
-            COMMAND ${CMAKE_COMMAND} --build <BINARY_DIR> --config Release --target install
-            COMMAND ${CMAKE_COMMAND} --build <BINARY_DIR> --config Debug --target install
-        INSTALL_COMMAND
-            ""
-        )
-    list(APPEND _deps googletest)
-endif()
-
 if(UXRCE_BUILD_TESTS)
+    find_package(GTest QUIET)
+    find_package(GMock QUIET)
+    if(NOT GTest_FOUND OR NOT GMock_FOUND)
+        unset(GTEST_ROOT CACHE)
+        unset(GMOCK_ROOT CACHE)
+        ExternalProject_Add(googletest
+            GIT_REPOSITORY
+                https://github.com/google/googletest.git
+            GIT_TAG
+                2fe3bd994b3189899d93f1d5a881e725e046fdc2
+            PREFIX
+                ${PROJECT_BINARY_DIR}/googletest
+            INSTALL_DIR
+                ${PROJECT_BINARY_DIR}/temp_install/googletest
+            CMAKE_ARGS
+                -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>
+                $<$<PLATFORM_ID:Windows>:-Dgtest_force_shared_crt:BOOL=ON>
+            BUILD_COMMAND
+                COMMAND ${CMAKE_COMMAND} --build <BINARY_DIR> --config Release --target install
+                COMMAND ${CMAKE_COMMAND} --build <BINARY_DIR> --config Debug --target install
+            INSTALL_COMMAND
+                ""
+            )
+        list(APPEND _deps googletest)
+    endif()
+
     ExternalProject_Add(itests
         SOURCE_DIR
             ${CMAKE_CURRENT_LIST_DIR}/test
