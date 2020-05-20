@@ -29,8 +29,8 @@ endif()
 
 project(microxrcedds VERSION "1.2.1")
 
-set(_client_tag fix/visibility)
-set(_agent_tag feature/client_update)
+set(_client_tag v1.2.3)
+set(_agent_tag v1.3.2)
 set(_gen_tag v1.1.0)
 
 ###############################################################################
