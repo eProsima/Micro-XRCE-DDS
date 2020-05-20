@@ -3,64 +3,68 @@
 
 #include <cstdint>
 
-const char fast_participant_xml[] = "<dds>"
-                                        "<participant>"
-                                            "<rtps>"
-                                                "<name>default_xrce_participant</name>"
-                                            "</rtps>"
-                                        "</participant>"
-                                    "</dds>";
+static constexpr const char* fast_participant_xml =
+    "<dds>"
+        "<participant>"
+            "<rtps>"
+                "<name>default_xrce_participant</name>"
+            "</rtps>"
+        "</participant>"
+    "</dds>";
 
-const char fast_topic_xml[] = "<dds>"
-                                  "<topic>"
-                                      "<name>BigHelloWorldTopic_@HOSTNAME_SUFFIX@</name>"
-                                      "<dataType>BigHelloWorld</dataType>"
-                                  "</topic>"
-                              "</dds>";
+static constexpr const char* fast_topic_xml =
+    "<dds>"
+        "<topic>"
+            "<name>BigHelloWorldTopic_@HOSTNAME_SUFFIX@</name>"
+            "<dataType>BigHelloWorld</dataType>"
+        "</topic>"
+    "</dds>";
 
-const char fast_publisher_xml[]  = "";
+static constexpr const char* fast_publisher_xml  = "";
 
-const char fast_datawriter_xml[] = "<dds>"
-                                       "<data_writer>"
-                                           "<historyMemoryPolicy>PREALLOCATED_WITH_REALLOC</historyMemoryPolicy>"
-                                           "<topic>"
-                                               "<kind>NO_KEY</kind>"
-                                               "<name>BigHelloWorldTopic_@HOSTNAME_SUFFIX@</name>"
-                                               "<dataType>BigHelloWorld</dataType>"
-                                               "<historyQos>"
-                                                   "<kind>KEEP_LAST</kind>"
-                                                   "<depth>10</depth>"
-                                               "</historyQos>"
-                                           "</topic>"
-                                           "<qos>"
-                                               "<durability>"
-                                                   "<kind>TRANSIENT_LOCAL</kind>"
-                                               "</durability>"
-                                           "</qos>"
-                                       "</data_writer>"
-                                   "</dds>";
+static constexpr const char* fast_datawriter_xml =
+    "<dds>"
+        "<data_writer>"
+            "<historyMemoryPolicy>PREALLOCATED_WITH_REALLOC</historyMemoryPolicy>"
+            "<topic>"
+                "<kind>NO_KEY</kind>"
+                "<name>BigHelloWorldTopic_@HOSTNAME_SUFFIX@</name>"
+                "<dataType>BigHelloWorld</dataType>"
+                "<historyQos>"
+                    "<kind>KEEP_LAST</kind>"
+                    "<depth>10</depth>"
+                "</historyQos>"
+            "</topic>"
+            "<qos>"
+                "<durability>"
+                    "<kind>TRANSIENT_LOCAL</kind>"
+                "</durability>"
+            "</qos>"
+        "</data_writer>"
+    "</dds>";
 
-const char fast_subscriber_xml[] = "";
+static constexpr const char* fast_subscriber_xml = "";
 
-const char fast_datareader_xml[] = "<dds>"
-                                       "<data_reader>"
-                                           "<historyMemoryPolicy>PREALLOCATED_WITH_REALLOC</historyMemoryPolicy>"
-                                           "<topic>"
-                                               "<kind>NO_KEY</kind>"
-                                               "<name>BigHelloWorldTopic_@HOSTNAME_SUFFIX@</name>"
-                                               "<dataType>BigHelloWorld</dataType>"
-                                               "<historyQos>"
-                                                   "<kind>KEEP_LAST</kind>"
-                                                   "<depth>10</depth>"
-                                               "</historyQos>"
-                                           "</topic>"
-                                           "<qos>"
-                                               "<durability>"
-                                                   "<kind>TRANSIENT_LOCAL</kind>"
-                                               "</durability>"
-                                           "</qos>"
-                                       "</data_reader>"
-                                   "</dds>";
+static constexpr const char* fast_datareader_xml =
+    "<dds>"
+        "<data_reader>"
+            "<historyMemoryPolicy>PREALLOCATED_WITH_REALLOC</historyMemoryPolicy>"
+            "<topic>"
+                "<kind>NO_KEY</kind>"
+                "<name>BigHelloWorldTopic_@HOSTNAME_SUFFIX@</name>"
+                "<dataType>BigHelloWorld</dataType>"
+                "<historyQos>"
+                    "<kind>KEEP_LAST</kind>"
+                    "<depth>10</depth>"
+                "</historyQos>"
+            "</topic>"
+            "<qos>"
+                "<durability>"
+                    "<kind>TRANSIENT_LOCAL</kind>"
+                "</durability>"
+            "</qos>"
+        "</data_reader>"
+    "</dds>";
 
 
 enum class MiddlewareKind : uint8_t
