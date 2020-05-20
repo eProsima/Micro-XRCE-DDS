@@ -32,6 +32,7 @@ add_gtest(cross_serialization_test
 target_include_directories(cross_serialization_test
     PRIVATE
         ${UCLIENT_SOURCE_DIR}/src/c
+        ${GTEST_INCLUDE_DIR}
     )
 
 target_link_libraries(cross_serialization_test
