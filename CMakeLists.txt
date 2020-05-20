@@ -27,10 +27,10 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
     set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
 endif()
 
-project(microxrcedds VERSION "1.2.0")
+project(microxrcedds VERSION "1.2.1")
 
-set(_client_tag 4dfeee1)
-set(_agent_tag f0dbe10)
+set(_client_tag fix/visibility)
+set(_agent_tag v1.3.1)
 set(_gen_tag v1.1.0)
 
 ###############################################################################
