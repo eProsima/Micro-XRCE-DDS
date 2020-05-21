@@ -110,6 +110,7 @@ public:
 
     void check_messages(std::string message, size_t number, uint8_t stream_id_raw)
     {
+        std::this_thread::sleep_for(std::chrono::seconds(5)); // TODO: remove, wait until matching.
         std::thread publisher_thread(&Client::publish, &publisher_, 1, stream_id_raw, number, message);
         std::thread subscriber_thread(&Client::subscribe, &subscriber_, 1, stream_id_raw, number, message);
 
