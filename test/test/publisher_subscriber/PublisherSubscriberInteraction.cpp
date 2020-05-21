@@ -16,12 +16,12 @@
 
 #include <thread>
 
-class PublisherSubscriberInteraction : public ::testing::TestWithParam<std::tuple<Transport, MiddlewareKind, float>>
+class PublisherSubscriberNoLost : public ::testing::TestWithParam<std::tuple<Transport, MiddlewareKind, float>>
 {
 public:
     const uint16_t AGENT_PORT = 2018 + uint16_t(std::get<0>(this->GetParam()));
 
-    PublisherSubscriberInteraction()
+    PublisherSubscriberNoLost()
         : transport_(std::get<0>(GetParam()))
         , middleware_{}
         , publisher_(std::get<2>(GetParam()), 8)
@@ -42,7 +42,7 @@ public:
         init_agent(AGENT_PORT);
     }
 
-    ~PublisherSubscriberInteraction()
+    ~PublisherSubscriberNoLost()
     {}
 
     void SetUp() override
@@ -110,7 +110,6 @@ public:
 
     void check_messages(std::string message, size_t number, uint8_t stream_id_raw)
     {
-        std::this_thread::sleep_for(std::chrono::seconds(5)); // TODO: remove, wait until matching.
         std::thread publisher_thread(&Client::publish, &publisher_, 1, stream_id_raw, number, message);
         std::thread subscriber_thread(&Client::subscribe, &subscriber_, 1, stream_id_raw, number, message);
 
@@ -130,60 +129,68 @@ protected:
     static const std::string SMALL_MESSAGE;
 };
 
-const std::string PublisherSubscriberInteraction::SMALL_MESSAGE("Hello DDS world!");
+class PublisherSubscriberLost : public PublisherSubscriberNoLost {};
 
-TEST_P(PublisherSubscriberInteraction, PubSub1TopicsBestEffort)
+const std::string PublisherSubscriberNoLost::SMALL_MESSAGE("Hello DDS world!");
+
+TEST_P(PublisherSubscriberNoLost, PubSub1TopicsBestEffort)
 {
-    if(0.0f == std::get<2>(GetParam())) //only without lost
-    {
-        check_messages(SMALL_MESSAGE, 1, 0x01);
-    }
+    std::this_thread::sleep_for(std::chrono::seconds(2)); // Waiting for matching.
+    check_messages(SMALL_MESSAGE, 1, 0x01);
 }
 
-TEST_P(PublisherSubscriberInteraction, PubSub10TopicsBestEffort)
+TEST_P(PublisherSubscriberNoLost, PubSub10TopicsBestEffort)
 {
-    if(0.0f == std::get<2>(GetParam())) //only without lost
-    {
-        check_messages(SMALL_MESSAGE, 10, 0x01);
-    }
+    std::this_thread::sleep_for(std::chrono::seconds(2)); // Waiting for matching.
+    check_messages(SMALL_MESSAGE, 10, 0x01);
 }
 
-TEST_P(PublisherSubscriberInteraction, PubSub1TopicsReliable)
+TEST_P(PublisherSubscriberNoLost, PubSub1TopicsReliable)
 {
+    std::this_thread::sleep_for(std::chrono::seconds(2)); // Waiting for matching.
     check_messages(SMALL_MESSAGE, 1, 0x80);
 }
 
-TEST_P(PublisherSubscriberInteraction, PubSub10TopicsReliable)
+TEST_P(PublisherSubscriberNoLost, PubSub10TopicsReliable)
 {
+    std::this_thread::sleep_for(std::chrono::seconds(2)); // Waiting for matching.
     check_messages(SMALL_MESSAGE, 10, 0x80);
 }
 
 // TODO (#4423) Fix the non-reliable behavior when messages is higher than the agent history to enable this
-/*TEST_P(PublisherSubscriberInteraction, PubSub30TopicsReliable)
+/*TEST_P(PublisherSubscriberNoLost, PubSub30TopicsReliable)
 {
+    std::this_thread::sleep_for(std::chrono::seconds(2)); // Waiting for matching.
     check_messages(SMALL_MESSAGE, 30, 0x80);
-}
-*/
+}*/
 
-TEST_P(PublisherSubscriberInteraction, PubSub1FragmentedTopic2Parts)
+INSTANTIATE_TEST_CASE_P(
+    TransportAndLost,
+    PublisherSubscriberNoLost,
+    ::testing::Combine(
+        ::testing::Values(Transport::UDP_IPV4_TRANSPORT, Transport::UDP_IPV6_TRANSPORT, Transport::TCP_IPV4_TRANSPORT, Transport::TCP_IPV6_TRANSPORT),
+        ::testing::Values(MiddlewareKind::FASTDDS, MiddlewareKind::FASTRTPS, MiddlewareKind::CED),
+        ::testing::Values(0.0f)));
+
+TEST_P(PublisherSubscriberLost, PubSub1FragmentedTopic2Parts)
 {
     std::string message(size_t(publisher_.get_mtu() * 1.5), 'A');
     check_messages(message, 1, 0x80);
 }
 
-TEST_P(PublisherSubscriberInteraction, PubSub3FragmentedTopic2Parts)
+TEST_P(PublisherSubscriberLost, PubSub3FragmentedTopic2Parts)
 {
     std::string message(size_t(publisher_.get_mtu() * 1.5), 'A');
     check_messages(message, 3, 0x80);
 }
 
-TEST_P(PublisherSubscriberInteraction, PubSub1FragmentedTopic4Parts)
+TEST_P(PublisherSubscriberLost, PubSub1FragmentedTopic4Parts)
 {
     std::string message(size_t(publisher_.get_mtu() * 3.5), 'A');
     check_messages(message, 1, 0x80);
 }
 
-TEST_P(PublisherSubscriberInteraction, PubSub3FragmentedTopic4Parts)
+TEST_P(PublisherSubscriberLost, PubSub3FragmentedTopic4Parts)
 {
     std::string message(size_t(publisher_.get_mtu() * 3.5), 'A');
     check_messages(message, 3, 0x80);
@@ -191,11 +198,11 @@ TEST_P(PublisherSubscriberInteraction, PubSub3FragmentedTopic4Parts)
 
 INSTANTIATE_TEST_CASE_P(
     TransportAndLost,
-    PublisherSubscriberInteraction,
+    PublisherSubscriberLost,
     ::testing::Combine(
-        ::testing::Values(Transport::UDP_IPV4_TRANSPORT, Transport::UDP_IPV6_TRANSPORT, Transport::TCP_IPV4_TRANSPORT, Transport::TCP_IPV6_TRANSPORT),
-        ::testing::Values(MiddlewareKind::FASTDDS, MiddlewareKind::FASTRTPS, MiddlewareKind::CED),
-        ::testing::Values(0.0f, 0.05f, 0.1f)));
+        ::testing::Values(Transport::UDP_IPV4_TRANSPORT),
+        ::testing::Values(MiddlewareKind::CED),
+        ::testing::Values(0.05f, 0.1f)));
 
 
 int main(int args, char** argv)
