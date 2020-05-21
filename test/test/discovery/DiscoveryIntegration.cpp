@@ -19,15 +19,29 @@
 #define LOCAL_HOST_IPV4 "127.0.0.1"
 #define LOCAL_HOST_IPV6 "::1"
 
-class DiscoveryIntegration : public ::testing::TestWithParam<Transport>
+class DiscoveryIntegration : public ::testing::TestWithParam<std::tuple<Transport, MiddlewareKind>>
 {
 public:
     const uint16_t AGENT_PORT = 2018;
     const uint16_t DISCOVERY_PORT = eprosima::uxr::DISCOVERY_PORT;
 
     DiscoveryIntegration()
-    : transport_(GetParam())
-    {}
+        : transport_(std::get<0>(GetParam()))
+        , middleware_{}
+    {
+        switch (std::get<1>(GetParam()))
+        {
+        case MiddlewareKind::FASTDDS:
+            middleware_ = eprosima::uxr::Middleware::Kind::FASTDDS;
+            break;
+        case MiddlewareKind::FASTRTPS:
+            middleware_ = eprosima::uxr::Middleware::Kind::FASTRTPS;
+            break;
+        case MiddlewareKind::CED:
+            middleware_ = eprosima::uxr::Middleware::Kind::CED;
+            break;
+        }
+    }
 
     ~DiscoveryIntegration() = default;
 
@@ -85,7 +99,7 @@ public:
             case Transport::UDP_IPV4_TRANSPORT:
             {
                 std::unique_ptr<eprosima::uxr::UDPv4Agent> agent;
-                agent.reset(new eprosima::uxr::UDPv4Agent(port, eprosima::uxr::Middleware::Kind::FAST));
+                agent.reset(new eprosima::uxr::UDPv4Agent(port, middleware_));
                 agent->start();
                 agent->set_verbose_level(6);
                 agent->enable_discovery(discovery_port);
@@ -95,7 +109,7 @@ public:
             case Transport::UDP_IPV6_TRANSPORT:
             {
                 std::unique_ptr<eprosima::uxr::UDPv6Agent> agent;
-                agent.reset(new eprosima::uxr::UDPv6Agent(port, eprosima::uxr::Middleware::Kind::FAST));
+                agent.reset(new eprosima::uxr::UDPv6Agent(port, middleware_));
                 agent->start();
                 agent->set_verbose_level(6);
                 agent->enable_discovery(discovery_port);
@@ -105,7 +119,7 @@ public:
             case Transport::TCP_IPV4_TRANSPORT:
             {
                 std::unique_ptr<eprosima::uxr::TCPv4Agent> agent;
-                agent.reset(new eprosima::uxr::TCPv4Agent(port, eprosima::uxr::Middleware::Kind::FAST));
+                agent.reset(new eprosima::uxr::TCPv4Agent(port, middleware_));
                 agent->start();
                 agent->set_verbose_level(6);
                 agent->enable_discovery(discovery_port);
@@ -115,7 +129,7 @@ public:
             case Transport::TCP_IPV6_TRANSPORT:
             {
                 std::unique_ptr<eprosima::uxr::TCPv6Agent> agent;
-                agent.reset(new eprosima::uxr::TCPv6Agent(port, eprosima::uxr::Middleware::Kind::FAST));
+                agent.reset(new eprosima::uxr::TCPv6Agent(port, middleware_));
                 agent->start();
                 agent->set_verbose_level(6);
                 agent->enable_discovery(discovery_port);
@@ -127,6 +141,7 @@ public:
 
 protected:
     Transport transport_;
+    eprosima::uxr::Middleware::Kind middleware_;
     std::unique_ptr<Discovery> discovery_;
 
 private:
@@ -135,8 +150,6 @@ private:
     std::vector<std::unique_ptr<eprosima::uxr::TCPv4Agent>> agents_tcp4_;
     std::vector<std::unique_ptr<eprosima::uxr::TCPv6Agent>> agents_tcp6_;
 };
-
-INSTANTIATE_TEST_CASE_P(Transports, DiscoveryIntegration, ::testing::Values(Transport::UDP_IPV4_TRANSPORT, Transport::UDP_IPV6_TRANSPORT, Transport::TCP_IPV4_TRANSPORT, Transport::TCP_IPV6_TRANSPORT));
 
 TEST_P(DiscoveryIntegration, DiscoveryUnicast)
 {
@@ -151,6 +164,13 @@ TEST_P(DiscoveryIntegration, DiscoveryMulticast)
     std::this_thread::sleep_for(std::chrono::seconds(1));
     discovery_->multicast();
 }
+
+INSTANTIATE_TEST_CASE_P(
+    Transports,
+    DiscoveryIntegration,
+    ::testing::Combine(
+        ::testing::Values(Transport::UDP_IPV4_TRANSPORT, Transport::UDP_IPV6_TRANSPORT, Transport::TCP_IPV4_TRANSPORT, Transport::TCP_IPV6_TRANSPORT),
+        ::testing::Values(MiddlewareKind::FASTDDS, MiddlewareKind::FASTRTPS, MiddlewareKind::CED)));
 
 int main(int args, char** argv)
 {
