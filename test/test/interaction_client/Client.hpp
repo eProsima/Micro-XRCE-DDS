@@ -3,6 +3,7 @@
 
 #include "BigHelloWorld.h"
 #include "Gateway.hpp"
+#include <EntitiesInfo.hpp>
 
 #include <uxr/client/client.h>
 #include <ucdr/microcdr.h>
@@ -32,6 +33,7 @@ inline bool operator == (const uxrStreamId& s1, const uxrStreamId& s2)
         && s1.direction == s2.direction;
 }
 
+
 class Client
 {
     const int timeout = 30000;
@@ -46,55 +48,75 @@ public:
     virtual ~Client()
     {}
 
+    template<MiddlewareKind Kind>
     void create_entities_xml(uint8_t id, uint8_t stream_id_raw, uint8_t expected_status, uint8_t flags)
     {
+        using EInfo = EntitiesInfo<Kind>;
+
         uxrStreamId output_stream_id = uxr_stream_id_from_raw(stream_id_raw, UXR_OUTPUT_STREAM);
         uint16_t request_id; uint8_t status;
 
         uxrObjectId participant_id = uxr_object_id(id, UXR_PARTICIPANT_ID);
-        request_id = uxr_buffer_create_participant_xml(&session_, output_stream_id, participant_id, 0, participant_xml_, flags);
+        request_id =
+            uxr_buffer_create_participant_xml(
+                &session_, output_stream_id, participant_id, 0, EInfo::participant_xml, flags);
         ASSERT_NE(UXR_INVALID_REQUEST_ID, request_id);
         uxr_run_session_until_all_status(&session_, timeout, &request_id, &status, 1);
         ASSERT_EQ(expected_status, status);
 
         uxrObjectId topic_id = uxr_object_id(id, UXR_TOPIC_ID);
-        request_id = uxr_buffer_create_topic_xml(&session_, output_stream_id, topic_id, participant_id, topic_xml_, flags);
+        request_id =
+            uxr_buffer_create_topic_xml(
+                &session_, output_stream_id, topic_id, participant_id, EInfo::topic_xml, flags);
         ASSERT_NE(UXR_INVALID_REQUEST_ID, request_id);
         uxr_run_session_until_all_status(&session_, timeout, &request_id, &status, 1);
         ASSERT_EQ(expected_status, status);
 
         uxrObjectId publisher_id = uxr_object_id(id, UXR_PUBLISHER_ID);
-        request_id = uxr_buffer_create_publisher_xml(&session_, output_stream_id, publisher_id, participant_id, publisher_xml_, flags);
+        request_id =
+            uxr_buffer_create_publisher_xml(
+                &session_, output_stream_id, publisher_id, participant_id, EInfo::publisher_xml, flags);
         ASSERT_NE(UXR_INVALID_REQUEST_ID, request_id);
         uxr_run_session_until_all_status(&session_, timeout, &request_id, &status, 1);
         ASSERT_EQ(expected_status, status);
 
         uxrObjectId datawriter_id = uxr_object_id(id, UXR_DATAWRITER_ID);
-        request_id = uxr_buffer_create_datawriter_xml(&session_, output_stream_id, datawriter_id, publisher_id, datawriter_xml_, flags);
+        request_id =
+            uxr_buffer_create_datawriter_xml(
+                &session_, output_stream_id, datawriter_id, publisher_id, EInfo::datawriter_xml, flags);
         ASSERT_NE(UXR_INVALID_REQUEST_ID, request_id);
         uxr_run_session_until_all_status(&session_, timeout, &request_id, &status, 1);
         ASSERT_EQ(expected_status, status);
 
         uxrObjectId subscriber_id = uxr_object_id(id, UXR_SUBSCRIBER_ID);
-        request_id = uxr_buffer_create_subscriber_xml(&session_, output_stream_id, subscriber_id, participant_id, subscriber_xml_, flags);
+        request_id =
+            uxr_buffer_create_subscriber_xml(
+                &session_, output_stream_id, subscriber_id, participant_id, EInfo::subscriber_xml, flags);
         ASSERT_NE(UXR_INVALID_REQUEST_ID, request_id);
         uxr_run_session_until_all_status(&session_, timeout, &request_id, &status, 1);
         ASSERT_EQ(expected_status, status);
 
         uxrObjectId datareader_id = uxr_object_id(id, UXR_DATAREADER_ID);
-        request_id = uxr_buffer_create_datareader_xml(&session_, output_stream_id, datareader_id, subscriber_id, datareader_xml_, flags);
+        request_id =
+            uxr_buffer_create_datareader_xml(
+                &session_, output_stream_id, datareader_id, subscriber_id, EInfo::datareader_xml, flags);
         ASSERT_NE(UXR_INVALID_REQUEST_ID, request_id);
         uxr_run_session_until_all_status(&session_, timeout, &request_id, &status, 1);
         ASSERT_EQ(expected_status, status);
     }
 
+    template<MiddlewareKind Kind>
     void create_entities_ref(uint8_t id, uint8_t stream_id_raw, uint8_t expected_status, uint8_t flags)
     {
+        using EInfo = EntitiesInfo<Kind>;
+
         uxrStreamId output_stream_id = uxr_stream_id_from_raw(stream_id_raw, UXR_OUTPUT_STREAM);
         uint16_t request_id; uint8_t status;
 
         uxrObjectId participant_id = uxr_object_id(id, UXR_PARTICIPANT_ID);
-        request_id = uxr_buffer_create_participant_ref(&session_, output_stream_id, participant_id, 0, "default_xrce_participant", flags);
+        request_id =
+            uxr_buffer_create_participant_ref(
+                &session_, output_stream_id, participant_id, 0, EInfo::participant_ref, flags);
         ASSERT_NE(UXR_INVALID_REQUEST_ID, request_id);
         uxr_run_session_until_all_status(&session_, timeout, &request_id, &status, 1);
         ASSERT_EQ(expected_status, status);
@@ -103,7 +125,9 @@ public:
         ASSERT_EQ(request_id, last_status_request_id_);
 
         uxrObjectId topic_id = uxr_object_id(id, UXR_TOPIC_ID);
-        request_id = uxr_buffer_create_topic_ref(&session_, output_stream_id, topic_id, participant_id, "bighelloworld_topic", flags);
+        request_id =
+            uxr_buffer_create_topic_ref(
+                &session_, output_stream_id, topic_id, participant_id, EInfo::topic_ref, flags);
         ASSERT_NE(UXR_INVALID_REQUEST_ID, request_id);
         uxr_run_session_until_all_status(&session_, timeout, &request_id, &status, 1);
         ASSERT_EQ(expected_status, status);
@@ -112,7 +136,9 @@ public:
         ASSERT_EQ(request_id, last_status_request_id_);
 
         uxrObjectId publisher_id = uxr_object_id(id, UXR_PUBLISHER_ID);
-        request_id = uxr_buffer_create_publisher_xml(&session_, output_stream_id, publisher_id, participant_id, "", flags);
+        request_id =
+            uxr_buffer_create_publisher_xml(
+                &session_, output_stream_id, publisher_id, participant_id, EInfo::publisher_ref, flags);
         ASSERT_NE(UXR_INVALID_REQUEST_ID, request_id);
         uxr_run_session_until_all_status(&session_, timeout, &request_id, &status, 1);
         ASSERT_EQ(expected_status, status);
@@ -121,7 +147,9 @@ public:
         ASSERT_EQ(request_id, last_status_request_id_);
 
         uxrObjectId datawriter_id = uxr_object_id(id, UXR_DATAWRITER_ID);
-        request_id = uxr_buffer_create_datawriter_ref(&session_, output_stream_id, datawriter_id, publisher_id, "bighelloworld_data_writer", flags);
+        request_id =
+            uxr_buffer_create_datawriter_ref(
+                &session_, output_stream_id, datawriter_id, publisher_id, EInfo::datawriter_ref, flags);
         ASSERT_NE(UXR_INVALID_REQUEST_ID, request_id);
         uxr_run_session_until_all_status(&session_, timeout, &request_id, &status, 1);
         ASSERT_EQ(expected_status, status);
@@ -130,7 +158,9 @@ public:
         ASSERT_EQ(request_id, last_status_request_id_);
 
         uxrObjectId subscriber_id = uxr_object_id(id, UXR_SUBSCRIBER_ID);
-        request_id = uxr_buffer_create_subscriber_xml(&session_, output_stream_id, subscriber_id, participant_id, "", flags);
+        request_id =
+            uxr_buffer_create_subscriber_xml(
+                &session_, output_stream_id, subscriber_id, participant_id, EInfo::subscriber_ref, flags);
         ASSERT_NE(UXR_INVALID_REQUEST_ID, request_id);
         uxr_run_session_until_all_status(&session_, timeout, &request_id, &status, 1);
         ASSERT_EQ(expected_status, status);
@@ -139,7 +169,9 @@ public:
         ASSERT_EQ(request_id, last_status_request_id_);
 
         uxrObjectId datareader_id = uxr_object_id(id, UXR_DATAREADER_ID);
-        request_id = uxr_buffer_create_datareader_ref(&session_, output_stream_id, datareader_id, subscriber_id, "bighelloworld_data_reader", flags);
+        request_id =
+            uxr_buffer_create_datareader_ref(
+                &session_, output_stream_id, datareader_id, subscriber_id, EInfo::datareader_ref, flags);
         ASSERT_NE(UXR_INVALID_REQUEST_ID, request_id);
         uxr_run_session_until_all_status(&session_, timeout, &request_id, &status, 1);
         ASSERT_EQ(expected_status, status);
@@ -381,5 +413,6 @@ private:
     size_t expected_topic_index_;
 };
 
+uint32_t Client::next_client_key_ = 0;
 
 #endif //IN_TEST_CLIENT_HPP

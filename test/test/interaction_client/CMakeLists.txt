@@ -16,13 +16,12 @@ include(${PROJECT_SOURCE_DIR}/cmake/common/check_configuration.cmake)
 
 cmake_host_system_information(RESULT HOSTNAME_SUFFIX QUERY HOSTNAME)
 
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Client.cpp.in
-    ${CMAKE_CURRENT_BINARY_DIR}/Client.cpp
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/../common/EntitiesInfo.hpp.in
+    ${CMAKE_CURRENT_BINARY_DIR}/EntitiesInfo.hpp
     @ONLY
     )
 
 set(SRCS
-    ${CMAKE_CURRENT_BINARY_DIR}/Client.cpp
     Gateway.cpp
     BigHelloWorld.c
     Discovery.cpp
@@ -44,6 +43,7 @@ endif()
 target_include_directories(interaction_client
     PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}
+        ${CMAKE_CURRENT_BINARY_DIR}
     PRIVATE
         ${GTEST_INCLUDE_DIRS}
     )

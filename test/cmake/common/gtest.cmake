@@ -135,7 +135,7 @@ macro(add_gtest test)
                 else()
                     add_test(NAME ${GTEST_GROUP_NAME}.${GTEST_NAME}
                         COMMAND ${test}
-                        --gtest_filter=${GTEST_GROUP_NAME}.${GTEST_NAME})
+                        --gtest_filter=*${GTEST_GROUP_NAME}.${GTEST_NAME}*)
                     # Add environment
                     if(WIN32)
                         set_property(TEST ${GTEST_GROUP_NAME}.${GTEST_NAME} APPEND PROPERTY ENVIRONMENT "PATH=${WIN_PATH}")
