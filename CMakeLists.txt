@@ -29,9 +29,9 @@ endif()
 
 project(microxrcedds VERSION "1.3.0")
 
-set(_client_tag develop)
-set(_agent_tag develop)
-set(_gen_tag develop)
+set(_client_tag v1.2.3)
+set(_agent_tag v1.4.0)
+set(_gen_tag v1.1.0)
 
 ###############################################################################
 # Build options.
