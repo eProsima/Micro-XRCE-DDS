@@ -16,7 +16,6 @@
 # CMake build rules for micro XRCE-DDS
 ###############################################################################
 
-
 cmake_minimum_required(VERSION 3.5)
 
 # Set CMAKE_BUILD_TYPE to Release by default.
