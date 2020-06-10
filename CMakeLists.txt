@@ -29,8 +29,8 @@ endif()
 
 project(microxrcedds VERSION "1.3.0")
 
-set(_client_tag hotfix/default_isolated_install)
-set(_agent_tag hotfix/default_isolated_install)
+set(_client_tag v1.2.5)
+set(_agent_tag v1.4.1)
 set(_gen_tag v1.1.0)
 
 ###############################################################################
