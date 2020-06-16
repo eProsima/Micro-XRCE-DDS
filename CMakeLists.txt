@@ -41,6 +41,7 @@ option(UXRCE_ENABLE_CLIENT "Enable the building and installation of Micro XRCE-D
 option(UXRCE_ENABLE_AGENT "Enable the building and installation of Micro XRCE-DDS Agent." ON)
 option(UXRCE_ENABLE_GEN "Enable the building and installation of Micro XRCE-DDS Gen." OFF)
 option(UXRCE_BUILD_TESTS "Build tests." OFF)
+option(UXRCE_BUILD_PROFILING "Build profiling test executables.")
 
 option(UXRCE_BUILD_CI_TESTS "Build CI tests." OFF)
 if(UXRCE_BUILD_CI_TESTS)
@@ -233,6 +234,10 @@ if(UXRCE_BUILD_TESTS)
         DEPENDS
             ${_deps}
         )
+endif()
+
+if(UXRCE_BUILD_PROFILING)
+    add_subdirectory(test/profiling)
 endif()
 
 ###############################################################################
