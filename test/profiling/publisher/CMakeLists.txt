@@ -19,7 +19,7 @@ project(publisher-profiling)
 
 find_package(microxrcedds_client)
 
-add_executable(${PROJECT_NAME} main.c HelloWorld.c)
+add_executable(${PROJECT_NAME} main.c)
 
 target_link_libraries(${PROJECT_NAME}
     PRIVATE

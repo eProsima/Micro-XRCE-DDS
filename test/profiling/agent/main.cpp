@@ -16,7 +16,7 @@
 
 int main()
 {
-    eprosima::uxr::UDPv4Agent agent(2018, eprosima::uxr::Middleware::Kind::CED);
+    eprosima::uxr::UDPv4Agent agent(2020, eprosima::uxr::Middleware::Kind::CED);
     agent.start();
 
     while (true) {

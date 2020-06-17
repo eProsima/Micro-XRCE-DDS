@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "HelloWorld.h"
-
 #include <uxr/client/client.h>
 #include <ucdr/microcdr.h>
 
@@ -27,20 +25,22 @@
 int main(int args, char** argv)
 {
     // CLI
-    if(3 > args || 0 == atoi(argv[2]))
+    if(4 > args)
     {
-        printf("usage: program [-h | --help] | ip port [<max_topics>]\n");
+        printf("usage: client_key  topic_name  topic_size \n");
         return 0;
     }
 
-    char* ip = argv[1];
-    char* port = argv[2];
-    uint32_t max_topics = (args == 4) ? (uint32_t)atoi(argv[3]) : UINT32_MAX;
+    uint32_t client_key = (uint32_t)atoi(argv[1]);
+    char* topic_name = argv[2];
+    uint16_t topic_size = (uint16_t)atoi(argv[3]);
+    topic_size = (4 > topic_size) ? 4 : topic_size;
+    uint32_t max_topics = 32u;
 
     // Transport
     uxrUDPTransport transport;
     uxrUDPPlatform udp_platform;
-    if(!uxr_init_udp_transport(&transport, &udp_platform, UXR_IPv4, ip, port))
+    if(!uxr_init_udp_transport(&transport, &udp_platform, UXR_IPv4, "127.0.0.1", "2020"))
     {
         printf("Error at create transport.\n");
         return 1;
@@ -68,7 +68,7 @@ int main(int args, char** argv)
     uint16_t participant_req = uxr_buffer_create_participant_ref(&session, reliable_out, participant_id, 0, participant_ref, UXR_REPLACE);
 
     uxrObjectId topic_id = uxr_object_id(0x01, UXR_TOPIC_ID);
-    const char* topic_ref = "topic_name";
+    const char* topic_ref = topic_name;
     uint16_t topic_req = uxr_buffer_create_topic_ref(&session, reliable_out, topic_id, participant_id, topic_ref, UXR_REPLACE);
 
     uxrObjectId publisher_id = uxr_object_id(0x01, UXR_PUBLISHER_ID);
@@ -93,15 +93,16 @@ int main(int args, char** argv)
     uint32_t count = 0;
     while(connected && count < max_topics)
     {
-        HelloWorld topic = {++count, "Hello DDS world!"};
+        char topic[65500] = {};
+        memset(topic, 'A', topic_size);
 
         ucdrBuffer ub;
-        uint32_t topic_size = HelloWorld_size_of_topic(&topic, 0);
-        uxr_prepare_output_stream(&session, reliable_out, datawriter_id, &ub, topic_size);
-        HelloWorld_serialize_topic(&ub, &topic);
+        uxr_prepare_output_stream(&session, reliable_out, datawriter_id, &ub, 4 + strlen(topic));
+        ucdr_serialize_string(&ub, topic);
 
-        printf("Send topic: %s, id: %i\n", topic.message, topic.index);
-        connected = uxr_run_session_time(&session, 1000);
+        printf("Send topic: %s\n", topic);
+        connected = uxr_run_session_time(&session, 100);
+        ++count;
     }
 
     // Delete resources

@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "HelloWorld.h"
-
 #include <uxr/client/client.h>
 
 #include <stdio.h> //printf
@@ -34,10 +32,10 @@ void on_topic(
 {
     (void) session; (void) object_id; (void) request_id; (void) stream_id; (void) length;
 
-    HelloWorld topic;
-    HelloWorld_deserialize_topic(ub, &topic);
+    char topic[65500];
+    ucdr_deserialize_string(ub, topic, sizeof(topic));
 
-    printf("Received topic: %s, id: %i\n", topic.message, topic.index);
+    printf("Received topic: %s\n", topic);
 
     uint32_t* count_ptr = (uint32_t*) args;
     (*count_ptr)++;
@@ -46,23 +44,21 @@ void on_topic(
 int main(int args, char** argv)
 {
     // CLI
-    if(3 > args || 0 == atoi(argv[2]))
+    if(3 > args)
     {
-        printf("usage: program [-h | --help] | ip port [<max_topics>]\n");
+        printf("usage: client_key  topic_name\n");
         return 0;
     }
 
-    char* ip = argv[1];
-    char* port = argv[2];
-    uint32_t max_topics = (args == 4) ? (uint32_t)atoi(argv[3]) : UINT32_MAX;
-
-    // State
+    uint32_t client_key = (uint32_t)atoi(argv[1]);
+    char* topic_name = argv[2];
+    uint32_t max_topics = 28u;
     uint32_t count = 0;
 
     // Transport
     uxrUDPTransport transport;
     uxrUDPPlatform udp_platform;
-    if(!uxr_init_udp_transport(&transport, &udp_platform, UXR_IPv4, ip, port))
+    if(!uxr_init_udp_transport(&transport, &udp_platform, UXR_IPv4, "127.0.0.1", "2020"))
     {
         printf("Error at create transport.\n");
         return 1;
@@ -70,7 +66,7 @@ int main(int args, char** argv)
 
     // Session
     uxrSession session;
-    uxr_init_session(&session, &transport.comm, 0xCCCCDDDD);
+    uxr_init_session(&session, &transport.comm, client_key);
     uxr_set_topic_callback(&session, on_topic, &count);
     if(!uxr_create_session(&session))
     {
@@ -91,7 +87,7 @@ int main(int args, char** argv)
     uint16_t participant_req = uxr_buffer_create_participant_ref(&session, reliable_out, participant_id, 0, participant_ref, UXR_REPLACE);
 
     uxrObjectId topic_id = uxr_object_id(0x01, UXR_TOPIC_ID);
-    const char* topic_ref = "topic_name";
+    const char* topic_ref = topic_name;
     uint16_t topic_req = uxr_buffer_create_topic_ref(&session, reliable_out, topic_id, participant_id, topic_ref, UXR_REPLACE);
 
     uxrObjectId subscriber_id = uxr_object_id(0x01, UXR_SUBSCRIBER_ID);
