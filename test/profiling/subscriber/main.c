@@ -19,7 +19,7 @@
 #include <stdlib.h> //atoi
 
 #define STREAM_HISTORY  2
-#define BUFFER_SIZE     UXR_CONFIG_UDP_TRANSPORT_MTU * STREAM_HISTORY
+#define BUFFER_SIZE     100 * STREAM_HISTORY
 
 uint32_t client_key;
 
@@ -34,7 +34,7 @@ void on_topic(
 {
     (void) session; (void) object_id; (void) request_id; (void) stream_id; (void) length;
 
-    char topic[65500];
+    char topic[300];
     ucdr_deserialize_string(ub, topic, sizeof(topic));
 
     printf("Received topic %s, by %d\n", topic, client_key);

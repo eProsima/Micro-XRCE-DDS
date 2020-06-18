@@ -18,7 +18,7 @@ for t in topic_size:
     heap = [t]
     total = [t]
     for n in n_pubsub:
-        agent_sp = subprocess.Popen(("valgrind --tool=massif --stacks=yes --detailed-freq=1 --max-snapshots=300 --threshold=1.0 --massif-out-file=./profiling.out ./install/bin/agent-profiling").split(), shell=False)
+        agent_sp = subprocess.Popen(("valgrind --tool=massif --stacks=yes --detailed-freq=1 --max-snapshots=300 --threshold=0.0 --massif-out-file=./massif-agent.out ./install/bin/agent-profiling").split(), shell=False)
         time.sleep(1)
 
         client_key = 1
@@ -39,7 +39,7 @@ for t in topic_size:
         agent_sp.send_signal(signal.SIGINT)
         time.sleep(1.0)
 
-        data = msparser.parse_file('profiling.out')
+        data = msparser.parse_file('massif-agent.out')
         peak_index = data['peak_snapshot_index']
         peak_snapshot = data['snapshots'][peak_index]
         for c in peak_snapshot['heap_tree']['children']:

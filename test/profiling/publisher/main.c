@@ -19,8 +19,8 @@
 #include <string.h> //strcmp
 #include <stdlib.h> //atoi
 
-#define STREAM_HISTORY  8
-#define BUFFER_SIZE     UXR_CONFIG_UDP_TRANSPORT_MTU * STREAM_HISTORY
+#define STREAM_HISTORY  2
+#define BUFFER_SIZE     100 * STREAM_HISTORY
 
 int main(int args, char** argv)
 {
@@ -96,7 +96,7 @@ int main(int args, char** argv)
     uint32_t count = 0;
     while(connected && count < max_topics)
     {
-        char topic[65500] = {};
+        char topic[300] = {};
         memset(topic, 'A', topic_size);
 
         ucdrBuffer ub;

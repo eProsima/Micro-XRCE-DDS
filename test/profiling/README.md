@@ -1,6 +1,6 @@
 # Profiling test
 
-Profiling test is composed of tree components:
+Profiling test is composed of three components:
 
 * A minimal Agent with just `UAGENT_CED_PROFILE` enable.
 * A publisher developed with the Client library.
@@ -10,7 +10,7 @@ Profiling test is composed of tree components:
 
 There are some scenarios where the Agent must run over low resource devices, so it is needed to characterize the minimum requirements of the Agent in terms of memory footprint.
 In that sense, the Agent profiling with the lowest memory footprint is the one that only use the `CedMiddleware` implementation without logger, cli, and p2p.
-Such configuration could be address disabling all the Agent`s profiles except the `UAGENT_CED_PROFILE`.
+Such configuration could be address disabling all the Agent's profiles except the `UAGENT_CED_PROFILE`.
 
 ## How?
 
@@ -18,5 +18,7 @@ Such configuration could be address disabling all the Agent`s profiles except th
 cmake .. -DUXRCE_ENABLE_CLIENT=OFF -DUXRCE_ENABLE_AGENT=OFF -DUXRCE_BUILD_PROFILING=ON
 cmake --build .
 cd build/test/profiling
-python3 profiling.py
+python3 agent-profiling.py
+python3 publisher-profiling.py
+python3 subscriber-profiling.py
 ```

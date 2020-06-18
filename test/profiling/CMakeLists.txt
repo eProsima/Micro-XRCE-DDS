@@ -91,5 +91,6 @@ ExternalProject_Add(agent
         agentlib
     )
 
-
-file(COPY ${CMAKE_CURRENT_LIST_DIR}/profiling.py DESTINATION ${PROJECT_BINARY_DIR})
+file(COPY ${CMAKE_CURRENT_LIST_DIR}/agent-profiling.py DESTINATION ${PROJECT_BINARY_DIR})
+file(COPY ${CMAKE_CURRENT_LIST_DIR}/publisher-profiling.py DESTINATION ${PROJECT_BINARY_DIR})
+file(COPY ${CMAKE_CURRENT_LIST_DIR}/subscriber-profiling.py DESTINATION ${PROJECT_BINARY_DIR})
