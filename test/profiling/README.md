@@ -16,4 +16,7 @@ Such configuration could be address disabling all the Agent`s profiles except th
 
 ```bash
 cmake .. -DUXRCE_ENABLE_CLIENT=OFF -DUXRCE_ENABLE_AGENT=OFF -DUXRCE_BUILD_PROFILING=ON
+cmake --build .
+cd build/test/profiling
+python3 profiling.py
 ```
