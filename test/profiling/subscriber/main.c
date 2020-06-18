@@ -18,8 +18,10 @@
 #include <string.h> //strcmp
 #include <stdlib.h> //atoi
 
-#define STREAM_HISTORY  8
+#define STREAM_HISTORY  2
 #define BUFFER_SIZE     UXR_CONFIG_UDP_TRANSPORT_MTU * STREAM_HISTORY
+
+uint32_t client_key;
 
 void on_topic(
         uxrSession* session,
@@ -35,7 +37,7 @@ void on_topic(
     char topic[65500];
     ucdr_deserialize_string(ub, topic, sizeof(topic));
 
-    printf("Received topic: %s\n", topic);
+    printf("Received topic %s, by %d\n", topic, client_key);
 
     uint32_t* count_ptr = (uint32_t*) args;
     (*count_ptr)++;
@@ -50,7 +52,7 @@ int main(int args, char** argv)
         return 0;
     }
 
-    uint32_t client_key = (uint32_t)atoi(argv[1]);
+    client_key = (uint32_t)atoi(argv[1]);
     char* topic_name = argv[2];
     uint32_t max_topics = 28u;
     uint32_t count = 0;
@@ -75,6 +77,9 @@ int main(int args, char** argv)
     }
 
     // Streams
+    uint8_t output_besteffort_stream_buffer[UXR_CONFIG_UDP_TRANSPORT_MTU];
+    uxrStreamId besteffort_out = uxr_create_output_best_effort_stream(&session, output_besteffort_stream_buffer, UXR_CONFIG_UDP_TRANSPORT_MTU);
+
     uint8_t output_reliable_stream_buffer[BUFFER_SIZE];
     uxrStreamId reliable_out = uxr_create_output_reliable_stream(&session, output_reliable_stream_buffer, BUFFER_SIZE, STREAM_HISTORY);
 
@@ -110,7 +115,7 @@ int main(int args, char** argv)
     // Request topics
     uxrDeliveryControl delivery_control = {0};
     delivery_control.max_samples = UXR_MAX_SAMPLES_UNLIMITED;
-    uint16_t read_data_req = uxr_buffer_request_data(&session, reliable_out, datareader_id, reliable_in, &delivery_control);
+    uint16_t read_data_req = uxr_buffer_request_data(&session, besteffort_out, datareader_id, reliable_in, &delivery_control);
 
     // Read topics
     bool connected = true;

@@ -46,6 +46,7 @@ ExternalProject_Add(agentlib
         -DUAGENT_DISCOVERY_PROFILE:BOOL=FALSE
         -DUAGENT_P2P_PROFILE:BOOL=FALSE
         -DUAGENT_LOGGER_PROFILE:BOOL=FALSE
+        -DUAGENT_SERVER_BUFFER_SIZE:STRING=1024
     )
 
 ExternalProject_Add(publisher
@@ -90,3 +91,5 @@ ExternalProject_Add(agent
         agentlib
     )
 
+
+file(COPY ${CMAKE_CURRENT_LIST_DIR}/profiling.py DESTINATION ${PROJECT_BINARY_DIR})

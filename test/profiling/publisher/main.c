@@ -48,7 +48,7 @@ int main(int args, char** argv)
 
     // Session
     uxrSession session;
-    uxr_init_session(&session, &transport.comm, 0xAAAABBBB);
+    uxr_init_session(&session, &transport.comm, client_key);
     if(!uxr_create_session(&session))
     {
         printf("Error at create session.\n");
@@ -56,6 +56,9 @@ int main(int args, char** argv)
     }
 
     // Streams
+    uint8_t output_besteffort_stream_buffer[UXR_CONFIG_UDP_TRANSPORT_MTU];
+    uxrStreamId besteffort_out = uxr_create_output_best_effort_stream(&session, output_besteffort_stream_buffer, UXR_CONFIG_UDP_TRANSPORT_MTU);
+
     uint8_t output_reliable_stream_buffer[BUFFER_SIZE];
     uxrStreamId reliable_out = uxr_create_output_reliable_stream(&session, output_reliable_stream_buffer, BUFFER_SIZE, STREAM_HISTORY);
 
@@ -97,11 +100,11 @@ int main(int args, char** argv)
         memset(topic, 'A', topic_size);
 
         ucdrBuffer ub;
-        uxr_prepare_output_stream(&session, reliable_out, datawriter_id, &ub, 4 + strlen(topic));
+        uxr_prepare_output_stream(&session, besteffort_out, datawriter_id, &ub, 4 + strlen(topic));
         ucdr_serialize_string(&ub, topic);
 
-        printf("Send topic: %s\n", topic);
-        connected = uxr_run_session_time(&session, 100);
+        printf("Send topic %s, by %d\n", topic, client_key);
+        connected = uxr_run_session_time(&session, 50);
         ++count;
     }
 
