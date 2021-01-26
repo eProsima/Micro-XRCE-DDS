@@ -377,12 +377,6 @@ private:
     }
 
     static uint32_t next_client_key_;
-    static const char* participant_xml_;
-    static const char* topic_xml_;
-    static const char* publisher_xml_;
-    static const char* subscriber_xml_;
-    static const char* datawriter_xml_;
-    static const char* datareader_xml_;
 
     Gateway gateway_;
 
@@ -397,9 +391,9 @@ private:
     size_t mtu_;
     uxrSession session_;
 
-    std::unique_ptr<uint8_t[]> output_best_effort_stream_buffer_;
-    std::unique_ptr<uint8_t[]> output_reliable_stream_buffer_;
-    std::unique_ptr<uint8_t[]> input_reliable_stream_buffer_;
+    std::shared_ptr<uint8_t[]> output_best_effort_stream_buffer_;
+    std::shared_ptr<uint8_t[]> output_reliable_stream_buffer_;
+    std::shared_ptr<uint8_t[]> input_reliable_stream_buffer_;
 
     std::string expected_message_;
 
