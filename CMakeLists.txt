@@ -157,6 +157,8 @@ if(UXRCE_ENABLE_AGENT)
             -DUAGENT_BUILD_EXECUTABLE:BOOL=OFF
             -DUAGENT_ISOLATED_INSTALL:BOOL=OFF
             -DGTEST_INDIVIDUAL:BOOL=ON
+            -DUAGENT_P2P_CLIENT_VERSION:STRING=${__client_ver}
+            -DUAGENT_P2P_CLIENT_TAG:STRING=${_client_tag}
         DEPENDS
             client
         )
