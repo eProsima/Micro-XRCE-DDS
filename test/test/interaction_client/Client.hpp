@@ -315,12 +315,15 @@ private:
         ASSERT_EQ(UXR_STATUS_OK, session_.info.last_requested_status);
 
         /* Setup streams. */
-        output_best_effort_stream_buffer_.reset(new uint8_t[mtu_ * UXR_CONFIG_MAX_OUTPUT_BEST_EFFORT_STREAMS]{0});
-        output_reliable_stream_buffer_.reset(new uint8_t[mtu_ * history_ * UXR_CONFIG_MAX_OUTPUT_RELIABLE_STREAMS]{0});
-        input_reliable_stream_buffer_.reset(new uint8_t[mtu_ * history_ * UXR_CONFIG_MAX_INPUT_RELIABLE_STREAMS]{0});
+        output_best_effort_stream_buffer_.reset(
+            new std::vector<uint8_t>(mtu_ * UXR_CONFIG_MAX_OUTPUT_BEST_EFFORT_STREAMS, 0));
+        output_reliable_stream_buffer_.reset(
+            new std::vector<uint8_t>(mtu_ * history_ * UXR_CONFIG_MAX_OUTPUT_RELIABLE_STREAMS, 0));
+        input_reliable_stream_buffer_.reset(
+            new std::vector<uint8_t>(mtu_ * history_ * UXR_CONFIG_MAX_INPUT_RELIABLE_STREAMS, 0));
         for(size_t i = 0; i < UXR_CONFIG_MAX_OUTPUT_BEST_EFFORT_STREAMS; ++i)
         {
-            uint8_t* buffer = output_best_effort_stream_buffer_.get() + mtu_ * i;
+            uint8_t* buffer = output_best_effort_stream_buffer_->data() + mtu_ * i;
             (void) uxr_create_output_best_effort_stream(&session_, buffer, mtu_);
         }
         for(size_t i = 0; i < UXR_CONFIG_MAX_INPUT_BEST_EFFORT_STREAMS; ++i)
@@ -329,12 +332,12 @@ private:
         }
         for(size_t i = 0; i < UXR_CONFIG_MAX_OUTPUT_RELIABLE_STREAMS; ++i)
         {
-            uint8_t* buffer = output_reliable_stream_buffer_.get() + mtu_ * history_ * i;
+            uint8_t* buffer = output_reliable_stream_buffer_->data() + mtu_ * history_ * i;
             (void) uxr_create_output_reliable_stream(&session_, buffer , mtu_ * history_, history_);
         }
         for(size_t i = 0; i < UXR_CONFIG_MAX_INPUT_RELIABLE_STREAMS; ++i)
         {
-            uint8_t* buffer = input_reliable_stream_buffer_.get() + mtu_ * history_ * i;
+            uint8_t* buffer = input_reliable_stream_buffer_->data() + mtu_ * history_ * i;
             (void) uxr_create_input_reliable_stream(&session_, buffer, mtu_ * history_, history_);
         }
     }
@@ -391,9 +394,9 @@ private:
     size_t mtu_;
     uxrSession session_;
 
-    std::shared_ptr<uint8_t[]> output_best_effort_stream_buffer_;
-    std::shared_ptr<uint8_t[]> output_reliable_stream_buffer_;
-    std::shared_ptr<uint8_t[]> input_reliable_stream_buffer_;
+    std::shared_ptr<std::vector<uint8_t>> output_best_effort_stream_buffer_;
+    std::shared_ptr<std::vector<uint8_t>> output_reliable_stream_buffer_;
+    std::shared_ptr<std::vector<uint8_t>> input_reliable_stream_buffer_;
 
     std::string expected_message_;
 
