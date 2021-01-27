@@ -58,7 +58,7 @@ if(WIN32)
 else()
     set(LICENSE_INSTALL_DIR ${DATA_INSTALL_DIR}/${PROJECT_NAME} CACHE PATH "Installation directory for licenses")
 endif()
-
+ 
 ###############################################################################
 # Tests
 ###############################################################################
