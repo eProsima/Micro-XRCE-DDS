@@ -30,6 +30,7 @@ endif()
 project(microxrcedds VERSION "2.0.0")
 
 set(_client_tag develop)
+set(_client_version 1.2.5)
 set(_agent_tag develop)
 set(_gen_tag develop)
 
@@ -150,6 +151,10 @@ if(UXRCE_ENABLE_AGENT)
             -DLIB_INSTALL_DIR:PATH=${LIB_INSTALL_DIR}
             -DDATA_INSTALL_DIR:PATH=${DATA_INSTALL_DIR}
             -DUAGENT_BUILD_TESTS:BOOL=${UXRCE_BUILD_TESTS}
+            -DUAGENT_P2P_CLIENT_TAG:STRING=${_client_tag}
+            -DUAGENT_P2P_CLIENT_VERSION:STRING=${_client_version}
+            -DUAGENT_CLI_PROFILE:BOOL=OFF
+            -DUAGENT_BUILD_EXECUTABLE:BOOL=OFF
             -DUAGENT_ISOLATED_INSTALL:BOOL=OFF
             -DGTEST_INDIVIDUAL:BOOL=ON
         DEPENDS
