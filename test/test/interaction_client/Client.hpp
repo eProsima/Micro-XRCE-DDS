@@ -6,13 +6,15 @@
 #include <EntitiesInfo.hpp>
 
 #include <uxr/client/client.h>
+#include <uxr/client/util/ping.h>
 #include <ucdr/microcdr.h>
 
 #include <gtest/gtest.h>
 #include <iostream>
 #include <thread>
 
-enum class Transport {
+enum class Transport
+{
     UDP_IPV4_TRANSPORT,
     UDP_IPV6_TRANSPORT,
     TCP_IPV4_TRANSPORT,
@@ -301,6 +303,29 @@ public:
     size_t get_mtu() const
     {
         return mtu_;
+    }
+
+    void ping_agent(
+            const Transport transport_kind)
+    {
+        uxrCommunication* comm(nullptr);
+
+        switch (transport_kind)
+        {
+            case Transport::UDP_IPV4_TRANSPORT:
+            case Transport::UDP_IPV6_TRANSPORT:
+            {
+                comm = &udp_transport_.comm;
+                break;
+            }
+            case Transport::TCP_IPV4_TRANSPORT:
+            case Transport::TCP_IPV6_TRANSPORT:
+            {
+                comm = &tcp_transport_.comm;
+                break;
+            }
+        }
+        ASSERT_TRUE(uxr_ping_agent_attempts(comm, 1000, 1));
     }
 
 private:
