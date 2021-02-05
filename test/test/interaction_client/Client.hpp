@@ -35,6 +35,9 @@ inline bool operator == (const uxrStreamId& s1, const uxrStreamId& s2)
         && s1.direction == s2.direction;
 }
 
+extern "C" bool flush_session(uxrSession* session){
+    return uxr_run_session_until_confirm_delivery(session, 1000);
+}
 
 class Client
 {
@@ -199,7 +202,13 @@ public:
 
             ucdrBuffer ub;
             uint32_t topic_size = BigHelloWorld_size_of_topic(&topic, 0);
-            bool prepared = uxr_prepare_output_stream(&session_, output_stream_id, datawriter_id, &ub, topic_size);
+            bool prepared = false;
+            if (topic_size < mtu_)
+            {
+                prepared = uxr_prepare_output_stream(&session_, output_stream_id, datawriter_id, &ub, topic_size);
+            } else {
+                prepared = uxr_prepare_output_stream_fragmented(&session_, output_stream_id, datawriter_id, &ub, topic_size, flush_session);
+            }
             ASSERT_TRUE(prepared);
             bool written = BigHelloWorld_serialize_topic(&ub, &topic);
             ASSERT_TRUE(written);

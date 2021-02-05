@@ -157,6 +157,12 @@ TEST_P(PublisherSubscriberNoLost, PubSub10TopicsReliable)
     check_messages(SMALL_MESSAGE, 10, 0x80);
 }
 
+TEST_P(PublisherSubscriberNoLost, PubSub1ContinousFragmentedTopic)
+{
+    std::string message(size_t(publisher_.get_mtu() * 8), 'A');
+    publisher_.publish(1, 0x80, 1, message);
+}
+
 // TODO (#4423) Fix the non-reliable behavior when messages is higher than the agent history to enable this
 /*TEST_P(PublisherSubscriberNoLost, PubSub30TopicsReliable)
 {
