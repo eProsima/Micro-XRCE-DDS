@@ -29,7 +29,7 @@ endif()
 
 project(microxrcedds VERSION "2.0.0")
 
-set(_client_tag develop)
+set(_client_tag feature/update_waitsession_timing)
 set(_client_version 1.2.5)
 set(_agent_tag develop)
 set(_gen_tag develop)
