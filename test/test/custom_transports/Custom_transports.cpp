@@ -15,7 +15,7 @@ std::mutex client_to_agent_mtx;
 std::mutex agent_to_client_mtx;
 
 template <class T>
-static int32_t find_queue_with_data(std::map<int32_t, T> m)
+static int32_t find_queue_with_data(const std::map<int32_t, T>& m)
 {
     for (auto const& it : m) {
         if (!it.second.empty())
@@ -52,11 +52,11 @@ eprosima::uxr::CustomAgent::RecvMsgFunction agent_custom_transport_read_packet =
 
     while (uxr_millis() - init_time < timeout)
     {   
+        std::unique_lock<std::mutex> lock(client_to_agent_mtx);
+
         int32_t index = find_queue_with_data(client_to_agent_packet_queue);
         if (0 <= index)
         {
-            std::unique_lock<std::mutex> lock(client_to_agent_mtx);
-
             auto data = client_to_agent_packet_queue[index].front();
             client_to_agent_packet_queue[index].pop();
 
@@ -117,11 +117,11 @@ eprosima::uxr::CustomAgent::RecvMsgFunction agent_custom_transport_read_stream =
 
     while (uxr_millis() - init_time < timeout)
     {   
+        std::unique_lock<std::mutex> lock(client_to_agent_mtx);
+
         int32_t index = find_queue_with_data(client_to_agent_stream_queue);
         if (0 <= index)
         {
-            std::unique_lock<std::mutex> lock(client_to_agent_mtx);
-
             rv = (buffer_length > client_to_agent_stream_queue[index].size()) ?
                                client_to_agent_stream_queue[index].size() :
                                buffer_length;
@@ -189,6 +189,10 @@ extern "C"{
     {
         int32_t index = *(int32_t*) transport->args;
         free(transport->args);
+        
+        std::unique_lock<std::mutex> lock1(client_to_agent_mtx);
+        std::unique_lock<std::mutex> lock2(agent_to_client_mtx);
+
         client_to_agent_packet_queue.erase(index);
         agent_to_client_packet_queue.erase(index);
         return true;
@@ -219,10 +223,10 @@ extern "C"{
 
         while (uxr_millis() - init_time < timeout)
         {
+            std::unique_lock<std::mutex> lock(agent_to_client_mtx);
+
             if (0 < agent_to_client_packet_queue[index].size())
             {
-                std::unique_lock<std::mutex> lock(agent_to_client_mtx);
-
                 auto data = agent_to_client_packet_queue[index].front();
                 agent_to_client_packet_queue[index].pop();
 
@@ -272,10 +276,10 @@ extern "C"{
 
         while (uxr_millis() - init_time < timeout)
         {
+            std::unique_lock<std::mutex> lock(agent_to_client_mtx);
+
             if (0 < agent_to_client_stream_queue[index].size())
             {
-                std::unique_lock<std::mutex> lock(agent_to_client_mtx);
-
                 rv = (len > agent_to_client_stream_queue[index].size()) ?
                       agent_to_client_stream_queue[index].size() :
                       len;
