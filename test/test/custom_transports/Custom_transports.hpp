@@ -13,7 +13,8 @@ extern eprosima::uxr::CustomAgent::RecvMsgFunction agent_custom_transport_read_p
 extern eprosima::uxr::CustomAgent::SendMsgFunction agent_custom_transport_write_packet;
 
 // Client custom transport
-extern "C"{
+extern "C"
+{
     bool client_custom_transport_open(uxrCustomTransport* transport);
     bool client_custom_transport_close(uxrCustomTransport* transport);
     size_t client_custom_transport_write_stream( uxrCustomTransport* transport, const uint8_t* buf, size_t len, uint8_t* errcode);
