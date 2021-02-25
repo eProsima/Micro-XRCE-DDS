@@ -38,11 +38,11 @@ eprosima::uxr::CustomAgent::FiniFunction agent_custom_transport_close = []() -> 
 };
 
 eprosima::uxr::CustomAgent::RecvMsgFunction agent_custom_transport_read_packet = [](
-            eprosima::uxr::CustomEndPoint* source_endpoint,
-            uint8_t* buffer,
-            size_t buffer_length,
-            int timeout,
-            eprosima::uxr::TransportRc& transport_rc) -> ssize_t
+        eprosima::uxr::CustomEndPoint* source_endpoint,
+        uint8_t* buffer,
+        size_t buffer_length,
+        int timeout,
+        eprosima::uxr::TransportRc& transport_rc) -> ssize_t
 {
     size_t rv = 0;
     int64_t init_time = uxr_millis();
