@@ -62,6 +62,12 @@ public:
                 ASSERT_NO_FATAL_FAILURE(client_.init_transport(transport_, "::1", std::to_string(AGENT_PORT).c_str()));
                 break;
             }
+            case Transport::CUSTOM_WITHOUT_FRAMING:
+            case Transport::CUSTOM_WITH_FRAMING:
+            {
+                ASSERT_NO_FATAL_FAILURE(client_.init_transport(transport_, NULL, NULL));
+                break;
+            }
         }
     }
 
@@ -104,6 +110,56 @@ public:
                 ASSERT_TRUE(agent_tcp6_->start());
                 break;
             }
+            case Transport::CUSTOM_WITHOUT_FRAMING:
+            {
+                try
+                {
+                    agent_custom_endpoint_.add_member<uint32_t>("index");
+                }
+                catch(const std::exception& e)
+                {
+                    // Do nothing
+                }
+                
+
+                agent_custom_.reset(new eprosima::uxr::CustomAgent(
+                    "custom_agent",
+                    &agent_custom_endpoint_,
+                    middleware_,
+                    false,
+                    agent_custom_transport_open,
+                    agent_custom_transport_close,
+                    agent_custom_transport_write_packet,
+                    agent_custom_transport_read_packet));
+                agent_custom_->set_verbose_level(6);
+                ASSERT_TRUE(agent_custom_->start());
+                break;
+            }
+            case Transport::CUSTOM_WITH_FRAMING:
+            {
+                try
+                {
+                    agent_custom_endpoint_.add_member<uint32_t>("index");
+                }
+                catch(const std::exception& e)
+                {
+                    // Do nothing
+                }
+
+                agent_custom_.reset(new eprosima::uxr::CustomAgent(
+                    "custom_agent",
+                    &agent_custom_endpoint_,
+                    middleware_,
+                    true,
+                    agent_custom_transport_open,
+                    agent_custom_transport_close,
+                    agent_custom_transport_write_stream,
+                    agent_custom_transport_read_stream));
+                agent_custom_->set_verbose_level(6);
+                ASSERT_TRUE(agent_custom_->start());
+                break;
+            }
+            
         }
     }
 
@@ -131,6 +187,12 @@ public:
                 ASSERT_TRUE(agent_tcp6_->stop());
                 break;
             }
+            case Transport::CUSTOM_WITHOUT_FRAMING:
+            case Transport::CUSTOM_WITH_FRAMING:
+            {
+                ASSERT_TRUE(agent_custom_->stop());
+                break;            
+            }
         }
     }
 
@@ -140,6 +202,9 @@ protected:
     std::unique_ptr<eprosima::uxr::UDPv6Agent> agent_udp6_;
     std::unique_ptr<eprosima::uxr::TCPv4Agent> agent_tcp4_;
     std::unique_ptr<eprosima::uxr::TCPv6Agent> agent_tcp6_;
+    std::unique_ptr<eprosima::uxr::CustomAgent> agent_custom_;
+    eprosima::uxr::CustomEndPoint agent_custom_endpoint_;
+
     eprosima::uxr::Middleware::Kind middleware_;
     Client client_;
 };
@@ -386,6 +451,13 @@ INSTANTIATE_TEST_CASE_P(
     ::testing::Combine(
         ::testing::Values(Transport::UDP_IPV4_TRANSPORT, Transport::TCP_IPV4_TRANSPORT, Transport::UDP_IPV6_TRANSPORT, Transport::TCP_IPV6_TRANSPORT),
         ::testing::Values(MiddlewareKind::FASTDDS, MiddlewareKind::FASTRTPS, MiddlewareKind::CED)));
+
+INSTANTIATE_TEST_CASE_P(
+    Transports,
+    ClientAgentInteraction,
+    ::testing::Combine(
+        ::testing::Values(Transport::CUSTOM_WITHOUT_FRAMING, Transport::CUSTOM_WITH_FRAMING),
+        ::testing::Values(MiddlewareKind::FASTDDS)));
 
 int main(int args, char** argv)
 {
