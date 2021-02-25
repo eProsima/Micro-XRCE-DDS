@@ -235,7 +235,7 @@ extern "C"{
                 {
                     std::copy( data.begin(), data.end(), buf);
                     rv = data.size();
-                    printf("Custom client received: %ld from queue %d\n", rv, index);
+                    printf("Custom client received: %ld B from queue %d\n", rv, index);
                 }
                 else
                 {
