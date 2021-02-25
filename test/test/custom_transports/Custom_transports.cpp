@@ -97,7 +97,7 @@ eprosima::uxr::CustomAgent::SendMsgFunction agent_custom_transport_write_packet 
     std::vector<uint8_t> packet(buffer, buffer + message_length);
     agent_to_client_packet_queue[index].emplace(std::move(packet));
     transport_rc = eprosima::uxr::TransportRc::ok;
-    printf("Custom agent send: %ld\n", message_length);
+    std::cout << "Custom agent send: " << message_length << " bytes." << std::endl;
 
     return static_cast<ssize_t>(message_length);
 };
