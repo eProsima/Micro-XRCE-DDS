@@ -27,17 +27,17 @@ static int32_t find_queue_with_data(std::map<int32_t, T> m)
     return -1;
 }
 
-eprosima::uxr::CustomAgent::InitFunction agent_custom_transport_open = [&]() -> bool
+eprosima::uxr::CustomAgent::InitFunction agent_custom_transport_open = []() -> bool
 {
     return true;
 };
 
-eprosima::uxr::CustomAgent::FiniFunction agent_custom_transport_close = [&]() -> bool
+eprosima::uxr::CustomAgent::FiniFunction agent_custom_transport_close = []() -> bool
 {
     return true;
 };
 
-eprosima::uxr::CustomAgent::RecvMsgFunction agent_custom_transport_read_packet = [&](
+eprosima::uxr::CustomAgent::RecvMsgFunction agent_custom_transport_read_packet = [](
             eprosima::uxr::CustomEndPoint* source_endpoint,
             uint8_t* buffer,
             size_t buffer_length,
@@ -85,7 +85,7 @@ eprosima::uxr::CustomAgent::RecvMsgFunction agent_custom_transport_read_packet =
     return static_cast<ssize_t>(rv);
 };
 
-eprosima::uxr::CustomAgent::SendMsgFunction agent_custom_transport_write_packet = [&](
+eprosima::uxr::CustomAgent::SendMsgFunction agent_custom_transport_write_packet = [](
         const eprosima::uxr::CustomEndPoint* destination_endpoint,
         uint8_t* buffer,
         size_t message_length,
@@ -102,7 +102,7 @@ eprosima::uxr::CustomAgent::SendMsgFunction agent_custom_transport_write_packet 
     return static_cast<ssize_t>(message_length);
 };
 
-eprosima::uxr::CustomAgent::RecvMsgFunction agent_custom_transport_read_stream = [&](
+eprosima::uxr::CustomAgent::RecvMsgFunction agent_custom_transport_read_stream = [](
             eprosima::uxr::CustomEndPoint* source_endpoint,
             uint8_t* buffer,
             size_t buffer_length,
@@ -149,7 +149,7 @@ eprosima::uxr::CustomAgent::RecvMsgFunction agent_custom_transport_read_stream =
     return static_cast<ssize_t>(rv);
 };
 
-eprosima::uxr::CustomAgent::SendMsgFunction agent_custom_transport_write_stream = [&](
+eprosima::uxr::CustomAgent::SendMsgFunction agent_custom_transport_write_stream = [](
         const eprosima::uxr::CustomEndPoint* destination_endpoint,
         uint8_t* buffer,
         size_t message_length,
