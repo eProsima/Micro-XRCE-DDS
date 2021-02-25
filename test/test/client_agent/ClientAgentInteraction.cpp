@@ -453,7 +453,7 @@ INSTANTIATE_TEST_CASE_P(
         ::testing::Values(MiddlewareKind::FASTDDS, MiddlewareKind::FASTRTPS, MiddlewareKind::CED)));
 
 INSTANTIATE_TEST_CASE_P(
-    Transports,
+    CustomTransports,
     ClientAgentInteraction,
     ::testing::Combine(
         ::testing::Values(Transport::CUSTOM_WITHOUT_FRAMING, Transport::CUSTOM_WITH_FRAMING),
