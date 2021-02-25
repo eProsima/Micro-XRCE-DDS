@@ -17,7 +17,8 @@ std::mutex agent_to_client_mtx;
 template <class T>
 static int32_t find_queue_with_data(const std::map<int32_t, T>& m)
 {
-    for (auto const& it : m) {
+    for (auto const& it : m)
+    {
         if (!it.second.empty())
         {
             return it.first;
