@@ -209,7 +209,7 @@ extern "C"{
 
         std::vector<uint8_t> packet(buf, buf + len);
         client_to_agent_packet_queue[index].emplace(std::move(packet));
-        printf("Custom client send: %ld to queue %d\n", len, index);
+        printf("Custom client send: %ld B to queue %d\n", len, index);
 
         return len;
     }
