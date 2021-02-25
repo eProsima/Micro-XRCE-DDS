@@ -172,7 +172,8 @@ eprosima::uxr::CustomAgent::SendMsgFunction agent_custom_transport_write_stream 
 
 
 // Client custom transport
-extern "C"{
+extern "C"
+{
     static int32_t global_index = 0;
 
     bool client_custom_transport_open(uxrCustomTransport* transport)
