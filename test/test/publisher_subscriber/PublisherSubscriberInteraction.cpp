@@ -53,7 +53,7 @@ public:
             ASSERT_NO_FATAL_FAILURE(publisher_.init_transport(transport_, "127.0.0.1", std::to_string(AGENT_PORT).c_str()));
             ASSERT_NO_FATAL_FAILURE(subscriber_.init_transport(transport_, "127.0.0.1", std::to_string(AGENT_PORT).c_str()));
         }
-        else if (transport_ == Transport::TCP_IPV4_TRANSPORT || transport_ == Transport::TCP_IPV6_TRANSPORT)
+        else if (transport_ == Transport::UDP_IPV6_TRANSPORT || transport_ == Transport::TCP_IPV6_TRANSPORT)
         {
             ASSERT_NO_FATAL_FAILURE(publisher_.init_transport(transport_, "::1", std::to_string(AGENT_PORT).c_str()));
             ASSERT_NO_FATAL_FAILURE(subscriber_.init_transport(transport_, "::1", std::to_string(AGENT_PORT).c_str()));
@@ -217,13 +217,13 @@ INSTANTIATE_TEST_CASE_P(
         ::testing::Values(MiddlewareKind::FASTDDS, MiddlewareKind::FASTRTPS, MiddlewareKind::CED),
         ::testing::Values(0.0f)));
 
-INSTANTIATE_TEST_CASE_P(
-    TransportAndLostCustomTransports,
-    PublisherSubscriberNoLost,
-    ::testing::Combine(
-        ::testing::Values(Transport::CUSTOM_WITH_FRAMING, Transport::CUSTOM_WITHOUT_FRAMING),
-        ::testing::Values(MiddlewareKind::FASTDDS),
-        ::testing::Values(0.0f)));
+// INSTANTIATE_TEST_CASE_P(
+//     TransportAndLostCustomTransports,
+//     PublisherSubscriberNoLost,
+//     ::testing::Combine(
+//         ::testing::Values(Transport::CUSTOM_WITH_FRAMING, Transport::CUSTOM_WITHOUT_FRAMING),
+//         ::testing::Values(MiddlewareKind::FASTDDS),
+//         ::testing::Values(0.0f)));
 
 TEST_P(PublisherSubscriberLost, PubSub1FragmentedTopic2Parts)
 {
