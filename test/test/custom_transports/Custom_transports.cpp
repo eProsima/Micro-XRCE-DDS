@@ -133,7 +133,7 @@ eprosima::uxr::CustomAgent::RecvMsgFunction agent_custom_transport_read_stream =
                 client_to_agent_stream_queue[index].pop();
             }
             
-            printf("Custom agent receive: %ld B in queue %d\n", rv, index);
+            std::cout << "Custom agent receive: " << rv << " bytes in queue " << index << std::endl;
             
             source_endpoint->set_member_value<uint32_t>("index", static_cast<uint32_t>(index));
             received = true;
