@@ -262,7 +262,7 @@ extern "C"{
             client_to_agent_stream_queue[index].emplace(buf[i]);
         }
 
-        printf("Custom client send: %ld to queue %d\n", len, index);
+        printf("Custom client send: %ld B to queue %d\n", len, index);
 
         return len;
     }
