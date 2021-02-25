@@ -165,7 +165,7 @@ eprosima::uxr::CustomAgent::SendMsgFunction agent_custom_transport_write_stream 
     }
     
     transport_rc = eprosima::uxr::TransportRc::ok;
-    printf("Custom agent send: %ld to queue %d\n", message_length, index);
+    std::cout << "Custom agent send: " << message_length << " bytes to queue " << index << std::endl;
 
     return static_cast<ssize_t>(message_length);
 };
