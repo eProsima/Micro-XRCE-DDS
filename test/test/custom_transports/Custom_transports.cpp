@@ -182,7 +182,7 @@ extern "C"
         *(int32_t*) transport->args = global_index++;
         int32_t index = *(int32_t*) transport->args;
 
-        printf("Custom client creating: %d\n", index);
+        std::cout << "Custom client creating: " << index << std::endl;
 
         return true;
     }
@@ -210,7 +210,7 @@ extern "C"
 
         std::vector<uint8_t> packet(buf, buf + len);
         client_to_agent_packet_queue[index].emplace(std::move(packet));
-        printf("Custom client send: %ld B to queue %d\n", len, index);
+        std::cout << "Custom client send: " << len << " bytes in queue " << index << std::endl;
 
         return len;
     }
@@ -236,6 +236,8 @@ extern "C"
                 {
                     std::copy( data.begin(), data.end(), buf);
                     rv = data.size();
+                    std::cout << "Custom client receive: " << len << " bytes in queue " << index << std::endl;
+
                     printf("Custom client received: %ld B from queue %d\n", rv, index);
                 }
                 else
@@ -263,7 +265,7 @@ extern "C"
             client_to_agent_stream_queue[index].emplace(buf[i]);
         }
 
-        printf("Custom client send: %ld B to queue %d\n", len, index);
+        std::cout << "Custom client send: " << len << " bytes in queue " << index << std::endl;
 
         return len;
     }

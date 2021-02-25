@@ -116,7 +116,7 @@ public:
                 {
                     agent_custom_endpoint_.add_member<uint32_t>("index");
                 }
-                catch(const std::exception& e)
+                catch(const std::exception& /*e*/)
                 {
                     // Do nothing
                 }
