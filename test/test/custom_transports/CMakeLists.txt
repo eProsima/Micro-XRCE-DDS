@@ -49,6 +49,7 @@ target_include_directories(custom_transports
 target_link_libraries(custom_transports
     PUBLIC
         microxrcedds_client
+        microxrcedds_agent
     PRIVATE
         ${GTEST_BOTH_LIBRARIES}
     )
