@@ -237,8 +237,6 @@ extern "C"
                     std::copy( data.begin(), data.end(), buf);
                     rv = data.size();
                     std::cout << "Custom client receive: " << len << " bytes in queue " << index << std::endl;
-
-                    printf("Custom client received: %ld B from queue %d\n", rv, index);
                 }
                 else
                 {
