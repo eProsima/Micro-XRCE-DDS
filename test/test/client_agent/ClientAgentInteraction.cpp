@@ -12,6 +12,8 @@
 #include <uxr/agent/transport/tcp/TCPv6AgentLinux.hpp>
 #endif
 
+#include <uxr/agent/transport/custom/CustomAgent.hpp>
+
 #include <Client.hpp>
 
 #include <thread>

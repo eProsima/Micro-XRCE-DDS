@@ -13,6 +13,8 @@
 #include <uxr/agent/transport/tcp/TCPv6AgentLinux.hpp>
 #endif
 
+#include <uxr/agent/transport/custom/CustomAgent.hpp>
+
 #include <../custom_transports/Custom_transports.hpp>
 
 #include <thread>
