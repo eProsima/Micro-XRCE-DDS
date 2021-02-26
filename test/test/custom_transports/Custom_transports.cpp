@@ -43,6 +43,14 @@ eprosima::uxr::CustomAgent::InitFunction agent_custom_transport_open = []() -> b
 
 eprosima::uxr::CustomAgent::FiniFunction agent_custom_transport_close = []() -> bool
 {
+    std::unique_lock<std::mutex> lock1(client_to_agent_mtx);
+    std::unique_lock<std::mutex> lock2(agent_to_client_mtx);
+
+    client_to_agent_stream_queue.clear();
+    client_to_agent_packet_queue.clear();
+    agent_to_client_stream_queue.clear();
+    agent_to_client_stream_queue.clear();
+    
     return true;
 };
 
