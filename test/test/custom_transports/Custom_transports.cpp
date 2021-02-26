@@ -28,6 +28,14 @@ static int32_t find_queue_with_data(const std::map<int32_t, T>& m)
     return -1;
 }
 
+template <class T>
+static void erase_fifo_by_index(std::map<int32_t, T>& m, const int32_t index)
+{
+    auto it = m.find(index);
+    if (it != m.end())
+        m.erase (it);
+}
+
 eprosima::uxr::CustomAgent::InitFunction agent_custom_transport_open = []() -> bool
 {
     return true;
@@ -195,8 +203,11 @@ extern "C"
         std::unique_lock<std::mutex> lock1(client_to_agent_mtx);
         std::unique_lock<std::mutex> lock2(agent_to_client_mtx);
 
-        client_to_agent_packet_queue.erase(index);
-        agent_to_client_packet_queue.erase(index);
+        erase_fifo_by_index(client_to_agent_packet_queue, index);
+        erase_fifo_by_index(client_to_agent_stream_queue, index);
+        erase_fifo_by_index(agent_to_client_packet_queue, index);
+        erase_fifo_by_index(agent_to_client_stream_queue, index);
+
         return true;
     }
 
