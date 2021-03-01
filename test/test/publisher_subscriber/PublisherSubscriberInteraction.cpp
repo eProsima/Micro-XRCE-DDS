@@ -219,13 +219,13 @@ INSTANTIATE_TEST_CASE_P(
         ::testing::Values(MiddlewareKind::FASTDDS, MiddlewareKind::FASTRTPS, MiddlewareKind::CED),
         ::testing::Values(0.0f)));
 
-// INSTANTIATE_TEST_CASE_P(
-//     TransportAndLostCustomTransports,
-//     PublisherSubscriberNoLost,
-//     ::testing::Combine(
-//         ::testing::Values(Transport::CUSTOM_WITH_FRAMING, Transport::CUSTOM_WITHOUT_FRAMING),
-//         ::testing::Values(MiddlewareKind::FASTDDS),
-//         ::testing::Values(0.0f)));
+INSTANTIATE_TEST_CASE_P(
+    TransportAndLostCustomTransports,
+    PublisherSubscriberNoLost,
+    ::testing::Combine(
+        ::testing::Values(Transport::CUSTOM_WITH_FRAMING, Transport::CUSTOM_WITHOUT_FRAMING),
+        ::testing::Values(MiddlewareKind::FASTDDS),
+        ::testing::Values(0.0f)));
 
 TEST_P(PublisherSubscriberLost, PubSub1FragmentedTopic2Parts)
 {
