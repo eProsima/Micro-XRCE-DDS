@@ -11,8 +11,7 @@ static std::map<int32_t, packet_fifo> agent_to_client_packet_queue;
 static std::map<int32_t, stream_fifo> client_to_agent_stream_queue;
 static std::map<int32_t, stream_fifo> agent_to_client_stream_queue;
 
-std::mutex client_to_agent_mtx;
-std::mutex agent_to_client_mtx;
+std::mutex transport_mtx;
 
 template <class T>
 static int32_t find_queue_with_data(const std::map<int32_t, T>& m)
@@ -43,8 +42,7 @@ eprosima::uxr::CustomAgent::InitFunction agent_custom_transport_open = []() -> b
 
 eprosima::uxr::CustomAgent::FiniFunction agent_custom_transport_close = []() -> bool
 {
-    std::unique_lock<std::mutex> lock1(client_to_agent_mtx);
-    std::unique_lock<std::mutex> lock2(agent_to_client_mtx);
+    std::unique_lock<std::mutex> lock(transport_mtx);
 
     client_to_agent_stream_queue.clear();
     client_to_agent_packet_queue.clear();
@@ -69,7 +67,7 @@ eprosima::uxr::CustomAgent::RecvMsgFunction agent_custom_transport_read_packet =
 
     while (uxr_millis() - init_time < timeout)
     {   
-        std::unique_lock<std::mutex> lock(client_to_agent_mtx);
+        std::unique_lock<std::mutex> lock(transport_mtx);
 
         int32_t index = find_queue_with_data(client_to_agent_packet_queue);
         if (0 <= index)
@@ -108,7 +106,7 @@ eprosima::uxr::CustomAgent::SendMsgFunction agent_custom_transport_write_packet 
         size_t message_length,
         eprosima::uxr::TransportRc& transport_rc) -> ssize_t
 {
-    std::unique_lock<std::mutex> lock(agent_to_client_mtx);
+    std::unique_lock<std::mutex> lock(transport_mtx);
     int32_t index = static_cast<int32_t>(destination_endpoint->get_member<uint32_t>("index"));
 
     std::vector<uint8_t> packet(buffer, buffer + message_length);
@@ -134,7 +132,7 @@ eprosima::uxr::CustomAgent::RecvMsgFunction agent_custom_transport_read_stream =
 
     while (uxr_millis() - init_time < timeout)
     {   
-        std::unique_lock<std::mutex> lock(client_to_agent_mtx);
+        std::unique_lock<std::mutex> lock(transport_mtx);
 
         int32_t index = find_queue_with_data(client_to_agent_stream_queue);
         if (0 <= index)
@@ -172,7 +170,7 @@ eprosima::uxr::CustomAgent::SendMsgFunction agent_custom_transport_write_stream 
         size_t message_length,
         eprosima::uxr::TransportRc& transport_rc) -> ssize_t
 {
-    std::unique_lock<std::mutex> lock(agent_to_client_mtx);
+    std::unique_lock<std::mutex> lock(transport_mtx);
     int32_t index = static_cast<int32_t>(destination_endpoint->get_member<uint32_t>("index"));
 
     for (size_t i = 0; i < message_length; i++)
@@ -208,8 +206,7 @@ extern "C"
         int32_t index = *(int32_t*) transport->args;
         free(transport->args);
         
-        std::unique_lock<std::mutex> lock1(client_to_agent_mtx);
-        std::unique_lock<std::mutex> lock2(agent_to_client_mtx);
+        std::unique_lock<std::mutex> lock(transport_mtx);
 
         erase_fifo_by_index(client_to_agent_packet_queue, index);
         erase_fifo_by_index(client_to_agent_stream_queue, index);
@@ -225,7 +222,7 @@ extern "C"
 
         int32_t index = *(int32_t*) transport->args;
 
-        std::unique_lock<std::mutex> lock(client_to_agent_mtx);
+        std::unique_lock<std::mutex> lock(transport_mtx);
 
         std::vector<uint8_t> packet(buf, buf + len);
         client_to_agent_packet_queue[index].emplace(std::move(packet));
@@ -244,7 +241,7 @@ extern "C"
 
         while (uxr_millis() - init_time < timeout)
         {
-            std::unique_lock<std::mutex> lock(agent_to_client_mtx);
+            std::unique_lock<std::mutex> lock(transport_mtx);
 
             if (0 < agent_to_client_packet_queue[index].size())
             {
@@ -275,7 +272,7 @@ extern "C"
 
         int32_t index = *(int32_t*) transport->args;
 
-        std::unique_lock<std::mutex> lock(client_to_agent_mtx);
+        std::unique_lock<std::mutex> lock(transport_mtx);
 
         for (size_t i = 0; i < len; i++)
         {
@@ -297,7 +294,7 @@ extern "C"
 
         while (uxr_millis() - init_time < timeout)
         {
-            std::unique_lock<std::mutex> lock(agent_to_client_mtx);
+            std::unique_lock<std::mutex> lock(transport_mtx);
 
             if (0 < agent_to_client_stream_queue[index].size())
             {
