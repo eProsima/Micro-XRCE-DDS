@@ -447,12 +447,12 @@ TEST_P(ClientAgentInteraction, PingFromClientToAgent)
     ASSERT_NO_FATAL_FAILURE(client_.ping_agent(transport_kind));
 }
 
-INSTANTIATE_TEST_CASE_P(
-    Transports,
-    ClientAgentInteraction,
-    ::testing::Combine(
-        ::testing::Values(Transport::UDP_IPV4_TRANSPORT, Transport::TCP_IPV4_TRANSPORT, Transport::UDP_IPV6_TRANSPORT, Transport::TCP_IPV6_TRANSPORT),
-        ::testing::Values(MiddlewareKind::FASTDDS, MiddlewareKind::FASTRTPS, MiddlewareKind::CED)));
+// INSTANTIATE_TEST_CASE_P(
+//     Transports,
+//     ClientAgentInteraction,
+//     ::testing::Combine(
+//         ::testing::Values(Transport::UDP_IPV4_TRANSPORT, Transport::TCP_IPV4_TRANSPORT, Transport::UDP_IPV6_TRANSPORT, Transport::TCP_IPV6_TRANSPORT),
+//         ::testing::Values(MiddlewareKind::FASTDDS, MiddlewareKind::FASTRTPS, MiddlewareKind::CED)));
 
 INSTANTIATE_TEST_CASE_P(
     CustomTransports,
