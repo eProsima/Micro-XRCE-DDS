@@ -1,7 +1,8 @@
 #include "Custom_transports.hpp"
 #include <uxr/client/util/time.h>
 
-#include <unistd.h>
+#include <chrono>
+#include <thread>
 #include <queue>
 
 using packet_fifo = std::queue<std::vector<uint8_t>>;
@@ -93,7 +94,7 @@ eprosima::uxr::CustomAgent::RecvMsgFunction agent_custom_transport_read_packet =
         }
 
         lock.unlock();
-        usleep(10);
+        std::this_thread::sleep_for(std::chrono::microseconds(10));
     }
     
     if (!received)
@@ -160,7 +161,7 @@ eprosima::uxr::CustomAgent::RecvMsgFunction agent_custom_transport_read_stream =
         }
  
         lock.unlock();
-        usleep(10);
+        std::this_thread::sleep_for(std::chrono::microseconds(10));
     }
     
     if (!received)
@@ -270,7 +271,7 @@ extern "C"
             }
             
             lock.unlock();
-            usleep(10);
+            std::this_thread::sleep_for(std::chrono::microseconds(10));
         }
         
         return rv;
@@ -321,7 +322,7 @@ extern "C"
                 break;
             }
             lock.unlock();
-            usleep(10);
+            std::this_thread::sleep_for(std::chrono::microseconds(10));
         }
         
         return rv;
