@@ -211,21 +211,21 @@ TEST_P(PublisherSubscriberNoLost, PubSub1ContinousFragmentedTopic)
     check_messages(SMALL_MESSAGE, 30, 0x80);
 }*/
 
-// INSTANTIATE_TEST_CASE_P(
-//     TransportAndLost,
-//     PublisherSubscriberNoLost,
-//     ::testing::Combine(
-//         ::testing::Values(Transport::UDP_IPV4_TRANSPORT, Transport::UDP_IPV6_TRANSPORT, Transport::TCP_IPV4_TRANSPORT, Transport::TCP_IPV6_TRANSPORT),
-//         ::testing::Values(MiddlewareKind::FASTDDS, MiddlewareKind::FASTRTPS, MiddlewareKind::CED),
-//         ::testing::Values(0.0f)));
-
 INSTANTIATE_TEST_CASE_P(
-    TransportAndLostCustomTransports,
+    TransportAndLost,
     PublisherSubscriberNoLost,
     ::testing::Combine(
-        ::testing::Values(Transport::CUSTOM_WITH_FRAMING, Transport::CUSTOM_WITHOUT_FRAMING),
-        ::testing::Values(MiddlewareKind::FASTDDS),
+        ::testing::Values(Transport::UDP_IPV4_TRANSPORT, Transport::UDP_IPV6_TRANSPORT, Transport::TCP_IPV4_TRANSPORT, Transport::TCP_IPV6_TRANSPORT),
+        ::testing::Values(MiddlewareKind::FASTDDS, MiddlewareKind::FASTRTPS, MiddlewareKind::CED),
         ::testing::Values(0.0f)));
+
+// INSTANTIATE_TEST_CASE_P(
+//     TransportAndLostCustomTransports,
+//     PublisherSubscriberNoLost,
+//     ::testing::Combine(
+//         ::testing::Values(Transport::CUSTOM_WITH_FRAMING, Transport::CUSTOM_WITHOUT_FRAMING),
+//         ::testing::Values(MiddlewareKind::FASTDDS),
+//         ::testing::Values(0.0f)));
 
 TEST_P(PublisherSubscriberLost, PubSub1FragmentedTopic2Parts)
 {
@@ -251,13 +251,13 @@ TEST_P(PublisherSubscriberLost, PubSub3FragmentedTopic4Parts)
     check_messages(message, 3, 0x80);
 }
 
-// INSTANTIATE_TEST_CASE_P(
-//     TransportAndLost,
-//     PublisherSubscriberLost,
-//     ::testing::Combine(
-//         ::testing::Values(Transport::UDP_IPV4_TRANSPORT),
-//         ::testing::Values(MiddlewareKind::CED),
-//         ::testing::Values(0.05f, 0.1f)));
+INSTANTIATE_TEST_CASE_P(
+    TransportAndLost,
+    PublisherSubscriberLost,
+    ::testing::Combine(
+        ::testing::Values(Transport::UDP_IPV4_TRANSPORT),
+        ::testing::Values(MiddlewareKind::CED),
+        ::testing::Values(0.05f, 0.1f)));
 
 
 int main(int args, char** argv)
