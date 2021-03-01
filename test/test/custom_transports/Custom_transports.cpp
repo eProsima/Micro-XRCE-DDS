@@ -1,6 +1,7 @@
 #include "Custom_transports.hpp"
 #include <uxr/client/util/time.h>
 
+#include <unistd.h>
 #include <queue>
 
 using packet_fifo = std::queue<std::vector<uint8_t>>;
@@ -90,6 +91,9 @@ eprosima::uxr::CustomAgent::RecvMsgFunction agent_custom_transport_read_packet =
             
             break;
         }
+
+        lock.unlock();
+        usleep(10);
     }
     
     if (!received)
@@ -154,6 +158,9 @@ eprosima::uxr::CustomAgent::RecvMsgFunction agent_custom_transport_read_stream =
             
             break;
         }
+ 
+        lock.unlock();
+        usleep(10);
     }
     
     if (!received)
@@ -261,6 +268,9 @@ extern "C"
                 
                 break;
             }
+            
+            lock.unlock();
+            usleep(10);
         }
         
         return rv;
@@ -310,6 +320,8 @@ extern "C"
                 
                 break;
             }
+            lock.unlock();
+            usleep(10);
         }
         
         return rv;
