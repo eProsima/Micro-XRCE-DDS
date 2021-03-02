@@ -46,4 +46,5 @@ add_subdirectory(test/interaction_client)
 add_subdirectory(test/client_agent)
 add_subdirectory(test/publisher_subscriber)
 add_subdirectory(test/discovery)
+add_subdirectory(test/custom_transports)
 #add_subdirectory(test/shapes_demo) TODO (julibert): fix client and agent paths.

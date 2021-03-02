@@ -4,6 +4,7 @@
 #include "BigHelloWorld.h"
 #include "Gateway.hpp"
 #include <EntitiesInfo.hpp>
+#include <../custom_transports/Custom_transports.hpp>
 
 #include <uxr/client/client.h>
 #include <uxr/client/util/ping.h>
@@ -18,7 +19,9 @@ enum class Transport
     UDP_IPV4_TRANSPORT,
     UDP_IPV6_TRANSPORT,
     TCP_IPV4_TRANSPORT,
-    TCP_IPV6_TRANSPORT
+    TCP_IPV6_TRANSPORT,
+    CUSTOM_WITH_FRAMING,
+    CUSTOM_WITHOUT_FRAMING
 };
 
 inline bool operator == (const uxrObjectId& obj1, const uxrObjectId& obj2)
@@ -278,6 +281,34 @@ public:
                 ASSERT_TRUE(uxr_init_tcp_transport(&tcp_transport_, UXR_IPv6, ip, port));
                 uxr_init_session(&session_, gateway_.monitorize(&tcp_transport_.comm), client_key_);
                 break;
+            case Transport::CUSTOM_WITHOUT_FRAMING:
+                mtu_ = UXR_CONFIG_CUSTOM_TRANSPORT_MTU;
+
+                uxr_set_custom_transport_callbacks(
+                    &custom_transport_,
+                    false,
+                    client_custom_transport_open,
+                    client_custom_transport_close,
+                    client_custom_transport_write_packet,
+                    client_custom_transport_read_packet);
+
+                ASSERT_TRUE(uxr_init_custom_transport(&custom_transport_, NULL));
+                uxr_init_session(&session_, gateway_.monitorize(&custom_transport_.comm), client_key_);
+                break;
+            case Transport::CUSTOM_WITH_FRAMING:
+                mtu_ = UXR_CONFIG_CUSTOM_TRANSPORT_MTU;
+
+                uxr_set_custom_transport_callbacks(
+                    &custom_transport_,
+                    true,
+                    client_custom_transport_open,
+                    client_custom_transport_close,
+                    client_custom_transport_write_stream,
+                    client_custom_transport_read_stream);
+
+                ASSERT_TRUE(uxr_init_custom_transport(&custom_transport_, NULL));
+                uxr_init_session(&session_, gateway_.monitorize(&custom_transport_.comm), client_key_);
+                break;
         }
 
         init_common();
@@ -306,6 +337,10 @@ public:
             case Transport::TCP_IPV6_TRANSPORT:
                 ASSERT_TRUE(uxr_close_tcp_transport(&tcp_transport_));
                 break;
+            case Transport::CUSTOM_WITHOUT_FRAMING:
+            case Transport::CUSTOM_WITH_FRAMING:
+                ASSERT_TRUE(uxr_close_custom_transport(&custom_transport_));
+                break;
         }
     }
 
@@ -331,6 +366,12 @@ public:
             case Transport::TCP_IPV6_TRANSPORT:
             {
                 comm = &tcp_transport_.comm;
+                break;
+            }
+            case Transport::CUSTOM_WITHOUT_FRAMING:
+            case Transport::CUSTOM_WITH_FRAMING:
+            {
+                comm = &custom_transport_.comm;
                 break;
             }
         }
@@ -422,6 +463,7 @@ private:
 
     uxrUDPTransport udp_transport_;
     uxrTCPTransport tcp_transport_;
+    uxrCustomTransport custom_transport_;
 
     size_t mtu_;
     uxrSession session_;
