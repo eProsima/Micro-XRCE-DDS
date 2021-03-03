@@ -205,14 +205,14 @@ public:
 
             ucdrBuffer ub;
             uint32_t topic_size = BigHelloWorld_size_of_topic(&topic, 0);
-            bool prepared = false;
+            uint16_t prepared = false;
             if (topic_size < mtu_)
             {
                 prepared = uxr_prepare_output_stream(&session_, output_stream_id, datawriter_id, &ub, topic_size);
             } else {
                 prepared = uxr_prepare_output_stream_fragmented(&session_, output_stream_id, datawriter_id, &ub, topic_size, flush_session);
             }
-            ASSERT_TRUE(prepared);
+            ASSERT_NE(prepared, UXR_INVALID_REQUEST_ID);
             bool written = BigHelloWorld_serialize_topic(&ub, &topic);
             ASSERT_TRUE(written);
             ASSERT_FALSE(ub.error);
