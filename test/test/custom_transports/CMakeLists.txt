@@ -1,4 +1,4 @@
-# Copyright 2019 Proyectos y Sistemas de Mantenimiento SL (eProsima).
+# Copyright 2021-present Proyectos y Sistemas de Mantenimiento SL (eProsima).
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,27 +12,25 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-include(${PROJECT_SOURCE_DIR}/cmake/common/check_configuration.cmake)
+# include(${PROJECT_SOURCE_DIR}/cmake/common/check_configuration.cmake)
 
-cmake_host_system_information(RESULT HOSTNAME_SUFFIX QUERY HOSTNAME)
+# cmake_host_system_information(RESULT HOSTNAME_SUFFIX QUERY HOSTNAME)
 
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/../common/EntitiesInfo.hpp.in
-    ${CMAKE_CURRENT_BINARY_DIR}/EntitiesInfo.hpp
-    @ONLY
-    )
+# configure_file(${CMAKE_CURRENT_SOURCE_DIR}/../common/EntitiesInfo.hpp.in
+#     ${CMAKE_CURRENT_BINARY_DIR}/EntitiesInfo.hpp
+#     @ONLY
+#     )
 
 set(SRCS
-    Gateway.cpp
-    BigHelloWorld.c
-    Discovery.cpp
+    Custom_transports.cpp
     )
 
-add_library(interaction_client STATIC ${SRCS})
+add_library(custom_transports STATIC ${SRCS})
 
-set_common_compile_options(interaction_client)
+set_common_compile_options(custom_transports)
 
 if(MSVC OR MSVC_IDE)
-    target_compile_options(interaction_client
+    target_compile_options(custom_transports
         PRIVATE
             /wd4996
         PUBLIC
@@ -40,7 +38,7 @@ if(MSVC OR MSVC_IDE)
         )
 endif()
 
-target_include_directories(interaction_client
+target_include_directories(custom_transports
     PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}
         ${CMAKE_CURRENT_BINARY_DIR}
@@ -48,15 +46,15 @@ target_include_directories(interaction_client
         ${GTEST_INCLUDE_DIRS}
     )
 
-target_link_libraries(interaction_client
+target_link_libraries(custom_transports
     PUBLIC
         microxrcedds_client
-        custom_transports
+        microxrcedds_agent
     PRIVATE
         ${GTEST_BOTH_LIBRARIES}
     )
 
-set_target_properties(interaction_client PROPERTIES
+set_target_properties(custom_transports PROPERTIES
     CXX_STANDARD
         11
     CXX_STANDARD_REQUIRED

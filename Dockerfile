@@ -34,7 +34,7 @@ RUN cd /uxrce/build && \
         -DCMAKE_INSTALL_PREFIX=../install \
         -DUXRCE_BUILD_EXAMPLES=ON \
         .. &&\
-    make && make install
+    make -j $(nproc) && make install
 
 # Prepare Micro XRCE-DDS artifacts
 RUN cd /uxrce && \
