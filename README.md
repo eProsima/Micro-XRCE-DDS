@@ -25,13 +25,13 @@ This is made possible by the creation of *DDS Entities* on the *Agent* as a resu
 
 The communication between a *Micro XRCE-DDS Client* and a *Micro XRCE-DDS Agent* is achieved by means of several kinds of built-in transports: **UDPv4**, **UDPv6**, **TCPv4**, **TCPv6** and **Serial** communication. In addition, there is the possibility for the user to generate its own **Custom** transport.
 
+<p align="center"> <img src="docs/General.png" alt="Image" width="70%"/> </p>
+
 This repository contains the totality of the *eProsima Micro XRCE-DDS* products:
 
 - *Micro XRCE-DDS Client*
 - *Micro XRCE-DDS Client*
 - *Micro XRCE-DDS Gen*
-
-<p align="center"> <img src="docs/General.png" alt="Image" width="70%"/> </p>
 
 ## Documentation
 
