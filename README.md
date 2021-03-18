@@ -29,9 +29,9 @@ The communication between a *Micro XRCE-DDS Client* and a *Micro XRCE-DDS Agent*
 
 This repository contains the totality of the *eProsima Micro XRCE-DDS* products:
 
-- *Micro XRCE-DDS Client*
-- *Micro XRCE-DDS Client*
-- *Micro XRCE-DDS Gen*
+- [*Micro XRCE-DDS Client*](https://github.com/eProsima/Micro-XRCE-DDS-Client)
+- [*Micro XRCE-DDS Agent*](https://github.com/eProsima/Micro-XRCE-DDS-Agent)
+- [*Micro XRCE-DDS Gen*](https://github.com/eProsima/Micro-XRCE-DDS-Gen)
 
 ## Documentation
 
