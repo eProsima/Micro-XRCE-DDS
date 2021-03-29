@@ -13,6 +13,9 @@
 #include <uxr/agent/transport/tcp/TCPv6AgentLinux.hpp>
 #endif
 
+#include <uxr/agent/transport/custom/CustomAgent.hpp>
+
+#include <../custom_transports/Custom_transports.hpp>
 
 #include <thread>
 
@@ -52,10 +55,15 @@ public:
             ASSERT_NO_FATAL_FAILURE(publisher_.init_transport(transport_, "127.0.0.1", std::to_string(AGENT_PORT).c_str()));
             ASSERT_NO_FATAL_FAILURE(subscriber_.init_transport(transport_, "127.0.0.1", std::to_string(AGENT_PORT).c_str()));
         }
-        else
+        else if (transport_ == Transport::UDP_IPV6_TRANSPORT || transport_ == Transport::TCP_IPV6_TRANSPORT)
         {
             ASSERT_NO_FATAL_FAILURE(publisher_.init_transport(transport_, "::1", std::to_string(AGENT_PORT).c_str()));
             ASSERT_NO_FATAL_FAILURE(subscriber_.init_transport(transport_, "::1", std::to_string(AGENT_PORT).c_str()));
+        }
+        else if (transport_ == Transport::CUSTOM_WITH_FRAMING || transport_ == Transport::CUSTOM_WITHOUT_FRAMING)
+        {
+            ASSERT_NO_FATAL_FAILURE(publisher_.init_transport(transport_, NULL, NULL));
+            ASSERT_NO_FATAL_FAILURE(subscriber_.init_transport(transport_, NULL, NULL));
         }
 
         switch (std::get<1>(GetParam()))
@@ -105,6 +113,36 @@ public:
                 agent_tcp6_->set_verbose_level(6);
                 ASSERT_TRUE(agent_tcp6_->start());
                 break;
+            case Transport::CUSTOM_WITHOUT_FRAMING:
+                agent_custom_endpoint_.add_member<uint32_t>("index");
+
+                agent_custom_.reset(new eprosima::uxr::CustomAgent(
+                    "custom_agent",
+                    &agent_custom_endpoint_,
+                    middleware_,
+                    false,
+                    agent_custom_transport_open,
+                    agent_custom_transport_close,
+                    agent_custom_transport_write_packet,
+                    agent_custom_transport_read_packet));
+                agent_custom_->set_verbose_level(6);
+                ASSERT_TRUE(agent_custom_->start());
+                break;                
+            case Transport::CUSTOM_WITH_FRAMING:
+                agent_custom_endpoint_.add_member<uint32_t>("index");
+
+                agent_custom_.reset(new eprosima::uxr::CustomAgent(
+                    "custom_agent",
+                    &agent_custom_endpoint_,
+                    middleware_,
+                    true,
+                    agent_custom_transport_open,
+                    agent_custom_transport_close,
+                    agent_custom_transport_write_stream,
+                    agent_custom_transport_read_stream));
+                agent_custom_->set_verbose_level(6);
+                ASSERT_TRUE(agent_custom_->start());
+                break;
         }
     }
 
@@ -123,6 +161,9 @@ protected:
     std::unique_ptr<eprosima::uxr::UDPv6Agent> agent_udp6_;
     std::unique_ptr<eprosima::uxr::TCPv4Agent> agent_tcp4_;
     std::unique_ptr<eprosima::uxr::TCPv6Agent> agent_tcp6_;
+    std::unique_ptr<eprosima::uxr::CustomAgent> agent_custom_;
+    eprosima::uxr::CustomEndPoint agent_custom_endpoint_;
+
     eprosima::uxr::Middleware::Kind middleware_;
     Client publisher_;
     Client subscriber_;
@@ -157,6 +198,12 @@ TEST_P(PublisherSubscriberNoLost, PubSub10TopicsReliable)
     check_messages(SMALL_MESSAGE, 10, 0x80);
 }
 
+TEST_P(PublisherSubscriberNoLost, PubSub1ContinousFragmentedTopic)
+{
+    std::string message(size_t(publisher_.get_mtu() * 8), 'A');
+    publisher_.publish(1, 0x80, 1, message);
+}
+
 // TODO (#4423) Fix the non-reliable behavior when messages is higher than the agent history to enable this
 /*TEST_P(PublisherSubscriberNoLost, PubSub30TopicsReliable)
 {
@@ -170,6 +217,14 @@ INSTANTIATE_TEST_CASE_P(
     ::testing::Combine(
         ::testing::Values(Transport::UDP_IPV4_TRANSPORT, Transport::UDP_IPV6_TRANSPORT, Transport::TCP_IPV4_TRANSPORT, Transport::TCP_IPV6_TRANSPORT),
         ::testing::Values(MiddlewareKind::FASTDDS, MiddlewareKind::FASTRTPS, MiddlewareKind::CED),
+        ::testing::Values(0.0f)));
+
+INSTANTIATE_TEST_CASE_P(
+    TransportAndLostCustomTransports,
+    PublisherSubscriberNoLost,
+    ::testing::Combine(
+        ::testing::Values(Transport::CUSTOM_WITH_FRAMING, Transport::CUSTOM_WITHOUT_FRAMING),
+        ::testing::Values(MiddlewareKind::FASTDDS),
         ::testing::Values(0.0f)));
 
 TEST_P(PublisherSubscriberLost, PubSub1FragmentedTopic2Parts)

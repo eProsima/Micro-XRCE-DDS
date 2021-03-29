@@ -37,7 +37,7 @@ extern "C"
 typedef struct BigHelloWorld
 {
     uint32_t index;
-    char message[4096];
+    char message[8192];
 
 } BigHelloWorld;
 

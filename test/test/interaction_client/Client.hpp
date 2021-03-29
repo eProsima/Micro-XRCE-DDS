@@ -4,19 +4,24 @@
 #include "BigHelloWorld.h"
 #include "Gateway.hpp"
 #include <EntitiesInfo.hpp>
+#include <../custom_transports/Custom_transports.hpp>
 
 #include <uxr/client/client.h>
+#include <uxr/client/util/ping.h>
 #include <ucdr/microcdr.h>
 
 #include <gtest/gtest.h>
 #include <iostream>
 #include <thread>
 
-enum class Transport {
+enum class Transport
+{
     UDP_IPV4_TRANSPORT,
     UDP_IPV6_TRANSPORT,
     TCP_IPV4_TRANSPORT,
-    TCP_IPV6_TRANSPORT
+    TCP_IPV6_TRANSPORT,
+    CUSTOM_WITH_FRAMING,
+    CUSTOM_WITHOUT_FRAMING
 };
 
 inline bool operator == (const uxrObjectId& obj1, const uxrObjectId& obj2)
@@ -33,6 +38,9 @@ inline bool operator == (const uxrStreamId& s1, const uxrStreamId& s2)
         && s1.direction == s2.direction;
 }
 
+extern "C" bool flush_session(uxrSession* session){
+    return uxr_run_session_until_confirm_delivery(session, 1000);
+}
 
 class Client
 {
@@ -197,8 +205,14 @@ public:
 
             ucdrBuffer ub;
             uint32_t topic_size = BigHelloWorld_size_of_topic(&topic, 0);
-            bool prepared = uxr_prepare_output_stream(&session_, output_stream_id, datawriter_id, &ub, topic_size);
-            ASSERT_TRUE(prepared);
+            uint16_t prepared = false;
+            if (topic_size < mtu_)
+            {
+                prepared = uxr_prepare_output_stream(&session_, output_stream_id, datawriter_id, &ub, topic_size);
+            } else {
+                prepared = uxr_prepare_output_stream_fragmented(&session_, output_stream_id, datawriter_id, &ub, topic_size, flush_session);
+            }
+            ASSERT_NE(prepared, UXR_INVALID_REQUEST_ID);
             bool written = BigHelloWorld_serialize_topic(&ub, &topic);
             ASSERT_TRUE(written);
             ASSERT_FALSE(ub.error);
@@ -249,23 +263,51 @@ public:
         {
             case Transport::UDP_IPV4_TRANSPORT:
                 mtu_ = UXR_CONFIG_UDP_TRANSPORT_MTU;
-                ASSERT_TRUE(uxr_init_udp_transport(&udp_transport_, &udp_platform_, UXR_IPv4, ip, port));
+                ASSERT_TRUE(uxr_init_udp_transport(&udp_transport_, UXR_IPv4, ip, port));
                 uxr_init_session(&session_, gateway_.monitorize(&udp_transport_.comm), client_key_);
                 break;
             case Transport::UDP_IPV6_TRANSPORT:
                 mtu_ = UXR_CONFIG_UDP_TRANSPORT_MTU;
-                ASSERT_TRUE(uxr_init_udp_transport(&udp_transport_, &udp_platform_, UXR_IPv6, ip, port));
+                ASSERT_TRUE(uxr_init_udp_transport(&udp_transport_, UXR_IPv6, ip, port));
                 uxr_init_session(&session_, gateway_.monitorize(&udp_transport_.comm), client_key_);
                 break;
             case Transport::TCP_IPV4_TRANSPORT:
                 mtu_ = UXR_CONFIG_TCP_TRANSPORT_MTU;
-                ASSERT_TRUE(uxr_init_tcp_transport(&tcp_transport_, &tcp_platform_, UXR_IPv4, ip, port));
+                ASSERT_TRUE(uxr_init_tcp_transport(&tcp_transport_, UXR_IPv4, ip, port));
                 uxr_init_session(&session_, gateway_.monitorize(&tcp_transport_.comm), client_key_);
                 break;
             case Transport::TCP_IPV6_TRANSPORT:
                 mtu_ = UXR_CONFIG_TCP_TRANSPORT_MTU;
-                ASSERT_TRUE(uxr_init_tcp_transport(&tcp_transport_, &tcp_platform_, UXR_IPv6, ip, port));
+                ASSERT_TRUE(uxr_init_tcp_transport(&tcp_transport_, UXR_IPv6, ip, port));
                 uxr_init_session(&session_, gateway_.monitorize(&tcp_transport_.comm), client_key_);
+                break;
+            case Transport::CUSTOM_WITHOUT_FRAMING:
+                mtu_ = UXR_CONFIG_CUSTOM_TRANSPORT_MTU;
+
+                uxr_set_custom_transport_callbacks(
+                    &custom_transport_,
+                    false,
+                    client_custom_transport_open,
+                    client_custom_transport_close,
+                    client_custom_transport_write_packet,
+                    client_custom_transport_read_packet);
+
+                ASSERT_TRUE(uxr_init_custom_transport(&custom_transport_, NULL));
+                uxr_init_session(&session_, gateway_.monitorize(&custom_transport_.comm), client_key_);
+                break;
+            case Transport::CUSTOM_WITH_FRAMING:
+                mtu_ = UXR_CONFIG_CUSTOM_TRANSPORT_MTU;
+
+                uxr_set_custom_transport_callbacks(
+                    &custom_transport_,
+                    true,
+                    client_custom_transport_open,
+                    client_custom_transport_close,
+                    client_custom_transport_write_stream,
+                    client_custom_transport_read_stream);
+
+                ASSERT_TRUE(uxr_init_custom_transport(&custom_transport_, NULL));
+                uxr_init_session(&session_, gateway_.monitorize(&custom_transport_.comm), client_key_);
                 break;
         }
 
@@ -295,12 +337,45 @@ public:
             case Transport::TCP_IPV6_TRANSPORT:
                 ASSERT_TRUE(uxr_close_tcp_transport(&tcp_transport_));
                 break;
+            case Transport::CUSTOM_WITHOUT_FRAMING:
+            case Transport::CUSTOM_WITH_FRAMING:
+                ASSERT_TRUE(uxr_close_custom_transport(&custom_transport_));
+                break;
         }
     }
 
     size_t get_mtu() const
     {
         return mtu_;
+    }
+
+    void ping_agent(
+            const Transport transport_kind)
+    {
+        uxrCommunication* comm(nullptr);
+
+        switch (transport_kind)
+        {
+            case Transport::UDP_IPV4_TRANSPORT:
+            case Transport::UDP_IPV6_TRANSPORT:
+            {
+                comm = &udp_transport_.comm;
+                break;
+            }
+            case Transport::TCP_IPV4_TRANSPORT:
+            case Transport::TCP_IPV6_TRANSPORT:
+            {
+                comm = &tcp_transport_.comm;
+                break;
+            }
+            case Transport::CUSTOM_WITHOUT_FRAMING:
+            case Transport::CUSTOM_WITH_FRAMING:
+            {
+                comm = &custom_transport_.comm;
+                break;
+            }
+        }
+        ASSERT_TRUE(uxr_ping_agent_attempts(comm, 1000, 1));
     }
 
 private:
@@ -315,12 +390,15 @@ private:
         ASSERT_EQ(UXR_STATUS_OK, session_.info.last_requested_status);
 
         /* Setup streams. */
-        output_best_effort_stream_buffer_.reset(new uint8_t[mtu_ * UXR_CONFIG_MAX_OUTPUT_BEST_EFFORT_STREAMS]{0});
-        output_reliable_stream_buffer_.reset(new uint8_t[mtu_ * history_ * UXR_CONFIG_MAX_OUTPUT_RELIABLE_STREAMS]{0});
-        input_reliable_stream_buffer_.reset(new uint8_t[mtu_ * history_ * UXR_CONFIG_MAX_INPUT_RELIABLE_STREAMS]{0});
+        output_best_effort_stream_buffer_.reset(
+            new std::vector<uint8_t>(mtu_ * UXR_CONFIG_MAX_OUTPUT_BEST_EFFORT_STREAMS, 0));
+        output_reliable_stream_buffer_.reset(
+            new std::vector<uint8_t>(mtu_ * history_ * UXR_CONFIG_MAX_OUTPUT_RELIABLE_STREAMS, 0));
+        input_reliable_stream_buffer_.reset(
+            new std::vector<uint8_t>(mtu_ * history_ * UXR_CONFIG_MAX_INPUT_RELIABLE_STREAMS, 0));
         for(size_t i = 0; i < UXR_CONFIG_MAX_OUTPUT_BEST_EFFORT_STREAMS; ++i)
         {
-            uint8_t* buffer = output_best_effort_stream_buffer_.get() + mtu_ * i;
+            uint8_t* buffer = output_best_effort_stream_buffer_->data() + mtu_ * i;
             (void) uxr_create_output_best_effort_stream(&session_, buffer, mtu_);
         }
         for(size_t i = 0; i < UXR_CONFIG_MAX_INPUT_BEST_EFFORT_STREAMS; ++i)
@@ -329,12 +407,12 @@ private:
         }
         for(size_t i = 0; i < UXR_CONFIG_MAX_OUTPUT_RELIABLE_STREAMS; ++i)
         {
-            uint8_t* buffer = output_reliable_stream_buffer_.get() + mtu_ * history_ * i;
+            uint8_t* buffer = output_reliable_stream_buffer_->data() + mtu_ * history_ * i;
             (void) uxr_create_output_reliable_stream(&session_, buffer , mtu_ * history_, history_);
         }
         for(size_t i = 0; i < UXR_CONFIG_MAX_INPUT_RELIABLE_STREAMS; ++i)
         {
-            uint8_t* buffer = input_reliable_stream_buffer_.get() + mtu_ * history_ * i;
+            uint8_t* buffer = input_reliable_stream_buffer_->data() + mtu_ * history_ * i;
             (void) uxr_create_input_reliable_stream(&session_, buffer, mtu_ * history_, history_);
         }
     }
@@ -377,12 +455,6 @@ private:
     }
 
     static uint32_t next_client_key_;
-    static const char* participant_xml_;
-    static const char* topic_xml_;
-    static const char* publisher_xml_;
-    static const char* subscriber_xml_;
-    static const char* datawriter_xml_;
-    static const char* datareader_xml_;
 
     Gateway gateway_;
 
@@ -390,16 +462,15 @@ private:
     uint16_t history_;
 
     uxrUDPTransport udp_transport_;
-    uxrUDPPlatform udp_platform_;
     uxrTCPTransport tcp_transport_;
-    uxrTCPPlatform tcp_platform_;
+    uxrCustomTransport custom_transport_;
 
     size_t mtu_;
     uxrSession session_;
 
-    std::unique_ptr<uint8_t[]> output_best_effort_stream_buffer_;
-    std::unique_ptr<uint8_t[]> output_reliable_stream_buffer_;
-    std::unique_ptr<uint8_t[]> input_reliable_stream_buffer_;
+    std::shared_ptr<std::vector<uint8_t>> output_best_effort_stream_buffer_;
+    std::shared_ptr<std::vector<uint8_t>> output_reliable_stream_buffer_;
+    std::shared_ptr<std::vector<uint8_t>> input_reliable_stream_buffer_;
 
     std::string expected_message_;
 

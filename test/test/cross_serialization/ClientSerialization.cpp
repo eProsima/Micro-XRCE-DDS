@@ -148,7 +148,7 @@ std::vector<uint8_t> ClientSerialization::info_payload()
     payload.object_info.config._.agent.xrce_version = XrceVersion{0x01, 0x23};
     payload.object_info.config._.agent.xrce_vendor_id = XrceVendorId{0x45, 0x67};
     payload.object_info.activity.kind = DDS_XRCE_OBJK_AGENT;
-    payload.object_info.activity._.agent.availibility = 1;
+    payload.object_info.activity._.agent.availability = 1;
     payload.object_info.activity._.agent.address_seq.size = 0x01;
     payload.object_info.activity._.agent.address_seq.data[0].format = ADDRESS_FORMAT_MEDIUM;
     payload.object_info.activity._.agent.address_seq.data[0]._.medium_locator.locator_port = 0x0123;

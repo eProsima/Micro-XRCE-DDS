@@ -27,11 +27,12 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
     set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
 endif()
 
-project(microxrcedds VERSION "1.3.1")
+project(microxrcedds VERSION "2.0.0")
 
-set(_client_tag v1.2.5)
-set(_agent_tag v1.4.1)
-set(_gen_tag v1.1.0)
+set(_client_tag master)
+set(_client_version 2.0.0)
+set(_agent_tag master)
+set(_gen_tag master)
 
 ###############################################################################
 # Build options.
@@ -41,6 +42,7 @@ option(UXRCE_ENABLE_CLIENT "Enable the building and installation of Micro XRCE-D
 option(UXRCE_ENABLE_AGENT "Enable the building and installation of Micro XRCE-DDS Agent." ON)
 option(UXRCE_ENABLE_GEN "Enable the building and installation of Micro XRCE-DDS Gen." OFF)
 option(UXRCE_BUILD_TESTS "Build tests." OFF)
+option(UXRCE_BUILD_PROFILING "Build profiling test executables.")
 
 option(UXRCE_BUILD_CI_TESTS "Build CI tests." OFF)
 if(UXRCE_BUILD_CI_TESTS)
@@ -149,6 +151,9 @@ if(UXRCE_ENABLE_AGENT)
             -DLIB_INSTALL_DIR:PATH=${LIB_INSTALL_DIR}
             -DDATA_INSTALL_DIR:PATH=${DATA_INSTALL_DIR}
             -DUAGENT_BUILD_TESTS:BOOL=${UXRCE_BUILD_TESTS}
+            -DUAGENT_P2P_CLIENT_TAG:STRING=${_client_tag}
+            -DUAGENT_P2P_CLIENT_VERSION:STRING=${_client_version}
+            -DUAGENT_BUILD_EXECUTABLE:BOOL=OFF
             -DUAGENT_ISOLATED_INSTALL:BOOL=OFF
             -DGTEST_INDIVIDUAL:BOOL=ON
         DEPENDS
@@ -233,6 +238,10 @@ if(UXRCE_BUILD_TESTS)
         DEPENDS
             ${_deps}
         )
+endif()
+
+if(UXRCE_BUILD_PROFILING)
+    add_subdirectory(test/profiling)
 endif()
 
 ###############################################################################
