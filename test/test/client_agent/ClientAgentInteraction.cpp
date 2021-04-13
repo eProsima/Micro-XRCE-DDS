@@ -264,6 +264,50 @@ TEST_P(ClientAgentInteraction, NewEntitiesCreationXMLReliable)
     }
 }
 
+TEST_P(ClientAgentInteraction, NewEntitiesCreationBINBestEffort)
+{
+    switch (std::get<1>(GetParam()))
+    {
+        case MiddlewareKind::FASTDDS:
+        {
+            ASSERT_NO_FATAL_FAILURE(client_.create_entities_bin<MiddlewareKind::FASTDDS>(1, 0x01, UXR_STATUS_OK, 0));
+            break;
+        }
+        case MiddlewareKind::FASTRTPS:
+        {
+            // Not implemented
+            break;
+        }
+        case MiddlewareKind::CED:
+        {
+            // Not implemented
+            break;
+        }
+    }
+}
+
+TEST_P(ClientAgentInteraction, NewEntitiesCreationBINReliable)
+{
+    switch (std::get<1>(GetParam()))
+    {
+        case MiddlewareKind::FASTDDS:
+        {
+            ASSERT_NO_FATAL_FAILURE(client_.create_entities_bin<MiddlewareKind::FASTDDS>(1, 0x80, UXR_STATUS_OK, 0));
+            break;
+        }
+        case MiddlewareKind::FASTRTPS:
+        {
+            // Not implemented
+            break;
+        }
+        case MiddlewareKind::CED:
+        {
+            // Not implemented
+            break;
+        }
+    }
+}
+
 TEST_P(ClientAgentInteraction, NewEntitiesCreationREFBestEffort)
 {
     switch (std::get<1>(GetParam()))

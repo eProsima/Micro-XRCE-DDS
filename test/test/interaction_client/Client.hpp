@@ -188,6 +188,81 @@ public:
         ASSERT_EQ(request_id, last_status_request_id_);
     }
 
+    template<MiddlewareKind Kind>
+    void create_entities_bin(uint8_t id, uint8_t stream_id_raw, uint8_t expected_status, uint8_t flags)
+    {
+        using EInfo = EntitiesInfo<Kind>;
+
+        uxrStreamId output_stream_id = uxr_stream_id_from_raw(stream_id_raw, UXR_OUTPUT_STREAM);
+        uint16_t request_id; uint8_t status;
+
+        uxrObjectId participant_id = uxr_object_id(id, UXR_PARTICIPANT_ID);
+        request_id =
+            uxr_buffer_create_participant_bin(
+                &session_, output_stream_id, participant_id, 0, flags);
+        ASSERT_NE(UXR_INVALID_REQUEST_ID, request_id);
+        uxr_run_session_until_all_status(&session_, timeout, &request_id, &status, 1);
+        ASSERT_EQ(expected_status, status);
+        ASSERT_EQ(expected_status, last_status_);
+        ASSERT_EQ(participant_id, last_status_object_id_);
+        ASSERT_EQ(request_id, last_status_request_id_);
+
+        uxrObjectId topic_id = uxr_object_id(id, UXR_TOPIC_ID);
+        request_id =
+            uxr_buffer_create_topic_bin(
+                &session_, output_stream_id, topic_id, participant_id, "topicname", "topictype", flags);
+        ASSERT_NE(UXR_INVALID_REQUEST_ID, request_id);
+        uxr_run_session_until_all_status(&session_, timeout, &request_id, &status, 1);
+        ASSERT_EQ(expected_status, status);
+        ASSERT_EQ(expected_status, last_status_);
+        ASSERT_EQ(topic_id, last_status_object_id_);
+        ASSERT_EQ(request_id, last_status_request_id_);
+
+        uxrObjectId publisher_id = uxr_object_id(id, UXR_PUBLISHER_ID);
+        request_id =
+            uxr_buffer_create_publisher_bin(
+                &session_, output_stream_id, publisher_id, participant_id, flags);
+        ASSERT_NE(UXR_INVALID_REQUEST_ID, request_id);
+        uxr_run_session_until_all_status(&session_, timeout, &request_id, &status, 1);
+        ASSERT_EQ(expected_status, status);
+        ASSERT_EQ(expected_status, last_status_);
+        ASSERT_EQ(publisher_id, last_status_object_id_);
+        ASSERT_EQ(request_id, last_status_request_id_);
+
+        uxrObjectId datawriter_id = uxr_object_id(id, UXR_DATAWRITER_ID);
+        request_id =
+            uxr_buffer_create_datawriter_bin(
+                &session_, output_stream_id, datawriter_id, publisher_id, "topicname", 1, 1, 1, flags);
+        ASSERT_NE(UXR_INVALID_REQUEST_ID, request_id);
+        uxr_run_session_until_all_status(&session_, timeout, &request_id, &status, 1);
+        ASSERT_EQ(expected_status, status);
+        ASSERT_EQ(expected_status, last_status_);
+        ASSERT_EQ(datawriter_id, last_status_object_id_);
+        ASSERT_EQ(request_id, last_status_request_id_);
+
+        uxrObjectId subscriber_id = uxr_object_id(id, UXR_SUBSCRIBER_ID);
+        request_id =
+            uxr_buffer_create_subscriber_bin(
+                &session_, output_stream_id, subscriber_id, participant_id, flags);
+        ASSERT_NE(UXR_INVALID_REQUEST_ID, request_id);
+        uxr_run_session_until_all_status(&session_, timeout, &request_id, &status, 1);
+        ASSERT_EQ(expected_status, status);
+        ASSERT_EQ(expected_status, last_status_);
+        ASSERT_EQ(subscriber_id, last_status_object_id_);
+        ASSERT_EQ(request_id, last_status_request_id_);
+
+        uxrObjectId datareader_id = uxr_object_id(id, UXR_DATAREADER_ID);
+        request_id =
+            uxr_buffer_create_datareader_bin(
+                &session_, output_stream_id, datareader_id, subscriber_id, "topicname", 1, 1, 1, flags);
+        ASSERT_NE(UXR_INVALID_REQUEST_ID, request_id);
+        uxr_run_session_until_all_status(&session_, timeout, &request_id, &status, 1);
+        ASSERT_EQ(expected_status, status);
+        ASSERT_EQ(expected_status, last_status_);
+        ASSERT_EQ(datareader_id, last_status_object_id_);
+        ASSERT_EQ(request_id, last_status_request_id_);
+    }
+
     void publish(uint8_t id, uint8_t stream_id_raw, size_t number, const std::string& message)
     {
         //Used only for waiting the RTPS subscriber matching
