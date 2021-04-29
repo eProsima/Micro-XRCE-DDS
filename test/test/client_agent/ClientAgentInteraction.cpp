@@ -377,6 +377,29 @@ TEST_P(ClientAgentInteraction, ExistantEntitiesCreationReuseXMLXMLReliable)
     }
 }
 
+TEST_P(ClientAgentInteraction, ExistantEntitiesCreationReuseBINBINReliable)
+{
+    switch (std::get<1>(GetParam()))
+    {
+        case MiddlewareKind::FASTDDS:
+        {
+            ASSERT_NO_FATAL_FAILURE(client_.create_entities_bin<MiddlewareKind::FASTDDS>(1, 0x80, UXR_STATUS_OK, 0));
+            ASSERT_NO_FATAL_FAILURE(client_.create_entities_bin<MiddlewareKind::FASTDDS>(1, 0x80, UXR_STATUS_OK_MATCHED, UXR_REUSE));
+            break;
+        }
+        case MiddlewareKind::FASTRTPS:
+        {
+            // Not implemented
+            break;
+        }
+        case MiddlewareKind::CED:
+        {
+            // Not implemented
+            break;
+        }
+    }
+}
+
 /* TODO (#3589): Fix XML and REF reference issue to enable this test.
 TEST_P(ClientAgentInteraction, ExistantEntitiesCreationReuseXMLREFReliable)
 {
@@ -410,7 +433,7 @@ TEST_P(ClientAgentInteraction, ExistantEntitiesCreationReuseREFREFReliable)
     }
 }
 
-TEST_P(ClientAgentInteraction, ExistantEntitiesCreationReplaceReliable)
+TEST_P(ClientAgentInteraction, ExistantEntitiesCreationReplaceXMLXMLReliable)
 {
     switch (std::get<1>(GetParam()))
     {
@@ -435,7 +458,30 @@ TEST_P(ClientAgentInteraction, ExistantEntitiesCreationReplaceReliable)
     }
 }
 
-TEST_P(ClientAgentInteraction, ExistantEntitiesCreationNoReplaceReliable)
+TEST_P(ClientAgentInteraction, ExistantEntitiesCreationReplaceBINBINReliable)
+{
+    switch (std::get<1>(GetParam()))
+    {
+        case MiddlewareKind::FASTDDS:
+        {
+            ASSERT_NO_FATAL_FAILURE(client_.create_entities_bin<MiddlewareKind::FASTDDS>(1, 0x80, UXR_STATUS_OK, 0));
+            ASSERT_NO_FATAL_FAILURE(client_.create_entities_bin<MiddlewareKind::FASTDDS>(1, 0x80, UXR_STATUS_OK, UXR_REPLACE));
+            break;
+        }
+        case MiddlewareKind::FASTRTPS:
+        {
+            // Not implemented
+            break;
+        }
+        case MiddlewareKind::CED:
+        {
+            // Not implemented
+            break;
+        }
+    }
+}
+
+TEST_P(ClientAgentInteraction, ExistantEntitiesCreationNoReplaceXMLXMLReliable)
 {
     switch (std::get<1>(GetParam()))
     {
@@ -460,7 +506,30 @@ TEST_P(ClientAgentInteraction, ExistantEntitiesCreationNoReplaceReliable)
     }
 }
 
-TEST_P(ClientAgentInteraction, ExistantEntitiesCreationReplaceReuseReliable)
+TEST_P(ClientAgentInteraction, ExistantEntitiesCreationNoReplaceBINBINReliable)
+{
+    switch (std::get<1>(GetParam()))
+    {
+        case MiddlewareKind::FASTDDS:
+        {
+            ASSERT_NO_FATAL_FAILURE(client_.create_entities_bin<MiddlewareKind::FASTDDS>(1, 0x80, UXR_STATUS_OK, 0));
+            ASSERT_NO_FATAL_FAILURE(client_.create_entities_bin<MiddlewareKind::FASTDDS>(1, 0x80, UXR_STATUS_ERR_ALREADY_EXISTS, 0));
+            break;
+        }
+        case MiddlewareKind::FASTRTPS:
+        {
+            // Not implemented
+            break;
+        }
+        case MiddlewareKind::CED:
+        {
+            // Not implemented
+            break;
+        }
+    }
+}
+
+TEST_P(ClientAgentInteraction, ExistantEntitiesCreationReplaceReuseXMLXMLReliable)
 {
     switch (std::get<1>(GetParam()))
     {
@@ -480,6 +549,29 @@ TEST_P(ClientAgentInteraction, ExistantEntitiesCreationReplaceReuseReliable)
         {
             ASSERT_NO_FATAL_FAILURE(client_.create_entities_xml<MiddlewareKind::CED>(1, 0x80, UXR_STATUS_OK, 0));
             ASSERT_NO_FATAL_FAILURE(client_.create_entities_xml<MiddlewareKind::CED>(1, 0x80, UXR_STATUS_OK_MATCHED, UXR_REPLACE | UXR_REUSE));
+            break;
+        }
+    }
+}
+
+TEST_P(ClientAgentInteraction, ExistantEntitiesCreationReplaceReuseBINBINReliable)
+{
+    switch (std::get<1>(GetParam()))
+    {
+        case MiddlewareKind::FASTDDS:
+        {
+            ASSERT_NO_FATAL_FAILURE(client_.create_entities_bin<MiddlewareKind::FASTDDS>(1, 0x80, UXR_STATUS_OK, 0));
+            ASSERT_NO_FATAL_FAILURE(client_.create_entities_bin<MiddlewareKind::FASTDDS>(1, 0x80, UXR_STATUS_OK_MATCHED, UXR_REPLACE | UXR_REUSE));
+            break;
+        }
+        case MiddlewareKind::FASTRTPS:
+        {
+            // Not implemented
+            break;
+        }
+        case MiddlewareKind::CED:
+        {
+            // Not implemented
             break;
         }
     }

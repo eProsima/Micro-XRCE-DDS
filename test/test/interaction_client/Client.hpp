@@ -191,8 +191,6 @@ public:
     template<MiddlewareKind Kind>
     void create_entities_bin(uint8_t id, uint8_t stream_id_raw, uint8_t expected_status, uint8_t flags)
     {
-        using EInfo = EntitiesInfo<Kind>;
-
         uxrStreamId output_stream_id = uxr_stream_id_from_raw(stream_id_raw, UXR_OUTPUT_STREAM);
         uint16_t request_id; uint8_t status;
 
