@@ -24,6 +24,13 @@ enum class Transport
     CUSTOM_WITHOUT_FRAMING
 };
 
+enum class XRCECreationMode
+{
+    XRCE_XML_CREATION,
+    XRCE_BIN_CREATION,
+    XRCE_REF_CREATION
+};
+
 inline bool operator == (const uxrObjectId& obj1, const uxrObjectId& obj2)
 {
     return obj1.id == obj2.id
@@ -230,7 +237,7 @@ public:
         uxrObjectId datawriter_id = uxr_object_id(id, UXR_DATAWRITER_ID);
         request_id =
             uxr_buffer_create_datawriter_bin(
-                &session_, output_stream_id, datawriter_id, publisher_id, "topicname", 1, 1, 1, flags);
+                &session_, output_stream_id, datawriter_id, publisher_id, "topicname", 1, 0, 1, flags);
         ASSERT_NE(UXR_INVALID_REQUEST_ID, request_id);
         uxr_run_session_until_all_status(&session_, timeout, &request_id, &status, 1);
         ASSERT_EQ(expected_status, status);
@@ -252,7 +259,7 @@ public:
         uxrObjectId datareader_id = uxr_object_id(id, UXR_DATAREADER_ID);
         request_id =
             uxr_buffer_create_datareader_bin(
-                &session_, output_stream_id, datareader_id, subscriber_id, "topicname", 1, 1, 1, flags);
+                &session_, output_stream_id, datareader_id, subscriber_id, "topicname", 1, 0, 1, flags);
         ASSERT_NE(UXR_INVALID_REQUEST_ID, request_id);
         uxr_run_session_until_all_status(&session_, timeout, &request_id, &status, 1);
         ASSERT_EQ(expected_status, status);
