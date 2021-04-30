@@ -19,7 +19,7 @@
 
 #include <thread>
 
-class PublisherSubscriberNoLost : public ::testing::TestWithParam<std::tuple<Transport, MiddlewareKind, float>>
+class PublisherSubscriberNoLost : public ::testing::TestWithParam<std::tuple<Transport, MiddlewareKind, float, XRCECreationMode>>
 {
 public:
     const uint16_t AGENT_PORT = 2018 + uint16_t(std::get<0>(this->GetParam()));
@@ -66,21 +66,39 @@ public:
             ASSERT_NO_FATAL_FAILURE(subscriber_.init_transport(transport_, NULL, NULL));
         }
 
-        switch (std::get<1>(GetParam()))
+        if (std::get<3>(GetParam()) == XRCECreationMode::XRCE_XML_CREATION)
         {
-        case MiddlewareKind::FASTDDS:
-            ASSERT_NO_FATAL_FAILURE(publisher_.create_entities_xml<MiddlewareKind::FASTDDS>(1, 0x80, UXR_STATUS_OK, 0));
-            ASSERT_NO_FATAL_FAILURE(subscriber_.create_entities_xml<MiddlewareKind::FASTDDS>(1, 0x80, UXR_STATUS_OK, 0));
-            break;
-        case MiddlewareKind::FASTRTPS:
-            ASSERT_NO_FATAL_FAILURE(publisher_.create_entities_xml<MiddlewareKind::FASTRTPS>(1, 0x80, UXR_STATUS_OK, 0));
-            ASSERT_NO_FATAL_FAILURE(subscriber_.create_entities_xml<MiddlewareKind::FASTRTPS>(1, 0x80, UXR_STATUS_OK, 0));
-            break;
-        case MiddlewareKind::CED:
-            ASSERT_NO_FATAL_FAILURE(publisher_.create_entities_xml<MiddlewareKind::CED>(1, 0x80, UXR_STATUS_OK, 0));
-            ASSERT_NO_FATAL_FAILURE(subscriber_.create_entities_xml<MiddlewareKind::CED>(1, 0x80, UXR_STATUS_OK, 0));
-            break;
+            switch (std::get<1>(GetParam()))
+            {
+            case MiddlewareKind::FASTDDS:
+                ASSERT_NO_FATAL_FAILURE(publisher_.create_entities_xml<MiddlewareKind::FASTDDS>(1, 0x80, UXR_STATUS_OK, 0));
+                ASSERT_NO_FATAL_FAILURE(subscriber_.create_entities_xml<MiddlewareKind::FASTDDS>(1, 0x80, UXR_STATUS_OK, 0));
+                break;
+            case MiddlewareKind::FASTRTPS:
+                ASSERT_NO_FATAL_FAILURE(publisher_.create_entities_xml<MiddlewareKind::FASTRTPS>(1, 0x80, UXR_STATUS_OK, 0));
+                ASSERT_NO_FATAL_FAILURE(subscriber_.create_entities_xml<MiddlewareKind::FASTRTPS>(1, 0x80, UXR_STATUS_OK, 0));
+                break;
+            case MiddlewareKind::CED:
+                ASSERT_NO_FATAL_FAILURE(publisher_.create_entities_xml<MiddlewareKind::CED>(1, 0x80, UXR_STATUS_OK, 0));
+                ASSERT_NO_FATAL_FAILURE(subscriber_.create_entities_xml<MiddlewareKind::CED>(1, 0x80, UXR_STATUS_OK, 0));
+                break;
+            }
         }
+        else if (std::get<3>(GetParam()) == XRCECreationMode::XRCE_BIN_CREATION)
+        {
+            switch (std::get<1>(GetParam()))
+            {
+            case MiddlewareKind::FASTDDS:
+                ASSERT_NO_FATAL_FAILURE(publisher_.create_entities_bin<MiddlewareKind::FASTDDS>(1, 0x80, UXR_STATUS_OK, 0));
+                ASSERT_NO_FATAL_FAILURE(subscriber_.create_entities_bin<MiddlewareKind::FASTDDS>(1, 0x80, UXR_STATUS_OK, 0));
+                break;
+            default:
+                // Not supported
+                ASSERT_TRUE(0);
+                break;
+            }
+        }
+    
     }
 
     void TearDown() override
@@ -217,7 +235,17 @@ INSTANTIATE_TEST_CASE_P(
     ::testing::Combine(
         ::testing::Values(Transport::UDP_IPV4_TRANSPORT, Transport::UDP_IPV6_TRANSPORT, Transport::TCP_IPV4_TRANSPORT, Transport::TCP_IPV6_TRANSPORT),
         ::testing::Values(MiddlewareKind::FASTDDS, MiddlewareKind::FASTRTPS, MiddlewareKind::CED),
-        ::testing::Values(0.0f)));
+        ::testing::Values(0.0f),
+        ::testing::Values(XRCECreationMode::XRCE_XML_CREATION)));
+
+INSTANTIATE_TEST_CASE_P(
+    TransportAndLostCreationModes,
+    PublisherSubscriberNoLost,
+    ::testing::Combine(
+        ::testing::Values(Transport::UDP_IPV4_TRANSPORT),
+        ::testing::Values(MiddlewareKind::FASTDDS),
+        ::testing::Values(0.0f),
+        ::testing::Values(XRCECreationMode::XRCE_XML_CREATION, XRCECreationMode::XRCE_BIN_CREATION)));
 
 INSTANTIATE_TEST_CASE_P(
     TransportAndLostCustomTransports,
@@ -225,7 +253,8 @@ INSTANTIATE_TEST_CASE_P(
     ::testing::Combine(
         ::testing::Values(Transport::CUSTOM_WITH_FRAMING, Transport::CUSTOM_WITHOUT_FRAMING),
         ::testing::Values(MiddlewareKind::FASTDDS),
-        ::testing::Values(0.0f)));
+        ::testing::Values(0.0f),
+        ::testing::Values(XRCECreationMode::XRCE_XML_CREATION)));
 
 TEST_P(PublisherSubscriberLost, PubSub1FragmentedTopic2Parts)
 {
@@ -257,7 +286,8 @@ INSTANTIATE_TEST_CASE_P(
     ::testing::Combine(
         ::testing::Values(Transport::UDP_IPV4_TRANSPORT),
         ::testing::Values(MiddlewareKind::CED),
-        ::testing::Values(0.05f, 0.1f)));
+        ::testing::Values(0.05f, 0.1f),
+        ::testing::Values(XRCECreationMode::XRCE_XML_CREATION)));
 
 
 int main(int args, char** argv)
