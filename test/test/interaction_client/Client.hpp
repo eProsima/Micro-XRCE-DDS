@@ -204,7 +204,7 @@ public:
         uxrObjectId participant_id = uxr_object_id(id, UXR_PARTICIPANT_ID);
         request_id =
             uxr_buffer_create_participant_bin(
-                &session_, output_stream_id, participant_id, 0, flags);
+                &session_, output_stream_id, participant_id, 0, "participant_name", flags);
         ASSERT_NE(UXR_INVALID_REQUEST_ID, request_id);
         uxr_run_session_until_all_status(&session_, timeout, &request_id, &status, 1);
         ASSERT_EQ(expected_status, status);
