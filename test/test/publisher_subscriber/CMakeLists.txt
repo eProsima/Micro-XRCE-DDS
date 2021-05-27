@@ -19,11 +19,15 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/DEFAULT_FASTRTPS_PROFILES.xml.in
     @ONLY
     )
 
-add_executable(publisher-subscriber-interaction-test PublisherSubscriberInteraction.cpp)
+add_executable(publisher-subscriber-interaction-test 
+    PublisherSubscriberInteraction.cpp
+    PublisherSubscriberSerial.cpp
+    )
 
 add_gtest(publisher-subscriber-interaction-test
     SOURCES
         PublisherSubscriberInteraction.cpp
+        PublisherSubscriberSerial.cpp
     ENVIRONMENTS
         $<$<PLATFORM_ID:Linux>:LD_LIBRARY_PATH=${CMAKE_PREFIX_PATH}/lib>
         $<$<PLATFORM_ID:Windows>:PATH=${CMAKE_PREFIX_PATH}/bin>
