@@ -20,6 +20,8 @@ enum class Transport
     UDP_IPV6_TRANSPORT,
     TCP_IPV4_TRANSPORT,
     TCP_IPV6_TRANSPORT,
+    SERIAL_TRANSPORT,
+    MULTISERIAL_TRANSPORT,
     CUSTOM_WITH_FRAMING,
     CUSTOM_WITHOUT_FRAMING
 };
@@ -45,9 +47,7 @@ inline bool operator == (const uxrStreamId& s1, const uxrStreamId& s2)
         && s1.direction == s2.direction;
 }
 
-extern "C" bool flush_session(uxrSession* session){
-    return uxr_run_session_until_confirm_delivery(session, 1000);
-}
+extern "C" bool flush_session(uxrSession* session);
 
 class Client
 {
@@ -298,7 +298,6 @@ public:
             ASSERT_FALSE(ub.error);
             bool sent = uxr_run_session_until_confirm_delivery(&session_, timeout);
             ASSERT_TRUE(sent);
-            std::cout << "topic sent: " << i << std::endl;
         }
     }
 
@@ -334,6 +333,7 @@ public:
             ASSERT_EQ(UXR_STATUS_OK, last_status_);
             ASSERT_EQ(datareader_id, last_status_object_id_);
             ASSERT_EQ(request_id, last_status_request_id_);
+            std::cout << "msg " << expected_topic_index_ << " received." << std::endl;
         }
     }
 
@@ -389,6 +389,9 @@ public:
                 ASSERT_TRUE(uxr_init_custom_transport(&custom_transport_, NULL));
                 uxr_init_session(&session_, gateway_.monitorize(&custom_transport_.comm), client_key_);
                 break;
+            default:
+                FAIL() << "Transport type not supported";
+                break;
         }
 
         init_common();
@@ -420,6 +423,9 @@ public:
             case Transport::CUSTOM_WITHOUT_FRAMING:
             case Transport::CUSTOM_WITH_FRAMING:
                 ASSERT_TRUE(uxr_close_custom_transport(&custom_transport_));
+                break;
+            default:
+                FAIL() << "Transport type not supported";
                 break;
         }
     }
@@ -454,15 +460,22 @@ public:
                 comm = &custom_transport_.comm;
                 break;
             }
+            default:
+                FAIL() << "Transport type not supported";
+                break;
         }
         ASSERT_TRUE(uxr_ping_agent_attempts(comm, 1000, 1));
     }
 
-private:
+protected:
     void init_common()
     {
-        /* Setup callback. */
-        uxr_set_topic_callback(&session_, on_topic_dispatcher, this);
+        if (session_.on_topic == NULL)
+        {
+            /* Setup callback. */
+            uxr_set_topic_callback(&session_, on_topic_dispatcher, this);
+        }
+        
         uxr_set_status_callback(&session_, on_status_dispatcher, this);
 
         /* Create session. */
@@ -502,6 +515,11 @@ private:
         static_cast<Client*>(args)->on_topic(session_, object_id, request_id, stream_id, serialization, length);
     }
 
+    static void on_topic_multi_dispatcher(uxrSession* session_, uxrObjectId object_id, uint16_t request_id, uxrStreamId stream_id, struct ucdrBuffer* serialization, uint16_t length, void* args)
+    {
+        static_cast<Client*>(args)->on_topic_multi(session_, object_id, request_id, stream_id, serialization, length);
+    }
+
     void on_topic(uxrSession* session, uxrObjectId object_id, uint16_t request_id, uxrStreamId stream_id, struct ucdrBuffer* serialization, uint16_t length)
     {
         (void) session;
@@ -518,6 +536,21 @@ private:
         expected_topic_index_++;
 
         std::cout << "topic received: " << topic.index << std::endl;
+    }
+
+    void on_topic_multi(uxrSession* session, uxrObjectId object_id, uint16_t request_id, uxrStreamId stream_id, struct ucdrBuffer* serialization, uint16_t length)
+    {
+        (void) session;
+        (void) length;
+
+        BigHelloWorld topic;
+        BigHelloWorld_deserialize_topic(serialization, &topic);
+
+        ASSERT_STREQ(expected_message_.c_str(), topic.message);
+        last_topic_object_id_ = object_id;
+        last_topic_stream_id_ = stream_id;
+        last_topic_request_id_ = request_id;
+        expected_topic_index_++;
     }
 
     static void on_status_dispatcher(uxrSession* session_, uxrObjectId object_id, uint16_t request_id, uint8_t status, void* args)
@@ -563,7 +596,5 @@ private:
     uint16_t last_topic_request_id_;
     size_t expected_topic_index_;
 };
-
-uint32_t Client::next_client_key_ = 0;
 
 #endif //IN_TEST_CLIENT_HPP

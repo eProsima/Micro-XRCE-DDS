@@ -19,11 +19,17 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/DEFAULT_FASTRTPS_PROFILES.xml.in
     @ONLY
     )
 
-add_executable(client-agent-test ClientAgentInteraction.cpp)
+set(SRCS ClientAgentInteraction.cpp)
+
+if(NOT WIN32)
+    list(APPEND SRCS ClientAgentSerial.cpp)
+endif()
+
+add_executable(client-agent-test ${SRCS})
 
 add_gtest(client-agent-test
     SOURCES
-        ClientAgentInteraction.cpp
+        ${SRCS}
     ENVIRONMENTS
         $<$<PLATFORM_ID:Linux>:LD_LIBRARY_PATH=${CMAKE_PREFIX_PATH}/lib>
         $<$<PLATFORM_ID:Windows>:PATH=${CMAKE_PREFIX_PATH}/bin>

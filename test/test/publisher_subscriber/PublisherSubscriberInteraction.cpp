@@ -1,23 +1,94 @@
 #include <gtest/gtest.h>
+#include <thread>
 
 #include <Client.hpp>
-#ifdef _WIN32
-#include <uxr/agent/transport/udp/UDPv4AgentWindows.hpp>
-#include <uxr/agent/transport/udp/UDPv6AgentWindows.hpp>
-#include <uxr/agent/transport/tcp/TCPv4AgentWindows.hpp>
-#include <uxr/agent/transport/tcp/TCPv6AgentWindows.hpp>
-#else
-#include <uxr/agent/transport/udp/UDPv4AgentLinux.hpp>
-#include <uxr/agent/transport/udp/UDPv6AgentLinux.hpp>
-#include <uxr/agent/transport/tcp/TCPv4AgentLinux.hpp>
-#include <uxr/agent/transport/tcp/TCPv6AgentLinux.hpp>
-#endif
+#include "../client_agent/ClientAgentInteraction.hpp"
 
-#include <uxr/agent/transport/custom/CustomAgent.hpp>
+class PubSub : public Client
+{
+public:
+    PubSub(std::tuple<Transport, MiddlewareKind, float, XRCECreationMode> parameters,
+          const uint16_t AGENT_PORT,
+          uint8_t id)
+        : Client(std::get<2>(parameters), 8)
+        , transport_(std::get<0>(parameters))
+        , middleware_(std::get<1>(parameters))
+        , creation_mode_(std::get<3>(parameters))
+        , AGENT_PORT_(AGENT_PORT)
+        , id_(id)
+    {        
+    }
 
-#include <../custom_transports/Custom_transports.hpp>
+    ~PubSub()
+    {}
 
-#include <thread>
+    void init()
+    {
+        switch(transport_)
+        {
+            case Transport::UDP_IPV4_TRANSPORT:
+            case Transport::TCP_IPV4_TRANSPORT:
+            {
+                ASSERT_NO_FATAL_FAILURE(Client::init_transport(transport_, "127.0.0.1", std::to_string(AGENT_PORT_).c_str()));
+                break;
+            }
+            case Transport::UDP_IPV6_TRANSPORT:
+            case Transport::TCP_IPV6_TRANSPORT:
+            {
+                ASSERT_NO_FATAL_FAILURE(Client::init_transport(transport_, "::1", std::to_string(AGENT_PORT_).c_str()));
+                break;
+            }
+            
+            case Transport::CUSTOM_WITH_FRAMING:
+            case Transport::CUSTOM_WITHOUT_FRAMING:
+            {
+                ASSERT_NO_FATAL_FAILURE(Client::init_transport(transport_, NULL, NULL));
+                break;
+            }
+        }
+
+        if (creation_mode_ == XRCECreationMode::XRCE_XML_CREATION)
+        {
+            switch (middleware_)
+            {
+                case MiddlewareKind::FASTDDS:
+                    ASSERT_NO_FATAL_FAILURE(Client::create_entities_xml<MiddlewareKind::FASTDDS>(1, 0x80, UXR_STATUS_OK, 0));
+                    break;
+                case MiddlewareKind::FASTRTPS:
+                    ASSERT_NO_FATAL_FAILURE(Client::create_entities_xml<MiddlewareKind::FASTRTPS>(1, 0x80, UXR_STATUS_OK, 0));
+                    break;
+                case MiddlewareKind::CED:
+                    ASSERT_NO_FATAL_FAILURE(Client::create_entities_xml<MiddlewareKind::CED>(1, 0x80, UXR_STATUS_OK, 0));
+                    break;
+            }
+        }
+        else if (creation_mode_ == XRCECreationMode::XRCE_BIN_CREATION)
+        {
+            switch (middleware_)
+            {
+                case MiddlewareKind::FASTDDS:
+                    ASSERT_NO_FATAL_FAILURE(Client::create_entities_bin<MiddlewareKind::FASTDDS>(1, 0x80, UXR_STATUS_OK, 0));
+                    break;
+                default:
+                    // Not supported
+                    ASSERT_TRUE(0);
+                    break;
+            }
+        }
+    }
+
+    void close()
+    {
+        ASSERT_NO_FATAL_FAILURE(Client::close_transport(transport_));
+    }
+
+private:
+    const uint16_t AGENT_PORT_;
+    Transport transport_;
+    MiddlewareKind middleware_;
+    XRCECreationMode creation_mode_;
+    uint8_t id_;
+};
 
 class PublisherSubscriberNoLost : public ::testing::TestWithParam<std::tuple<Transport, MiddlewareKind, float, XRCECreationMode>>
 {
@@ -26,23 +97,11 @@ public:
 
     PublisherSubscriberNoLost()
         : transport_(std::get<0>(GetParam()))
-        , middleware_{}
-        , publisher_(std::get<2>(GetParam()), 8)
-        , subscriber_(std::get<2>(GetParam()), 8)
-    {
-        switch (std::get<1>(GetParam()))
-        {
-        case MiddlewareKind::FASTDDS:
-            middleware_ = eprosima::uxr::Middleware::Kind::FASTDDS;
-            break;
-        case MiddlewareKind::FASTRTPS:
-            middleware_ = eprosima::uxr::Middleware::Kind::FASTRTPS;
-            break;
-        case MiddlewareKind::CED:
-            middleware_ = eprosima::uxr::Middleware::Kind::CED;
-            break;
-        }
-        init_agent(AGENT_PORT);
+        , agent_(transport_, (MiddlewareKind) std::get<1>(GetParam()), AGENT_PORT)
+        , publisher_(GetParam(), AGENT_PORT, 1)
+        , subscriber_(GetParam(), AGENT_PORT, 1)
+    {        
+        agent_.start();
     }
 
     ~PublisherSubscriberNoLost()
@@ -50,118 +109,14 @@ public:
 
     void SetUp() override
     {
-        if (transport_ == Transport::UDP_IPV4_TRANSPORT || transport_ == Transport::TCP_IPV4_TRANSPORT)
-        {
-            ASSERT_NO_FATAL_FAILURE(publisher_.init_transport(transport_, "127.0.0.1", std::to_string(AGENT_PORT).c_str()));
-            ASSERT_NO_FATAL_FAILURE(subscriber_.init_transport(transport_, "127.0.0.1", std::to_string(AGENT_PORT).c_str()));
-        }
-        else if (transport_ == Transport::UDP_IPV6_TRANSPORT || transport_ == Transport::TCP_IPV6_TRANSPORT)
-        {
-            ASSERT_NO_FATAL_FAILURE(publisher_.init_transport(transport_, "::1", std::to_string(AGENT_PORT).c_str()));
-            ASSERT_NO_FATAL_FAILURE(subscriber_.init_transport(transport_, "::1", std::to_string(AGENT_PORT).c_str()));
-        }
-        else if (transport_ == Transport::CUSTOM_WITH_FRAMING || transport_ == Transport::CUSTOM_WITHOUT_FRAMING)
-        {
-            ASSERT_NO_FATAL_FAILURE(publisher_.init_transport(transport_, NULL, NULL));
-            ASSERT_NO_FATAL_FAILURE(subscriber_.init_transport(transport_, NULL, NULL));
-        }
-
-        if (std::get<3>(GetParam()) == XRCECreationMode::XRCE_XML_CREATION)
-        {
-            switch (std::get<1>(GetParam()))
-            {
-            case MiddlewareKind::FASTDDS:
-                ASSERT_NO_FATAL_FAILURE(publisher_.create_entities_xml<MiddlewareKind::FASTDDS>(1, 0x80, UXR_STATUS_OK, 0));
-                ASSERT_NO_FATAL_FAILURE(subscriber_.create_entities_xml<MiddlewareKind::FASTDDS>(1, 0x80, UXR_STATUS_OK, 0));
-                break;
-            case MiddlewareKind::FASTRTPS:
-                ASSERT_NO_FATAL_FAILURE(publisher_.create_entities_xml<MiddlewareKind::FASTRTPS>(1, 0x80, UXR_STATUS_OK, 0));
-                ASSERT_NO_FATAL_FAILURE(subscriber_.create_entities_xml<MiddlewareKind::FASTRTPS>(1, 0x80, UXR_STATUS_OK, 0));
-                break;
-            case MiddlewareKind::CED:
-                ASSERT_NO_FATAL_FAILURE(publisher_.create_entities_xml<MiddlewareKind::CED>(1, 0x80, UXR_STATUS_OK, 0));
-                ASSERT_NO_FATAL_FAILURE(subscriber_.create_entities_xml<MiddlewareKind::CED>(1, 0x80, UXR_STATUS_OK, 0));
-                break;
-            }
-        }
-        else if (std::get<3>(GetParam()) == XRCECreationMode::XRCE_BIN_CREATION)
-        {
-            switch (std::get<1>(GetParam()))
-            {
-            case MiddlewareKind::FASTDDS:
-                ASSERT_NO_FATAL_FAILURE(publisher_.create_entities_bin<MiddlewareKind::FASTDDS>(1, 0x80, UXR_STATUS_OK, 0));
-                ASSERT_NO_FATAL_FAILURE(subscriber_.create_entities_bin<MiddlewareKind::FASTDDS>(1, 0x80, UXR_STATUS_OK, 0));
-                break;
-            default:
-                // Not supported
-                ASSERT_TRUE(0);
-                break;
-            }
-        }
-    
+        publisher_.init();
+        subscriber_.init();
     }
 
     void TearDown() override
     {
-        ASSERT_NO_FATAL_FAILURE(publisher_.close_transport(transport_));
-        ASSERT_NO_FATAL_FAILURE(subscriber_.close_transport(transport_));
-    }
-
-    void init_agent(uint16_t port)
-    {
-        switch(transport_)
-        {
-            case Transport::UDP_IPV4_TRANSPORT:
-                agent_udp4_.reset(new eprosima::uxr::UDPv4Agent(port, middleware_));
-                agent_udp4_->set_verbose_level(6);
-                ASSERT_TRUE(agent_udp4_->start());
-                break;
-            case Transport::UDP_IPV6_TRANSPORT:
-                agent_udp6_.reset(new eprosima::uxr::UDPv6Agent(port, middleware_));
-                agent_udp6_->set_verbose_level(6);
-                ASSERT_TRUE(agent_udp6_->start());
-                break;
-            case Transport::TCP_IPV4_TRANSPORT:
-                agent_tcp4_.reset(new eprosima::uxr::TCPv4Agent(port, middleware_));
-                agent_tcp4_->set_verbose_level(6);
-                ASSERT_TRUE(agent_tcp4_->start());
-                break;
-            case Transport::TCP_IPV6_TRANSPORT:
-                agent_tcp6_.reset(new eprosima::uxr::TCPv6Agent(port, middleware_));
-                agent_tcp6_->set_verbose_level(6);
-                ASSERT_TRUE(agent_tcp6_->start());
-                break;
-            case Transport::CUSTOM_WITHOUT_FRAMING:
-                agent_custom_endpoint_.add_member<uint32_t>("index");
-
-                agent_custom_.reset(new eprosima::uxr::CustomAgent(
-                    "custom_agent",
-                    &agent_custom_endpoint_,
-                    middleware_,
-                    false,
-                    agent_custom_transport_open,
-                    agent_custom_transport_close,
-                    agent_custom_transport_write_packet,
-                    agent_custom_transport_read_packet));
-                agent_custom_->set_verbose_level(6);
-                ASSERT_TRUE(agent_custom_->start());
-                break;                
-            case Transport::CUSTOM_WITH_FRAMING:
-                agent_custom_endpoint_.add_member<uint32_t>("index");
-
-                agent_custom_.reset(new eprosima::uxr::CustomAgent(
-                    "custom_agent",
-                    &agent_custom_endpoint_,
-                    middleware_,
-                    true,
-                    agent_custom_transport_open,
-                    agent_custom_transport_close,
-                    agent_custom_transport_write_stream,
-                    agent_custom_transport_read_stream));
-                agent_custom_->set_verbose_level(6);
-                ASSERT_TRUE(agent_custom_->start());
-                break;
-        }
+        ASSERT_NO_FATAL_FAILURE(publisher_.close());
+        ASSERT_NO_FATAL_FAILURE(subscriber_.close());
     }
 
     void check_messages(std::string message, size_t number, uint8_t stream_id_raw)
@@ -175,16 +130,9 @@ public:
 
 protected:
     Transport transport_;
-    std::unique_ptr<eprosima::uxr::UDPv4Agent> agent_udp4_;
-    std::unique_ptr<eprosima::uxr::UDPv6Agent> agent_udp6_;
-    std::unique_ptr<eprosima::uxr::TCPv4Agent> agent_tcp4_;
-    std::unique_ptr<eprosima::uxr::TCPv6Agent> agent_tcp6_;
-    std::unique_ptr<eprosima::uxr::CustomAgent> agent_custom_;
-    eprosima::uxr::CustomEndPoint agent_custom_endpoint_;
-
-    eprosima::uxr::Middleware::Kind middleware_;
-    Client publisher_;
-    Client subscriber_;
+    Agent agent_;
+    PubSub publisher_;
+    PubSub subscriber_;
     static const std::string SMALL_MESSAGE;
 };
 
