@@ -28,38 +28,69 @@ set(SRCS
     Discovery.cpp
     )
 
-add_library(interaction_client STATIC ${SRCS})
+list(APPEND libs interaction_client)
+find_library(CLIENT microxrcedds_client REQUIRED 
+    HINTS ${PROJECT_BINARY_DIR}/../../../temp_install/lib/libmicroxrcedds_client.a)
 
-set_common_compile_options(interaction_client)
-
-if(MSVC OR MSVC_IDE)
-    target_compile_options(interaction_client
-        PRIVATE
-            /wd4996
-        PUBLIC
-            -D_CRT_SECURE_NO_WARNINGS
-        )
+if(UXRCE_TEST_THREAD)
+    list(APPEND libs interaction_thread_client)
+    find_library(CLIENT_MULTITHREAD thread_microxrcedds_client REQUIRED 
+    HINTS ${PROJECT_BINARY_DIR}/../../../temp_install/lib/libthread_microxrcedds_client.a)
 endif()
 
-target_include_directories(interaction_client
-    PUBLIC
-        ${CMAKE_CURRENT_SOURCE_DIR}
-        ${CMAKE_CURRENT_BINARY_DIR}
-    PRIVATE
-        ${GTEST_INCLUDE_DIRS}
-    )
+foreach(lib ${libs})
+    add_library(${lib} STATIC ${SRCS})
+    set_common_compile_options(${lib})
 
-target_link_libraries(interaction_client
-    PUBLIC
-        microxrcedds_client
-        custom_transports
-    PRIVATE
-        ${GTEST_BOTH_LIBRARIES}
-    )
+    if(MSVC OR MSVC_IDE)
+        target_compile_options(${lib}
+            PRIVATE
+                /wd4996
+            PUBLIC
+                -D_CRT_SECURE_NO_WARNINGS
+            )
+    endif()
 
-set_target_properties(interaction_client PROPERTIES
-    CXX_STANDARD
-        11
-    CXX_STANDARD_REQUIRED
-        YES
-    )
+    if(${lib} STREQUAL interaction_client)
+        target_include_directories(${lib}
+        PUBLIC
+            ${PROJECT_BINARY_DIR}/../../../temp_install/include
+            ${CMAKE_CURRENT_SOURCE_DIR}
+            ${CMAKE_CURRENT_BINARY_DIR}
+        PRIVATE
+            ${GTEST_INCLUDE_DIRS}
+        )
+
+        target_link_libraries(${lib}
+        PUBLIC
+            ${CLIENT}
+            custom_transports
+        PRIVATE
+            ${GTEST_BOTH_LIBRARIES}
+        )
+    elseif(${lib} STREQUAL interaction_thread_client)
+        target_include_directories(${lib}
+            PUBLIC
+                ${PROJECT_BINARY_DIR}/../../../temp_install/include_thread
+                ${CMAKE_CURRENT_BINARY_DIR}
+                ${CMAKE_CURRENT_SOURCE_DIR}
+            PRIVATE
+                ${GTEST_INCLUDE_DIRS}
+            )
+
+        target_link_libraries(${lib}
+        PUBLIC
+            ${CLIENT_MULTITHREAD}
+            custom_transports
+        PRIVATE
+            ${GTEST_BOTH_LIBRARIES}
+        )
+    endif()
+
+    set_target_properties(${lib} PROPERTIES
+        CXX_STANDARD
+            11
+        CXX_STANDARD_REQUIRED
+            YES
+        )
+endforeach()

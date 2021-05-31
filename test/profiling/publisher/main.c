@@ -101,7 +101,7 @@ int main(int args, char** argv)
         ucdrBuffer ub;
         uxr_prepare_output_stream(&session, besteffort_out, datawriter_id, &ub, 4 + strlen(topic));
         ucdr_serialize_string(&ub, topic);
-
+        UXR_UNLOCK_STREAM_ID(&session, besteffort_out);
         printf("Send topic %s, by %d\n", topic, client_key);
         connected = uxr_run_session_time(&session, 50);
         ++count;

@@ -121,6 +121,46 @@ if(UXRCE_ENABLE_CLIENT)
     list(APPEND _deps client)
 endif()
 
+if(UXRCE_TEST_THREAD)
+    ExternalProject_Add(client_thread
+        GIT_REPOSITORY
+            https://github.com/eProsima/Micro-XRCE-DDS-Client.git
+        GIT_TAG
+            ${_client_tag}
+        PREFIX
+            ${PROJECT_BINARY_DIR}/client_thread
+        INSTALL_DIR
+            ${PROJECT_BINARY_DIR}/temp_install
+        TEST_AFTER_INSTALL
+            ${_run_tests}
+        TEST_COMMAND
+            ${_test_command}
+        CMAKE_CACHE_ARGS
+            -DLIB_PREFIX:STRING=libthread_
+            -DUCLIENT_PROFILE_MULTITHREAD:BOOL=ON
+            -DCMAKE_CXX_COMPILER:FILEPATH=${CMAKE_CXX_COMPILER}
+            -DCMAKE_C_COMPILER:FILEPATH=${CMAKE_C_COMPILER}
+            -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
+            -DCMAKE_C_FLAGS:STRING=${CMAKE_C_FLAGS}
+            -DCMAKE_CXX_FLAGS:STRING=${CMAKE_CXX_FLAGS}
+            -DCMAKE_EXE_LINKER_FLAGS:STRING=${CMAKE_EXE_LINKER_FLAGS}
+            -DCMAKE_SHARED_LINKER_FLAGS:STRING=${CMAKE_SHARED_LINKER_FLAGS}
+            -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>
+            -DCMAKE_PREFIX_PATH:PATH=<INSTALL_DIR>
+            -DBIN_INSTALL_DIR:PATH=${BIN_INSTALL_DIR}
+            -DINCLUDE_INSTALL_DIR:PATH=${INCLUDE_INSTALL_DIR}_thread
+            -DLIB_INSTALL_DIR:PATH=${LIB_INSTALL_DIR}
+            -DDATA_INSTALL_DIR:PATH=${DATA_INSTALL_DIR}
+            -DUCLIENT_BUILD_EXAMPLES:BOOL=${UXRCE_BUILD_EXAMPLES}
+            -DUCLIENT_INSTALL_EXAMPLES:BOOL=${UXRCE_BUILD_EXAMPLES}
+            -DUCLIENT_PIC:BOOL=ON
+            -DUCLIENT_BUILD_TESTS:BOOL=${UXRCE_BUILD_TESTS}
+            -DUCLIENT_ISOLATED_INSTALL:BOOL=OFF
+            -DGTEST_INDIVIDUAL:BOOL=ON
+        )
+    list(APPEND _deps client_thread)
+endif()
+
 if(UXRCE_ENABLE_AGENT)
     ExternalProject_Add(agent
         GIT_REPOSITORY
@@ -223,6 +263,7 @@ if(UXRCE_BUILD_TESTS)
         TEST_COMMAND
             ${_test_command}
         CMAKE_CACHE_ARGS
+            -DUXRCE_TEST_THREAD:BOOL=${UXRCE_TEST_THREAD}
             -DCMAKE_CXX_COMPILER:FILEPATH=${CMAKE_CXX_COMPILER}
             -DCMAKE_C_COMPILER:FILEPATH=${CMAKE_C_COMPILER}
             -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
