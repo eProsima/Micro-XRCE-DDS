@@ -14,45 +14,34 @@
 
 cmake_host_system_information(RESULT HOSTNAME_SUFFIX QUERY HOSTNAME)
 
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/DEFAULT_FASTRTPS_PROFILES.xml.in
-    ${CMAKE_CURRENT_BINARY_DIR}/DEFAULT_FASTRTPS_PROFILES.xml
-    @ONLY
-    )
+add_executable(client-thread-test ClientAgentInteractionThread.cpp)
 
-set(SRCS PublisherSubscriberInteraction.cpp)
-
-if(NOT WIN32)
-    list(APPEND SRCS PublisherSubscriberSerial.cpp)
-endif()
-
-add_executable(publisher-subscriber-interaction-test ${SRCS})
-
-add_gtest(publisher-subscriber-interaction-test
+add_gtest(client-thread-test
     SOURCES
-        ${SRCS}
+        ClientAgentInteractionThread.cpp
     ENVIRONMENTS
         $<$<PLATFORM_ID:Linux>:LD_LIBRARY_PATH=${CMAKE_PREFIX_PATH}/lib>
         $<$<PLATFORM_ID:Windows>:PATH=${CMAKE_PREFIX_PATH}/bin>
     )
 
-target_include_directories(publisher-subscriber-interaction-test
+target_include_directories(client-thread-test
     PRIVATE
+        ${PROJECT_BINARY_DIR}/microxrcedds-build/itests
         ${GTEST_INCLUDE_DIR}
     )
 
-link_directories(${PROJECT_BINARY_DIR}/test/interaction_client)
-target_link_libraries(publisher-subscriber-interaction-test
+target_link_libraries(client-thread-test
     PRIVATE
-        interaction_client
+        interaction_thread_client
         microxrcedds_agent
         ${GTEST_BOTH_LIBRARIES}
         ${CMAKE_THREAD_LIBS_INIT}
     )
 
-set_target_properties(publisher-subscriber-interaction-test PROPERTIES
-        CXX_STANDARD
-            11
-        CXX_STANDARD_REQUIRED
-            YES
+set_target_properties(client-thread-test PROPERTIES
+    CXX_STANDARD
+        11
+    CXX_STANDARD_REQUIRED
+        YES
     )
 
