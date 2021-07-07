@@ -31,7 +31,7 @@ project(microxrcedds VERSION "2.0.0")
 
 set(_client_tag develop)
 set(_client_version 2.0.0)
-set(_agent_tag develop)
+set(_agent_tag fix/serial_timeout)
 set(_gen_tag master)
 
 ###############################################################################
