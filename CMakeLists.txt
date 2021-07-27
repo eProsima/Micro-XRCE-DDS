@@ -31,7 +31,7 @@ project(microxrcedds VERSION "2.0.0")
 
 set(_client_tag develop)
 set(_client_version 2.0.0)
-set(_agent_tag feature/stop_agent)
+set(_agent_tag fix/stop_windows)
 set(_gen_tag master)
 
 ###############################################################################
