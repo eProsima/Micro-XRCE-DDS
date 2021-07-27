@@ -47,7 +47,7 @@ inline bool operator == (const uxrStreamId& s1, const uxrStreamId& s2)
         && s1.direction == s2.direction;
 }
 
-extern "C" bool flush_session(uxrSession* session);
+extern "C" bool flush_session(uxrSession* session, void * args);
 
 class Client
 {
