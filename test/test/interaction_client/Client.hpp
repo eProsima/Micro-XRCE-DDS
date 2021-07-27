@@ -290,7 +290,7 @@ public:
             {
                 prepared = uxr_prepare_output_stream(&session_, output_stream_id, datawriter_id, &ub, topic_size);
             } else {
-                prepared = uxr_prepare_output_stream_fragmented(&session_, output_stream_id, datawriter_id, &ub, topic_size, flush_session);
+                prepared = uxr_prepare_output_stream_fragmented(&session_, output_stream_id, datawriter_id, &ub, topic_size, flush_session, NULL);
             }
             ASSERT_NE(prepared, UXR_INVALID_REQUEST_ID);
             bool written = BigHelloWorld_serialize_topic(&ub, &topic);
@@ -475,7 +475,7 @@ protected:
             /* Setup callback. */
             uxr_set_topic_callback(&session_, on_topic_dispatcher, this);
         }
-        
+
         uxr_set_status_callback(&session_, on_status_dispatcher, this);
 
         /* Create session. */
