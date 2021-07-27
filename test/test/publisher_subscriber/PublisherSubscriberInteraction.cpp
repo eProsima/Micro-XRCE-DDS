@@ -16,7 +16,7 @@ public:
         , creation_mode_(std::get<3>(parameters))
         , AGENT_PORT_(AGENT_PORT)
         , id_(id)
-    {        
+    {
     }
 
     ~PubSub()
@@ -38,7 +38,7 @@ public:
                 ASSERT_NO_FATAL_FAILURE(Client::init_transport(transport_, "::1", std::to_string(AGENT_PORT_).c_str()));
                 break;
             }
-            
+
             case Transport::CUSTOM_WITH_FRAMING:
             case Transport::CUSTOM_WITHOUT_FRAMING:
             {
@@ -79,7 +79,7 @@ public:
 
     void close()
     {
-        ASSERT_NO_FATAL_FAILURE(Client::close_transport(transport_));
+        Client::close_transport(transport_);
     }
 
 private:
@@ -100,7 +100,7 @@ public:
         , agent_(transport_, (MiddlewareKind) std::get<1>(GetParam()), AGENT_PORT)
         , publisher_(GetParam(), AGENT_PORT, 1)
         , subscriber_(GetParam(), AGENT_PORT, 1)
-    {        
+    {
         agent_.start();
     }
 
