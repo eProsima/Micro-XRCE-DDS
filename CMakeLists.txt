@@ -40,6 +40,7 @@ set(_gen_tag master)
 option(UXRCE_BUILD_EXAMPLES "Build and install examples." OFF)
 option(UXRCE_ENABLE_CLIENT "Enable the building and installation of Micro XRCE-DDS Client." ON)
 option(UXRCE_ENABLE_AGENT "Enable the building and installation of Micro XRCE-DDS Agent." ON)
+option(UXRCE_BUILD_AGENT_EXECUTABLE "Enable the buildin Micro XRCE-DDS Agent executable." OFF)
 option(UXRCE_ENABLE_GEN "Enable the building and installation of Micro XRCE-DDS Gen." OFF)
 option(UXRCE_BUILD_TESTS "Build tests." OFF)
 option(UXRCE_BUILD_PROFILING "Build profiling test executables.")
@@ -153,7 +154,7 @@ if(UXRCE_ENABLE_AGENT)
             -DUAGENT_BUILD_TESTS:BOOL=${UXRCE_BUILD_TESTS}
             -DUAGENT_P2P_CLIENT_TAG:STRING=${_client_tag}
             -DUAGENT_P2P_CLIENT_VERSION:STRING=${_client_version}
-            -DUAGENT_BUILD_EXECUTABLE:BOOL=ON
+            -DUAGENT_BUILD_EXECUTABLE:BOOL=${UXRCE_BUILD_AGENT_EXECUTABLE}
             -DUAGENT_ISOLATED_INSTALL:BOOL=OFF
             -DGTEST_INDIVIDUAL:BOOL=ON
         DEPENDS
