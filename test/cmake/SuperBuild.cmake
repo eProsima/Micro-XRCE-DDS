@@ -21,7 +21,7 @@ ExternalProject_Add(uagent
     PREFIX
         ${PROJECT_BINARY_DIR}/uagent
     GIT_REPOSITORY
-        https://github.com/eProsima/Micro-XRCE-DDS-Agent.git
+        https://github.com/kneep/Micro-XRCE-DDS-Agent.git
     GIT_TAG
         origin/${AGENT_BRANCH}
     GIT_SHALLOW
