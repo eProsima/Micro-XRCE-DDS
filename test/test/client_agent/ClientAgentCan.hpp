@@ -4,6 +4,9 @@
 #include <uxr/agent/transport/can/CanAgentLinux.hpp>
 #include <ClientCan.hpp>
 #include <fcntl.h>
+#include <stdlib.h>
+
+static bool initialized = false;
 
 class AgentCan
 {
@@ -33,6 +36,12 @@ public:
 
     void start()
     {
+        if (!initialized)
+        {
+            ASSERT_TRUE(0 == system("apt install -y iproute2 && ip link add dev vcan0 type vcan && ip link set vcan0 mtu 72 && ip link set dev vcan0 up"));
+            initialized = true;
+        }
+
         agent_can_.reset(new eprosima::uxr::CanAgent(dev, can_id, middleware_));
         agent_can_->set_verbose_level(6);
         ASSERT_TRUE(agent_can_->start());
