@@ -49,9 +49,6 @@ endif()
 ctest_empty_binary_directory(${CTEST_BINARY_DIRECTORY})
 
 if(UNIX)
-    add_custom_command(TARGET MainTest
-                       POST_BUILD
-                       COMMAND "ip link add dev vcan0 type vcan && ip link set vcan0 mtu 72 && ip link set dev vcan0 up")
     find_program(CTEST_COVERAGE_COMMAND NAMES gcov)
     find_program(CTEST_MEMORYCHECK_COMMAND NAMES valgrind)
 endif()
