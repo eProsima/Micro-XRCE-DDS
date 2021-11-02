@@ -38,7 +38,7 @@ public:
     {
         if (!initialized)
         {
-            ASSERT_TRUE(0 == system("apt install -y iproute2 && ip link add dev vcan0 type vcan && ip link set vcan0 mtu 72 && ip link set dev vcan0 up"));
+            ASSERT_TRUE(0 == system("sudo ip link add dev vcan0 type vcan && sudo ip link set vcan0 mtu 72 && sudo ip link set dev vcan0 up"));
             initialized = true;
         }
 
