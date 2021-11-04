@@ -5,8 +5,8 @@
 #include <ClientCan.hpp>
 #include <fcntl.h>
 #include <stdlib.h>
-
-static bool initialized = false;
+#include <sys/ioctl.h>
+#include <net/if.h>
 
 class AgentCan
 {
@@ -34,12 +34,22 @@ public:
     ~AgentCan()
     {}
 
+    bool is_interface_up(const char * interface) 
+    {
+        struct ifreq ifr;
+        int sock = socket(PF_CAN, SOCK_RAW, CAN_RAW);
+        memset(&ifr, 0, sizeof(ifr));
+        strcpy(ifr.ifr_name, interface);
+        ioctl(sock, SIOCGIFFLAGS, &ifr);
+        close(sock);
+        return !!(ifr.ifr_flags & IFF_UP);
+    }
+
     void start()
     {
-        if (!initialized)
+        if (!is_interface_up(dev))
         {
-            ASSERT_TRUE(0 == system("apt install -y iproute2 && ip link add dev vcan0 type vcan && ip link set vcan0 mtu 72 && ip link set dev vcan0 up"));
-            initialized = true;
+            ASSERT_TRUE(0 == system("ip link add dev vcan0 type vcan && ip link set vcan0 mtu 72 && ip link set dev vcan0 up"));
         }
 
         agent_can_.reset(new eprosima::uxr::CanAgent(dev, can_id, middleware_));
