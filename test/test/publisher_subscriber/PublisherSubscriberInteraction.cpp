@@ -69,6 +69,9 @@ public:
                 case MiddlewareKind::FASTDDS:
                     ASSERT_NO_FATAL_FAILURE(Client::create_entities_bin<MiddlewareKind::FASTDDS>(1, 0x80, UXR_STATUS_OK, 0));
                     break;
+                case MiddlewareKind::CED:
+                    ASSERT_NO_FATAL_FAILURE(Client::create_entities_bin<MiddlewareKind::CED>(1, 0x80, UXR_STATUS_OK, 0));
+                    break;
                 default:
                     // Not supported
                     ASSERT_TRUE(0);
