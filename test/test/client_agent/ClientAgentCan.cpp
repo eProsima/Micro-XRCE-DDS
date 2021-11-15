@@ -12,4 +12,4 @@ TEST_P(ClientAgentCan, PingFromClientToAgent)
 INSTANTIATE_TEST_CASE_P(
     CanTransports,
     ClientAgentCan,
-    ::testing::Values(MiddlewareKind::FASTDDS, MiddlewareKind::FASTRTPS, MiddlewareKind::CED));
+    ::testing::Values(MiddlewareKind::FASTDDS));
