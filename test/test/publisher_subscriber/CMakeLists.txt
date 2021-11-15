@@ -23,6 +23,7 @@ set(SRCS PublisherSubscriberInteraction.cpp)
 
 if(NOT WIN32)
     list(APPEND SRCS PublisherSubscriberSerial.cpp)
+    list(APPEND SRCS PublisherSubscriberCan.cpp)
 endif()
 
 add_executable(publisher-subscriber-interaction-test ${SRCS})

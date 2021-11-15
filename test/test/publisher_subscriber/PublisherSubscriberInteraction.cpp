@@ -69,6 +69,9 @@ public:
                 case MiddlewareKind::FASTDDS:
                     ASSERT_NO_FATAL_FAILURE(Client::create_entities_bin<MiddlewareKind::FASTDDS>(1, 0x80, UXR_STATUS_OK, 0));
                     break;
+                case MiddlewareKind::CED:
+                    ASSERT_NO_FATAL_FAILURE(Client::create_entities_bin<MiddlewareKind::CED>(1, 0x80, UXR_STATUS_OK, 0));
+                    break;
                 default:
                     // Not supported
                     ASSERT_TRUE(0);
@@ -191,7 +194,7 @@ INSTANTIATE_TEST_CASE_P(
     PublisherSubscriberNoLost,
     ::testing::Combine(
         ::testing::Values(Transport::UDP_IPV4_TRANSPORT),
-        ::testing::Values(MiddlewareKind::FASTDDS),
+        ::testing::Values(MiddlewareKind::FASTDDS, MiddlewareKind::CED),
         ::testing::Values(0.0f),
         ::testing::Values(XRCECreationMode::XRCE_XML_CREATION, XRCECreationMode::XRCE_BIN_CREATION)));
 

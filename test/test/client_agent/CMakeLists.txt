@@ -23,6 +23,7 @@ set(SRCS ClientAgentInteraction.cpp)
 
 if(NOT WIN32)
     list(APPEND SRCS ClientAgentSerial.cpp)
+    list(APPEND SRCS ClientAgentCan.cpp)
 endif()
 
 add_executable(client-agent-test ${SRCS})

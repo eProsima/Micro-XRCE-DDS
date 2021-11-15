@@ -77,7 +77,7 @@ TEST_P(ClientAgentInteraction, NewEntitiesCreationBINBestEffort)
         }
         case MiddlewareKind::CED:
         {
-            // Not implemented
+            ASSERT_NO_FATAL_FAILURE(client_.create_entities_bin<MiddlewareKind::CED>(1, 0x01, UXR_STATUS_OK, 0));
             break;
         }
     }
@@ -99,7 +99,7 @@ TEST_P(ClientAgentInteraction, NewEntitiesCreationBINReliable)
         }
         case MiddlewareKind::CED:
         {
-            // Not implemented
+            ASSERT_NO_FATAL_FAILURE(client_.create_entities_bin<MiddlewareKind::CED>(1, 0x80, UXR_STATUS_OK, 0));
             break;
         }
     }
@@ -191,7 +191,8 @@ TEST_P(ClientAgentInteraction, ExistantEntitiesCreationReuseBINBINReliable)
         }
         case MiddlewareKind::CED:
         {
-            // Not implemented
+            ASSERT_NO_FATAL_FAILURE(client_.create_entities_bin<MiddlewareKind::CED>(1, 0x80, UXR_STATUS_OK, 0));
+            ASSERT_NO_FATAL_FAILURE(client_.create_entities_bin<MiddlewareKind::CED>(1, 0x80, UXR_STATUS_OK_MATCHED, UXR_REUSE));
             break;
         }
     }
@@ -272,7 +273,8 @@ TEST_P(ClientAgentInteraction, ExistantEntitiesCreationReplaceBINBINReliable)
         }
         case MiddlewareKind::CED:
         {
-            // Not implemented
+            ASSERT_NO_FATAL_FAILURE(client_.create_entities_bin<MiddlewareKind::CED>(1, 0x80, UXR_STATUS_OK, 0));
+            ASSERT_NO_FATAL_FAILURE(client_.create_entities_bin<MiddlewareKind::CED>(1, 0x80, UXR_STATUS_OK, UXR_REPLACE));
             break;
         }
     }
@@ -320,7 +322,8 @@ TEST_P(ClientAgentInteraction, ExistantEntitiesCreationNoReplaceBINBINReliable)
         }
         case MiddlewareKind::CED:
         {
-            // Not implemented
+            ASSERT_NO_FATAL_FAILURE(client_.create_entities_bin<MiddlewareKind::CED>(1, 0x80, UXR_STATUS_OK, 0));
+            ASSERT_NO_FATAL_FAILURE(client_.create_entities_bin<MiddlewareKind::CED>(1, 0x80, UXR_STATUS_ERR_ALREADY_EXISTS, 0));
             break;
         }
     }
@@ -368,7 +371,8 @@ TEST_P(ClientAgentInteraction, ExistantEntitiesCreationReplaceReuseBINBINReliabl
         }
         case MiddlewareKind::CED:
         {
-            // Not implemented
+            ASSERT_NO_FATAL_FAILURE(client_.create_entities_bin<MiddlewareKind::CED>(1, 0x80, UXR_STATUS_OK, 0));
+            ASSERT_NO_FATAL_FAILURE(client_.create_entities_bin<MiddlewareKind::CED>(1, 0x80, UXR_STATUS_OK_MATCHED, UXR_REPLACE | UXR_REUSE));
             break;
         }
     }

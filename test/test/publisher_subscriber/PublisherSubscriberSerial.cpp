@@ -28,7 +28,7 @@ public:
             case Transport::SERIAL_TRANSPORT:
             case Transport::MULTISERIAL_TRANSPORT:
                 grantpt(masterfd_);
-                unlockpt(masterfd_);   
+                unlockpt(masterfd_);
                 ASSERT_NO_FATAL_FAILURE(ClientSerial::init_transport(transport_, ptsname(masterfd_), NULL));
                 break;
 
@@ -51,7 +51,6 @@ public:
                     ASSERT_NO_FATAL_FAILURE(ClientSerial::create_entities_xml<MiddlewareKind::CED>(id_, 0x80, UXR_STATUS_OK, 0));
                     break;
             }
-            
         }
         else if (creation_mode_ == XRCECreationMode::XRCE_BIN_CREATION)
         {
@@ -60,8 +59,11 @@ public:
                 case MiddlewareKind::FASTDDS:
                     ASSERT_NO_FATAL_FAILURE(ClientSerial::create_entities_bin<MiddlewareKind::FASTDDS>(id_, 0x80, UXR_STATUS_OK, 0));
                     break;
+                case MiddlewareKind::CED:
+                    ASSERT_NO_FATAL_FAILURE(ClientSerial::create_entities_bin<MiddlewareKind::CED>(id_, 0x80, UXR_STATUS_OK, 0));
+                    break;
                 default:
-                    FAIL() << "Transport type not supported";
+                    FAIL() << "Creation mode not supported";
                     break;
             }
         }
@@ -89,8 +91,7 @@ public:
         : transport_(std::get<0>(GetParam()))
         , agent_(transport_, (MiddlewareKind) std::get<1>(GetParam()))
         , clients_{}
-
-    {        
+    {
         agent_.start();
         agent_.wait_multiserial_open();
 
@@ -124,7 +125,6 @@ public:
     {
         int expected_number = (clients_.size()-1)*number;
         std::thread subscriber_thread(&ClientSerial::subscribe, &clients_[0],  clients_[0].id_, stream_id_raw, expected_number, message);
-        
         std::vector<std::thread> pub_thr;
 
         for (auto it = clients_.begin()+1; it != clients_.end(); it++)
