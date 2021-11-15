@@ -118,6 +118,7 @@ if(UXRCE_ENABLE_CLIENT)
             -DUCLIENT_BUILD_TESTS:BOOL=${UXRCE_BUILD_TESTS}
             -DUCLIENT_ISOLATED_INSTALL:BOOL=OFF
             -DGTEST_INDIVIDUAL:BOOL=ON
+            -DUCLIENT_PROFILE_CAN:BOOL=ON
         )
     list(APPEND _deps client)
 endif()
