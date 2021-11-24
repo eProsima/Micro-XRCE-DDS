@@ -338,6 +338,30 @@ public:
         }
     }
 
+    void request_data(uint8_t id, uint8_t stream_id_raw, const std::string& message)
+    {
+        expected_message_ = message;
+        expected_topic_index_ = 0;
+        last_topic_stream_id_ = uxr_stream_id_from_raw(0, UXR_OUTPUT_STREAM);
+        last_topic_object_id_ = uxr_object_id(255, 15);
+
+        uxrStreamId output_stream_id = uxr_stream_id(0, UXR_RELIABLE_STREAM, UXR_OUTPUT_STREAM);
+        uxrStreamId input_stream_id = uxr_stream_id_from_raw(stream_id_raw, UXR_INPUT_STREAM);
+        uxrObjectId datareader_id = uxr_object_id(id, UXR_DATAREADER_ID);
+
+        uxrDeliveryControl delivery_control = {};
+        delivery_control.max_samples = UXR_MAX_SAMPLES_UNLIMITED;
+        uint16_t request_id = uxr_buffer_request_data(&session_, output_stream_id, datareader_id, input_stream_id, &delivery_control);
+        ASSERT_NE(UXR_INVALID_REQUEST_ID, request_id);
+
+        uxr_flash_output_streams(&session_);
+    }
+
+    size_t get_received_topics()
+    {
+        return expected_topic_index_;
+    }
+
     void init_transport(Transport transport, const char* ip, const char* port)
     {
         switch(transport)

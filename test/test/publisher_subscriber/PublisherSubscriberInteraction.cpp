@@ -173,6 +173,17 @@ TEST_P(PublisherSubscriberNoLost, PubSub1ContinousFragmentedTopic)
     publisher_.publish(1, 0x80, 1, message);
 }
 
+TEST_P(PublisherSubscriberNoLost, PubSub1WithPing)
+{
+    size_t message_number = 1;
+    publisher_.publish(1, 0x80, message_number, SMALL_MESSAGE);
+    subscriber_.request_data(1, 0x80, SMALL_MESSAGE);
+    subscriber_.ping_agent(transport_);
+
+    // Check number of topics received
+    ASSERT_EQ(subscriber_.get_received_topics(), message_number);
+}
+
 // TODO (#4423) Fix the non-reliable behavior when messages is higher than the agent history to enable this
 /*TEST_P(PublisherSubscriberNoLost, PubSub30TopicsReliable)
 {
