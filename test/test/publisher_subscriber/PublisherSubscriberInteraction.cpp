@@ -178,7 +178,11 @@ TEST_P(PublisherSubscriberNoLost, PubSub1WithPing)
     size_t message_number = 1;
     publisher_.publish(1, 0x80, message_number, SMALL_MESSAGE);
     subscriber_.request_data(1, 0x80, SMALL_MESSAGE);
-    subscriber_.ping_agent(transport_);
+
+    for (size_t i = 0; i < 5; i++)
+    {
+        subscriber_.ping_agent_session();
+    }
 
     // Check number of topics received
     ASSERT_EQ(subscriber_.get_received_topics(), message_number);
