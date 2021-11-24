@@ -492,6 +492,11 @@ public:
         ASSERT_TRUE(uxr_ping_agent_attempts(comm, 1000, 1));
     }
 
+    void ping_agent_session()
+    {
+        ASSERT_TRUE(uxr_ping_agent_session(&session_, 1000, 1));
+    }
+
 protected:
     void init_common()
     {
