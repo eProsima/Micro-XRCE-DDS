@@ -341,6 +341,7 @@ public:
 
     void request_data(uint8_t id, uint8_t stream_id_raw, const std::string& message)
     {
+        std::this_thread::sleep_for(std::chrono::milliseconds(2000));
         expected_message_ = message;
         expected_topic_index_ = 0;
         last_topic_stream_id_ = uxr_stream_id_from_raw(0, UXR_OUTPUT_STREAM);
