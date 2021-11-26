@@ -176,12 +176,16 @@ TEST_P(PublisherSubscriberNoLost, PubSub1ContinousFragmentedTopic)
 TEST_P(PublisherSubscriberNoLost, PubSub1WithPing)
 {
     size_t message_number = 1;
+    int64_t timeout = 10000;
+
     publisher_.publish(1, 0x80, message_number, SMALL_MESSAGE);
     subscriber_.request_data(1, 0x80, SMALL_MESSAGE);
 
-    for (size_t i = 0; i < 5; i++)
-    {
-        subscriber_.ping_agent_session();
+    int64_t start_time = uxr_millis();
+
+    while((uxr_millis() -  start_time) < timeout && subscriber_.get_received_topics() != message_number){
+            subscriber_.ping_agent_session();
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
 
     // Check number of topics received

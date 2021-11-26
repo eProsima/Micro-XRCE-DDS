@@ -6,6 +6,7 @@
 #include <EntitiesInfo.hpp>
 #include <../custom_transports/Custom_transports.hpp>
 
+#include <uxr/client/util/time.h>
 #include <uxr/client/client.h>
 #include <uxr/client/util/ping.h>
 #include <ucdr/microcdr.h>
