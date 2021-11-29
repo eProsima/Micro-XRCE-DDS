@@ -173,12 +173,43 @@ TEST_P(PublisherSubscriberNoLost, PubSub1ContinousFragmentedTopic)
     publisher_.publish(1, 0x80, 1, message);
 }
 
+
 // TODO (#4423) Fix the non-reliable behavior when messages is higher than the agent history to enable this
 /*TEST_P(PublisherSubscriberNoLost, PubSub30TopicsReliable)
 {
     std::this_thread::sleep_for(std::chrono::seconds(2)); // Waiting for matching.
     check_messages(SMALL_MESSAGE, 30, 0x80);
 }*/
+
+class PublisherSubscriberUnitary : public PublisherSubscriberNoLost {};
+
+TEST_P(PublisherSubscriberUnitary, PubSub1WithPing)
+{
+    size_t message_number = 1;
+    int64_t timeout = 10000;
+
+    publisher_.publish(1, 0x80, message_number, SMALL_MESSAGE);
+    subscriber_.request_data(1, 0x80, SMALL_MESSAGE);
+
+    int64_t start_time = uxr_millis();
+
+    while((uxr_millis() -  start_time) < timeout && subscriber_.get_received_topics() != message_number){
+            subscriber_.ping_agent_session();
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    }
+
+    // Check number of topics received
+    ASSERT_EQ(subscriber_.get_received_topics(), message_number);
+}
+
+INSTANTIATE_TEST_CASE_P(
+    PublisherSubscriberWithPing,
+    PublisherSubscriberUnitary,
+    ::testing::Combine(
+        ::testing::Values(Transport::UDP_IPV4_TRANSPORT),
+        ::testing::Values(MiddlewareKind::FASTDDS),
+        ::testing::Values(0.0f),
+        ::testing::Values(XRCECreationMode::XRCE_BIN_CREATION)));
 
 INSTANTIATE_TEST_CASE_P(
     TransportAndLost,
