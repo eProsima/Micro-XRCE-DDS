@@ -236,10 +236,11 @@ public:
         ASSERT_EQ(publisher_id, last_status_object_id_);
         ASSERT_EQ(request_id, last_status_request_id_);
 
+        uxrQoS_t qos = {UXR_DURABILITY_TRANSIENT_LOCAL, UXR_RELIABILITY_RELIABLE, UXR_HISTORY_KEEP_ALL, 0};
+
         uxrObjectId datawriter_id = uxr_object_id(id, UXR_DATAWRITER_ID);
         request_id =
-            uxr_buffer_create_datawriter_bin(
-                &session_, output_stream_id, datawriter_id, publisher_id, topic_id, 1, 0, 0, UXR_DURABILITY_TRANSIENT_LOCAL, flags);
+            uxr_buffer_create_datawriter_bin(&session_, output_stream_id, datawriter_id, publisher_id, topic_id, qos, flags);
         ASSERT_NE(UXR_INVALID_REQUEST_ID, request_id);
         uxr_run_session_until_all_status(&session_, timeout, &request_id, &status, 1);
         ASSERT_EQ(expected_status, status);
@@ -260,8 +261,7 @@ public:
 
         uxrObjectId datareader_id = uxr_object_id(id, UXR_DATAREADER_ID);
         request_id =
-            uxr_buffer_create_datareader_bin(
-                &session_, output_stream_id, datareader_id, subscriber_id, topic_id, 1, 0, 0, UXR_DURABILITY_TRANSIENT_LOCAL, flags);
+            uxr_buffer_create_datareader_bin(&session_, output_stream_id, datareader_id, subscriber_id, topic_id, qos, flags);
         ASSERT_NE(UXR_INVALID_REQUEST_ID, request_id);
         uxr_run_session_until_all_status(&session_, timeout, &request_id, &status, 1);
         ASSERT_EQ(expected_status, status);
