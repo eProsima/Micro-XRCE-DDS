@@ -17,6 +17,7 @@ public:
           MiddlewareKind middleware)
         : transport_(transport)
         , middleware_{}
+        , initialized(false)
     {
         switch (middleware)
         {
@@ -50,33 +51,38 @@ public:
             case Transport::MULTISERIAL_TRANSPORT:
             {
                 struct termios attr = ClientSerial::init_termios(baudrate);
-                
+
                 std::vector<std::string> devs;
                 for (size_t i = 0; i < client_number; i++)
                 {
                     devs.push_back(port_name);
                 }
-    
+
                 agent_multiserial_.reset(new eprosima::uxr::MultiTermiosAgent(devs,  O_RDWR | O_NOCTTY, attr, 0, middleware_));
                 ASSERT_TRUE(agent_multiserial_->start());
                 break;
             }
         }
+
+        initialized = true;
     }
 
     void stop()
     {
-        switch(transport_)
+        if (initialized)
         {
-            case Transport::SERIAL_TRANSPORT:
+            switch(transport_)
             {
-                ASSERT_TRUE(agent_serial_->stop());
-                break;
-            }
-            case Transport::MULTISERIAL_TRANSPORT:
-            {
-                ASSERT_TRUE(agent_multiserial_->stop());
-                break;
+                case Transport::SERIAL_TRANSPORT:
+                {
+                    ASSERT_TRUE(agent_serial_->stop());
+                    break;
+                }
+                case Transport::MULTISERIAL_TRANSPORT:
+                {
+                    ASSERT_TRUE(agent_multiserial_->stop());
+                    break;
+                }
             }
         }
     }
@@ -107,6 +113,7 @@ private:
     std::unique_ptr<eprosima::uxr::MultiTermiosAgent> agent_multiserial_;
 
     eprosima::uxr::Middleware::Kind middleware_;
+    bool initialized;
 };
 
 class ClientAgentSerial : public ::testing::TestWithParam<std::tuple<Transport, MiddlewareKind>>
@@ -118,7 +125,7 @@ public:
         , transport_(std::get<0>(GetParam()))
         , clients_multiserial_{}
         , agent_(transport_, (MiddlewareKind) std::get<1>(GetParam()))
-    {        
+    {
         for (size_t i = 0; i < agent_.client_number; i++)
         {
             ClientSerial auxcli(0.0f, 8);
@@ -131,7 +138,7 @@ public:
 
     void SetUp() override
     {
-        agent_.start();      
+        agent_.start();
 
         switch (transport_)
         {
@@ -139,7 +146,7 @@ public:
             {
                 int masterfd = agent_.getfd();
                 grantpt(masterfd);
-                unlockpt(masterfd);   
+                unlockpt(masterfd);
                 ASSERT_NO_FATAL_FAILURE(client_serial_.init_transport(transport_, ptsname(masterfd), NULL));
                 break;
             }
@@ -151,10 +158,10 @@ public:
                 for (size_t i = 0; i < masterfd.size(); i++)
                 {
                     grantpt(masterfd[i]);
-                    unlockpt(masterfd[i]);   
+                    unlockpt(masterfd[i]);
                     ASSERT_NO_FATAL_FAILURE(clients_multiserial_[i].init_transport(transport_, ptsname(masterfd[i]), NULL));
                 }
-                
+
                 break;
             }
         }
@@ -175,17 +182,17 @@ public:
                 {
                     ASSERT_NO_FATAL_FAILURE(clients_multiserial_[i].close_transport(transport_));
                 }
-                
+                break;
             }
         }
-        
+
         agent_.stop();
     }
 
 protected:
     Transport transport_;
     AgentSerial agent_;
-    
+
     std::vector<ClientSerial> clients_multiserial_;
     ClientSerial client_serial_;
 };

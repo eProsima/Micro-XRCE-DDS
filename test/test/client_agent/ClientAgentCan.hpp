@@ -16,6 +16,7 @@ public:
 
     AgentCan(MiddlewareKind middleware)
         : middleware_{}
+        , initialized(false)
     {
         switch (middleware)
         {
@@ -34,7 +35,7 @@ public:
     ~AgentCan()
     {}
 
-    bool is_interface_up(const char * interface) 
+    bool is_interface_up(const char * interface)
     {
         struct ifreq ifr;
         int sock = socket(PF_CAN, SOCK_RAW, CAN_RAW);
@@ -47,24 +48,29 @@ public:
 
     void start()
     {
-        if (!is_interface_up(dev))
+        if (!is_interface_up(dev) && 0 != system("ip link add dev vcan0 type vcan && ip link set vcan0 mtu 72 && ip link set dev vcan0 up"))
         {
-            ASSERT_TRUE(0 == system("ip link add dev vcan0 type vcan && ip link set vcan0 mtu 72 && ip link set dev vcan0 up"));
+            GTEST_SKIP();
         }
 
         agent_can_.reset(new eprosima::uxr::CanAgent(dev, can_id, middleware_));
         agent_can_->set_verbose_level(6);
         ASSERT_TRUE(agent_can_->start());
+        initialized = true;
     }
 
     void stop()
     {
-        ASSERT_TRUE(agent_can_->stop());
+        if (initialized)
+        {
+            ASSERT_TRUE(agent_can_->stop());
+        }
     }
 
 private:
     std::unique_ptr<eprosima::uxr::CanAgent> agent_can_;
     eprosima::uxr::Middleware::Kind middleware_;
+    bool initialized;
 };
 
 class ClientAgentCan : public ::testing::TestWithParam<MiddlewareKind>
@@ -80,7 +86,7 @@ public:
 
     void SetUp() override
     {
-        agent_.start();
+        ASSERT_NO_FATAL_FAILURE(agent_.start());
         ASSERT_NO_FATAL_FAILURE(client_can_.init_transport(agent_.dev, agent_.can_id + 1));
     }
 

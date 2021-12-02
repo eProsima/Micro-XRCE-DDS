@@ -24,6 +24,7 @@ public:
         : transport_(transport)
         , middleware_{}
         , port_(port)
+        , initialized(false)
     {
         switch (middleware)
         {
@@ -84,7 +85,6 @@ public:
                 {
                     // Do nothing
                 }
-                
 
                 agent_custom_.reset(new eprosima::uxr::CustomAgent(
                     "custom_agent",
@@ -123,39 +123,43 @@ public:
                 ASSERT_TRUE(agent_custom_->start());
                 break;
             }
-            
         }
+
+        initialized = true;
     }
 
     void stop()
     {
-        switch(transport_)
+        if (initialized)
         {
-            case Transport::UDP_IPV4_TRANSPORT:
+            switch(transport_)
             {
-                ASSERT_TRUE(agent_udp4_->stop());
-                break;
-            }
-            case Transport::UDP_IPV6_TRANSPORT:
-            {
-                ASSERT_TRUE(agent_udp6_->stop());
-                break;
-            }
-            case Transport::TCP_IPV4_TRANSPORT:
-            {
-                ASSERT_TRUE(agent_tcp4_->stop());
-                break;
-            }
-            case Transport::TCP_IPV6_TRANSPORT:
-            {
-                ASSERT_TRUE(agent_tcp6_->stop());
-                break;
-            }
-            case Transport::CUSTOM_WITHOUT_FRAMING:
-            case Transport::CUSTOM_WITH_FRAMING:
-            {
-                ASSERT_TRUE(agent_custom_->stop());
-                break;            
+                case Transport::UDP_IPV4_TRANSPORT:
+                {
+                    ASSERT_TRUE(agent_udp4_->stop());
+                    break;
+                }
+                case Transport::UDP_IPV6_TRANSPORT:
+                {
+                    ASSERT_TRUE(agent_udp6_->stop());
+                    break;
+                }
+                case Transport::TCP_IPV4_TRANSPORT:
+                {
+                    ASSERT_TRUE(agent_tcp4_->stop());
+                    break;
+                }
+                case Transport::TCP_IPV6_TRANSPORT:
+                {
+                    ASSERT_TRUE(agent_tcp6_->stop());
+                    break;
+                }
+                case Transport::CUSTOM_WITHOUT_FRAMING:
+                case Transport::CUSTOM_WITH_FRAMING:
+                {
+                    ASSERT_TRUE(agent_custom_->stop());
+                    break;
+                }
             }
         }
     }
@@ -171,6 +175,7 @@ private:
 
     eprosima::uxr::Middleware::Kind middleware_;
     uint16_t port_;
+    bool initialized;
 };
 
 class ClientAgentInteraction : public ::testing::TestWithParam<std::tuple<Transport, MiddlewareKind>>
