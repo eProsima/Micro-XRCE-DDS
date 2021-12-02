@@ -22,6 +22,7 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/../common/EntitiesInfo.hpp.in
     )
 
 set(SRCS
+    Client.cpp
     Gateway.cpp
     BigHelloWorld.c
     Discovery.cpp

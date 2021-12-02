@@ -6,6 +6,7 @@
 #include <EntitiesInfo.hpp>
 #include <../custom_transports/Custom_transports.hpp>
 
+#include <uxr/client/util/time.h>
 #include <uxr/client/client.h>
 #include <uxr/client/util/ping.h>
 #include <ucdr/microcdr.h>
@@ -20,8 +21,18 @@ enum class Transport
     UDP_IPV6_TRANSPORT,
     TCP_IPV4_TRANSPORT,
     TCP_IPV6_TRANSPORT,
+    CAN_TRANSPORT,
+    SERIAL_TRANSPORT,
+    MULTISERIAL_TRANSPORT,
     CUSTOM_WITH_FRAMING,
     CUSTOM_WITHOUT_FRAMING
+};
+
+enum class XRCECreationMode
+{
+    XRCE_XML_CREATION,
+    XRCE_BIN_CREATION,
+    XRCE_REF_CREATION
 };
 
 inline bool operator == (const uxrObjectId& obj1, const uxrObjectId& obj2)
@@ -38,9 +49,7 @@ inline bool operator == (const uxrStreamId& s1, const uxrStreamId& s2)
         && s1.direction == s2.direction;
 }
 
-extern "C" bool flush_session(uxrSession* session){
-    return uxr_run_session_until_confirm_delivery(session, 1000);
-}
+extern "C" bool flush_session(uxrSession* session, void * args);
 
 class Client
 {
@@ -188,6 +197,79 @@ public:
         ASSERT_EQ(request_id, last_status_request_id_);
     }
 
+    template<MiddlewareKind Kind>
+    void create_entities_bin(uint8_t id, uint8_t stream_id_raw, uint8_t expected_status, uint8_t flags)
+    {
+        uxrStreamId output_stream_id = uxr_stream_id_from_raw(stream_id_raw, UXR_OUTPUT_STREAM);
+        uint16_t request_id; uint8_t status;
+
+        uxrObjectId participant_id = uxr_object_id(id, UXR_PARTICIPANT_ID);
+        request_id =
+            uxr_buffer_create_participant_bin(
+                &session_, output_stream_id, participant_id, 0, "participant_name", flags);
+        ASSERT_NE(UXR_INVALID_REQUEST_ID, request_id);
+        uxr_run_session_until_all_status(&session_, timeout, &request_id, &status, 1);
+        ASSERT_EQ(expected_status, status);
+        ASSERT_EQ(expected_status, last_status_);
+        ASSERT_EQ(participant_id, last_status_object_id_);
+        ASSERT_EQ(request_id, last_status_request_id_);
+
+        uxrObjectId topic_id = uxr_object_id(id, UXR_TOPIC_ID);
+        request_id =
+            uxr_buffer_create_topic_bin(
+                &session_, output_stream_id, topic_id, participant_id, "topicname", "topictype", flags);
+        ASSERT_NE(UXR_INVALID_REQUEST_ID, request_id);
+        uxr_run_session_until_all_status(&session_, timeout, &request_id, &status, 1);
+        ASSERT_EQ(expected_status, status);
+        ASSERT_EQ(expected_status, last_status_);
+        ASSERT_EQ(topic_id, last_status_object_id_);
+        ASSERT_EQ(request_id, last_status_request_id_);
+
+        uxrObjectId publisher_id = uxr_object_id(id, UXR_PUBLISHER_ID);
+        request_id =
+            uxr_buffer_create_publisher_bin(
+                &session_, output_stream_id, publisher_id, participant_id, flags);
+        ASSERT_NE(UXR_INVALID_REQUEST_ID, request_id);
+        uxr_run_session_until_all_status(&session_, timeout, &request_id, &status, 1);
+        ASSERT_EQ(expected_status, status);
+        ASSERT_EQ(expected_status, last_status_);
+        ASSERT_EQ(publisher_id, last_status_object_id_);
+        ASSERT_EQ(request_id, last_status_request_id_);
+
+        uxrQoS_t qos = {UXR_DURABILITY_TRANSIENT_LOCAL, UXR_RELIABILITY_RELIABLE, UXR_HISTORY_KEEP_ALL, 0};
+
+        uxrObjectId datawriter_id = uxr_object_id(id, UXR_DATAWRITER_ID);
+        request_id =
+            uxr_buffer_create_datawriter_bin(&session_, output_stream_id, datawriter_id, publisher_id, topic_id, qos, flags);
+        ASSERT_NE(UXR_INVALID_REQUEST_ID, request_id);
+        uxr_run_session_until_all_status(&session_, timeout, &request_id, &status, 1);
+        ASSERT_EQ(expected_status, status);
+        ASSERT_EQ(expected_status, last_status_);
+        ASSERT_EQ(datawriter_id, last_status_object_id_);
+        ASSERT_EQ(request_id, last_status_request_id_);
+
+        uxrObjectId subscriber_id = uxr_object_id(id, UXR_SUBSCRIBER_ID);
+        request_id =
+            uxr_buffer_create_subscriber_bin(
+                &session_, output_stream_id, subscriber_id, participant_id, flags);
+        ASSERT_NE(UXR_INVALID_REQUEST_ID, request_id);
+        uxr_run_session_until_all_status(&session_, timeout, &request_id, &status, 1);
+        ASSERT_EQ(expected_status, status);
+        ASSERT_EQ(expected_status, last_status_);
+        ASSERT_EQ(subscriber_id, last_status_object_id_);
+        ASSERT_EQ(request_id, last_status_request_id_);
+
+        uxrObjectId datareader_id = uxr_object_id(id, UXR_DATAREADER_ID);
+        request_id =
+            uxr_buffer_create_datareader_bin(&session_, output_stream_id, datareader_id, subscriber_id, topic_id, qos, flags);
+        ASSERT_NE(UXR_INVALID_REQUEST_ID, request_id);
+        uxr_run_session_until_all_status(&session_, timeout, &request_id, &status, 1);
+        ASSERT_EQ(expected_status, status);
+        ASSERT_EQ(expected_status, last_status_);
+        ASSERT_EQ(datareader_id, last_status_object_id_);
+        ASSERT_EQ(request_id, last_status_request_id_);
+    }
+
     void publish(uint8_t id, uint8_t stream_id_raw, size_t number, const std::string& message)
     {
         //Used only for waiting the RTPS subscriber matching
@@ -210,7 +292,7 @@ public:
             {
                 prepared = uxr_prepare_output_stream(&session_, output_stream_id, datawriter_id, &ub, topic_size);
             } else {
-                prepared = uxr_prepare_output_stream_fragmented(&session_, output_stream_id, datawriter_id, &ub, topic_size, flush_session);
+                prepared = uxr_prepare_output_stream_fragmented(&session_, output_stream_id, datawriter_id, &ub, topic_size, flush_session, NULL);
             }
             ASSERT_NE(prepared, UXR_INVALID_REQUEST_ID);
             bool written = BigHelloWorld_serialize_topic(&ub, &topic);
@@ -218,7 +300,6 @@ public:
             ASSERT_FALSE(ub.error);
             bool sent = uxr_run_session_until_confirm_delivery(&session_, timeout);
             ASSERT_TRUE(sent);
-            std::cout << "topic sent: " << i << std::endl;
         }
     }
 
@@ -254,7 +335,33 @@ public:
             ASSERT_EQ(UXR_STATUS_OK, last_status_);
             ASSERT_EQ(datareader_id, last_status_object_id_);
             ASSERT_EQ(request_id, last_status_request_id_);
+            std::cout << "msg " << expected_topic_index_ << " received." << std::endl;
         }
+    }
+
+    void request_data(uint8_t id, uint8_t stream_id_raw, const std::string& message)
+    {
+        std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+        expected_message_ = message;
+        expected_topic_index_ = 0;
+        last_topic_stream_id_ = uxr_stream_id_from_raw(0, UXR_OUTPUT_STREAM);
+        last_topic_object_id_ = uxr_object_id(255, 15);
+
+        uxrStreamId output_stream_id = uxr_stream_id(0, UXR_RELIABLE_STREAM, UXR_OUTPUT_STREAM);
+        uxrStreamId input_stream_id = uxr_stream_id_from_raw(stream_id_raw, UXR_INPUT_STREAM);
+        uxrObjectId datareader_id = uxr_object_id(id, UXR_DATAREADER_ID);
+
+        uxrDeliveryControl delivery_control = {};
+        delivery_control.max_samples = UXR_MAX_SAMPLES_UNLIMITED;
+        uint16_t request_id = uxr_buffer_request_data(&session_, output_stream_id, datareader_id, input_stream_id, &delivery_control);
+        ASSERT_NE(UXR_INVALID_REQUEST_ID, request_id);
+
+        uxr_flash_output_streams(&session_);
+    }
+
+    size_t get_received_topics()
+    {
+        return expected_topic_index_;
     }
 
     void init_transport(Transport transport, const char* ip, const char* port)
@@ -309,6 +416,9 @@ public:
                 ASSERT_TRUE(uxr_init_custom_transport(&custom_transport_, NULL));
                 uxr_init_session(&session_, gateway_.monitorize(&custom_transport_.comm), client_key_);
                 break;
+            default:
+                FAIL() << "Transport type not supported";
+                break;
         }
 
         init_common();
@@ -340,6 +450,9 @@ public:
             case Transport::CUSTOM_WITHOUT_FRAMING:
             case Transport::CUSTOM_WITH_FRAMING:
                 ASSERT_TRUE(uxr_close_custom_transport(&custom_transport_));
+                break;
+            default:
+                FAIL() << "Transport type not supported";
                 break;
         }
     }
@@ -374,15 +487,27 @@ public:
                 comm = &custom_transport_.comm;
                 break;
             }
+            default:
+                FAIL() << "Transport type not supported";
+                break;
         }
         ASSERT_TRUE(uxr_ping_agent_attempts(comm, 1000, 1));
     }
 
-private:
+    void ping_agent_session()
+    {
+        ASSERT_TRUE(uxr_ping_agent_session(&session_, 1000, 1));
+    }
+
+protected:
     void init_common()
     {
-        /* Setup callback. */
-        uxr_set_topic_callback(&session_, on_topic_dispatcher, this);
+        if (session_.on_topic == NULL)
+        {
+            /* Setup callback. */
+            uxr_set_topic_callback(&session_, on_topic_dispatcher, this);
+        }
+
         uxr_set_status_callback(&session_, on_status_dispatcher, this);
 
         /* Create session. */
@@ -422,6 +547,11 @@ private:
         static_cast<Client*>(args)->on_topic(session_, object_id, request_id, stream_id, serialization, length);
     }
 
+    static void on_topic_multi_dispatcher(uxrSession* session_, uxrObjectId object_id, uint16_t request_id, uxrStreamId stream_id, struct ucdrBuffer* serialization, uint16_t length, void* args)
+    {
+        static_cast<Client*>(args)->on_topic_multi(session_, object_id, request_id, stream_id, serialization, length);
+    }
+
     void on_topic(uxrSession* session, uxrObjectId object_id, uint16_t request_id, uxrStreamId stream_id, struct ucdrBuffer* serialization, uint16_t length)
     {
         (void) session;
@@ -438,6 +568,21 @@ private:
         expected_topic_index_++;
 
         std::cout << "topic received: " << topic.index << std::endl;
+    }
+
+    void on_topic_multi(uxrSession* session, uxrObjectId object_id, uint16_t request_id, uxrStreamId stream_id, struct ucdrBuffer* serialization, uint16_t length)
+    {
+        (void) session;
+        (void) length;
+
+        BigHelloWorld topic;
+        BigHelloWorld_deserialize_topic(serialization, &topic);
+
+        ASSERT_STREQ(expected_message_.c_str(), topic.message);
+        last_topic_object_id_ = object_id;
+        last_topic_stream_id_ = stream_id;
+        last_topic_request_id_ = request_id;
+        expected_topic_index_++;
     }
 
     static void on_status_dispatcher(uxrSession* session_, uxrObjectId object_id, uint16_t request_id, uint8_t status, void* args)
@@ -483,7 +628,5 @@ private:
     uint16_t last_topic_request_id_;
     size_t expected_topic_index_;
 };
-
-uint32_t Client::next_client_key_ = 0;
 
 #endif //IN_TEST_CLIENT_HPP

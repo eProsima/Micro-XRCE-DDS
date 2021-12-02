@@ -33,6 +33,7 @@ RUN cd /uxrce/build && \
     cmake \
         -DCMAKE_INSTALL_PREFIX=../install \
         -DUXRCE_BUILD_EXAMPLES=ON \
+        -DUXRCE_BUILD_AGENT_EXECUTABLE=ON \
         .. &&\
     make -j $(nproc) && make install
 
