@@ -162,7 +162,7 @@ TEST_P(PublisherSubscriberSerial, MultiPubSub)
     check_messages(SMALL_MESSAGE, 10, 0x01);
 }
 
-INSTANTIATE_TEST_CASE_P(
+INSTANTIATE_TEST_SUITE_P(
     MultiSerialPubSubBin,
     PublisherSubscriberSerial,
     ::testing::Combine(

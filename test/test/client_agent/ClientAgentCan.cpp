@@ -9,7 +9,7 @@ TEST_P(ClientAgentCan, PingFromClientToAgent)
     ASSERT_NO_FATAL_FAILURE(client_can_.ping_agent());
 }
 
-INSTANTIATE_TEST_CASE_P(
+INSTANTIATE_TEST_SUITE_P(
     CanTransports,
     ClientAgentCan,
     ::testing::Values(MiddlewareKind::FASTDDS));

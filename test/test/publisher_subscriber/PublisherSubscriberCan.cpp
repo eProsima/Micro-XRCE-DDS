@@ -137,7 +137,7 @@ TEST_P(PublisherSubscriberCan, PubSub1ContinousFragmentedTopic)
     publisher_.publish(1, 0x80, 1, message);
 }
 
-INSTANTIATE_TEST_CASE_P(
+INSTANTIATE_TEST_SUITE_P(
     PubSubCan,
     PublisherSubscriberCan,
     ::testing::Combine(

@@ -101,7 +101,7 @@ macro(add_gtest test)
 
             # Search for google value-parameterized tests instantiations
             unset(GTEST_INSTANTATIONS) # list of instantiations names
-            file(STRINGS ${GTEST_SOURCE_FILE} GTEST_INSTANTIATION_NAMES REGEX ^INSTANTIATE_TEST_CASE_P)
+            file(STRINGS ${GTEST_SOURCE_FILE} GTEST_INSTANTIATION_NAMES REGEX ^INSTANTIATE_TEST_SUITE_P)
             foreach(GTEST_INSTANTIATION_NAME ${GTEST_INSTANTIATION_NAMES})
                 # Search and append all instantiation names
                 string(REGEX REPLACE ["\) \(,"] ";" GTEST_INSTANTIATION_NAME ${GTEST_INSTANTIATION_NAME})

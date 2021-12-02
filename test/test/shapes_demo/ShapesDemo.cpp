@@ -104,7 +104,7 @@ protected:
 
 /* ############################################## TESTS ##################################################### */
 
-INSTANTIATE_TEST_CASE_P(Transport, ShapesDemoTest, ::testing::Values(UDP_TRANSPORT, TCP_TRANSPORT), ::testing::PrintToStringParamName());
+INSTANTIATE_TEST_SUITE_P(Transport, ShapesDemoTest, ::testing::Values(UDP_TRANSPORT, TCP_TRANSPORT), ::testing::PrintToStringParamName());
 
 TEST_P(ShapesDemoTest, CreateSession)
 {

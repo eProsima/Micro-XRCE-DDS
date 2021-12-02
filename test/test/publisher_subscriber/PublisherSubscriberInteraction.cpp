@@ -202,7 +202,7 @@ TEST_P(PublisherSubscriberUnitary, PubSub1WithPing)
     ASSERT_EQ(subscriber_.get_received_topics(), message_number);
 }
 
-INSTANTIATE_TEST_CASE_P(
+INSTANTIATE_TEST_SUITE_P(
     PublisherSubscriberWithPing,
     PublisherSubscriberUnitary,
     ::testing::Combine(
@@ -211,7 +211,7 @@ INSTANTIATE_TEST_CASE_P(
         ::testing::Values(0.0f),
         ::testing::Values(XRCECreationMode::XRCE_BIN_CREATION)));
 
-INSTANTIATE_TEST_CASE_P(
+INSTANTIATE_TEST_SUITE_P(
     TransportAndLost,
     PublisherSubscriberNoLost,
     ::testing::Combine(
@@ -220,7 +220,7 @@ INSTANTIATE_TEST_CASE_P(
         ::testing::Values(0.0f),
         ::testing::Values(XRCECreationMode::XRCE_XML_CREATION)));
 
-INSTANTIATE_TEST_CASE_P(
+INSTANTIATE_TEST_SUITE_P(
     TransportAndLostCreationModes,
     PublisherSubscriberNoLost,
     ::testing::Combine(
@@ -229,7 +229,7 @@ INSTANTIATE_TEST_CASE_P(
         ::testing::Values(0.0f),
         ::testing::Values(XRCECreationMode::XRCE_XML_CREATION, XRCECreationMode::XRCE_BIN_CREATION)));
 
-INSTANTIATE_TEST_CASE_P(
+INSTANTIATE_TEST_SUITE_P(
     TransportAndLostCustomTransports,
     PublisherSubscriberNoLost,
     ::testing::Combine(
@@ -262,7 +262,7 @@ TEST_P(PublisherSubscriberLost, PubSub3FragmentedTopic4Parts)
     check_messages(message, 3, 0x80);
 }
 
-INSTANTIATE_TEST_CASE_P(
+INSTANTIATE_TEST_SUITE_P(
     TransportAndLost,
     PublisherSubscriberLost,
     ::testing::Combine(
