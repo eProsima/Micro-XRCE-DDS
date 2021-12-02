@@ -67,18 +67,6 @@ endif()
 set(_run_tests OFF)
 set(_test_command "")
 
-if(UXRCE_BUILD_TESTS)
-    set(_run_tests ON)
-    list(APPEND _test_command COMMAND ${CMAKE_CTEST_COMMAND} -VV -C ${CMAKE_BUILD_TYPE} -T Test)
-endif()
-
-if(UXRCE_BUILD_CI_TESTS)
-    if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
-        list(APPEND _test_command COMMAND ${CMAKE_CTEST_COMMAND} -VV -T MemCheck)
-        list(APPEND _test_command COMMAND ${CMAKE_CTEST_COMMAND} -VV -T Coverage)
-    endif()
-endif()
-
 ###############################################################################
 # Dependencies
 ###############################################################################
@@ -198,7 +186,7 @@ if(UXRCE_BUILD_TESTS)
             GIT_REPOSITORY
                 https://github.com/google/googletest.git
             GIT_TAG
-                2fe3bd994b3189899d93f1d5a881e725e046fdc2
+                v1.10.x
             PREFIX
                 ${PROJECT_BINARY_DIR}/googletest
             INSTALL_DIR
