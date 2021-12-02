@@ -67,6 +67,11 @@ public:
         }
     }
 
+    bool is_initialized()
+    {
+        return initialized;
+    }
+
 private:
     std::unique_ptr<eprosima::uxr::CanAgent> agent_can_;
     eprosima::uxr::Middleware::Kind middleware_;
@@ -92,8 +97,11 @@ public:
 
     void TearDown() override
     {
-        ASSERT_NO_FATAL_FAILURE(client_can_.close_transport());
-        agent_.stop();
+        if (agent_.is_initialized())
+        {
+            ASSERT_NO_FATAL_FAILURE(client_can_.close_transport());
+            agent_.stop();
+        }
     }
 
 protected:
