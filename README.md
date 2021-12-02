@@ -1,10 +1,14 @@
 # eProsima Micro XRCE-DDS
 
-[![Releases](https://img.shields.io/github/release/eProsima/Micro-XRCE-DDS.svg)](https://github.com/eProsima/Micro-XRCE-DDS/releases)
+[![FIWARE Robotics](https://nexus.lab.fiware.org/static/badges/chapters/robotics.svg)](https://www.fiware.org/developers/catalogue/)
 [![License](https://img.shields.io/github/license/eProsima/Micro-XRCE-DDS.svg)](https://github.com/eProsima/Micro-XRCE-DDS/blob/master/LICENSE)
+[![Releases](https://img.shields.io/github/release/eProsima/Micro-XRCE-DDS.svg)](https://github.com/eProsima/Micro-XRCE-DDS/releases)
 [![Issues](https://img.shields.io/github/issues/eProsima/Micro-XRCE-DDS.svg)](https://github.com/eProsima/Micro-XRCE-DDS/issues)
 [![Forks](https://img.shields.io/github/forks/eProsima/Micro-XRCE-DDS.svg)](https://github.com/eProsima/Micro-XRCE-DDS/network/members)
 [![Stars](https://img.shields.io/github/stars/eProsima/Micro-XRCE-DDS.svg)](https://github.com/eProsima/Micro-XRCE-DDS/stargazers)
+<br/>
+[![Documentation badge](https://img.shields.io/readthedocs/micro-xrce-dds.svg)](https://micro-xrce-dds.readthedocs.io)
+![Status](https://nexus.lab.fiware.org/repository/raw/public/badges/statuses/incubating.svg)
 
 <a href="http://www.eprosima.com"><img src="https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcSd0PDlVz1U_7MgdTe0FRIWD0Jc9_YH-gGi0ZpLkr-qgCI6ZEoJZ5GBqQ" align="left" hspace="8" vspace="2" width="100" height="100" ></a>
 
@@ -32,6 +36,9 @@ This repository contains the totality of the *eProsima Micro XRCE-DDS* products:
 - [*Micro XRCE-DDS Client*](https://github.com/eProsima/Micro-XRCE-DDS-Client)
 - [*Micro XRCE-DDS Agent*](https://github.com/eProsima/Micro-XRCE-DDS-Agent)
 - [*Micro XRCE-DDS Gen*](https://github.com/eProsima/Micro-XRCE-DDS-Gen)
+
+This project is part of [FIWARE](https://www.fiware.org/). For more information check the FIWARE Catalogue entry for
+[Robotics](https://github.com/Fiware/catalogue/tree/master/robotics).
 
 ## Documentation
 
