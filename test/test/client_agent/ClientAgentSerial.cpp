@@ -44,4 +44,4 @@ INSTANTIATE_TEST_CASE_P(
     ClientAgentSerial,
     ::testing::Combine(
         ::testing::Values(Transport::SERIAL_TRANSPORT, Transport::MULTISERIAL_TRANSPORT),
-        ::testing::Values(MiddlewareKind::FASTDDS, MiddlewareKind::FASTRTPS, MiddlewareKind::CED)));
+        ::testing::Values(MiddlewareKind::FASTDDS)));
