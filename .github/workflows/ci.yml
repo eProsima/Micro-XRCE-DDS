@@ -1,0 +1,30 @@
+name: CI Micro XRCE-DDS Suite
+
+on:
+    pull_request:
+      branches:
+        - '**'
+
+jobs:
+
+  rosidl_typesupport_microxrcedds_ci:
+        runs-on: ubuntu-20.04
+        container: ubuntu:20.04
+
+        steps:
+        - uses: actions/checkout@v2
+
+        - name: Build & Test
+          run: |
+            cd Micro-XRCE-DDS
+            mkdir build
+            cd build
+            cmake ../ci/linux
+            make -j$(nproc)
+
+        # - name: Coverage
+        #   run: |
+        #     cd src/rosidl_typesupport_microxrcedds/rosidl_typesupport_microxrcedds_c
+        #     gcovr -x -r . -o coverage.xml ../../../build --exclude-unreachable-branches
+        #     curl -s https://codecov.io/bash -o codecov.bash && chmod +x codecov.bash
+        #     ./codecov.bash -t ${{ secrets.CODECOV_TOKEN }}
