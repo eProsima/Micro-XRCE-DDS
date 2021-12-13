@@ -7,12 +7,15 @@ on:
 
 jobs:
 
-  rosidl_typesupport_microxrcedds_ci:
+  micro_xrce_dds_suite_ci:
         runs-on: ubuntu-20.04
         container: ubuntu:20.04
 
         steps:
         - uses: actions/checkout@v2
+          with:
+            path: Micro-XRCE-DDS
+
 
         - name: Build & Test
           run: |
