@@ -19,7 +19,7 @@ jobs:
         - name: Install dependencies
           run: |
             apt update
-            apt install -y cmake
+            apt install -y cmake build-essential
 
         - name: Build & Test
           run: |
