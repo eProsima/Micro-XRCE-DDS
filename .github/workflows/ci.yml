@@ -19,7 +19,7 @@ jobs:
         - name: Install dependencies
           run: |
             apt update
-            apt install cmake
+            apt install -y cmake
 
         - name: Build & Test
           run: |
