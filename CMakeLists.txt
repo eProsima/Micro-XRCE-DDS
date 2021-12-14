@@ -29,7 +29,7 @@ endif()
 
 project(microxrcedds VERSION "2.1.0")
 
-set(_client_tag fix/fragmentation)
+set(_client_tag v2.1.0)
 set(_client_version 2.1.0)
 set(_agent_tag develop)
 set(_gen_tag master)
@@ -68,15 +68,15 @@ set(_run_tests OFF)
 set(_test_command "")
 
 if(UXRCE_BUILD_TESTS)
-    # set(_run_tests ON)
-    # list(APPEND _test_command COMMAND ${CMAKE_CTEST_COMMAND} -VV -C ${CMAKE_BUILD_TYPE} -T Test)
+    set(_run_tests ON)
+    list(APPEND _test_command COMMAND ${CMAKE_CTEST_COMMAND} -VV -C ${CMAKE_BUILD_TYPE} -T Test)
 endif()
 
 if(UXRCE_BUILD_CI_TESTS)
-    # if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
-    #     list(APPEND _test_command COMMAND ${CMAKE_CTEST_COMMAND} -VV -T MemCheck)
-    #     list(APPEND _test_command COMMAND ${CMAKE_CTEST_COMMAND} -VV -T Coverage)
-    # endif()
+    if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+        list(APPEND _test_command COMMAND ${CMAKE_CTEST_COMMAND} -VV -T MemCheck)
+        list(APPEND _test_command COMMAND ${CMAKE_CTEST_COMMAND} -VV -T Coverage)
+    endif()
 endif()
 
 ###############################################################################
