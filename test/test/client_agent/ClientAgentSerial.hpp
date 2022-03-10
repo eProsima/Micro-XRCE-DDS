@@ -11,7 +11,7 @@ class AgentSerial
 public:
     const char * baudrate = "115200";
     const char * port_name = "/dev/ptmx";
-    const int client_number = 5;
+    const int client_number = 2;
 
     AgentSerial(Transport transport,
           MiddlewareKind middleware)
