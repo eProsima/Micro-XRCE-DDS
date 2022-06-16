@@ -31,7 +31,7 @@ project(microxrcedds VERSION "2.1.1")
 
 set(_client_tag fix/wait_session)
 set(_client_version 2.1.1)
-set(_agent_tag v2.1.1)
+set(_agent_tag develop)
 set(_gen_tag master)
 
 ###############################################################################
