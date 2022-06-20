@@ -18,7 +18,7 @@ project(microxrcedds-profiling)
 
 ExternalProject_Add(clientlib
     GIT_REPOSITORY
-        https://github.com/eProsima/Micro-XRCE-DDS-Client.git
+        https://github.com/jseldent/Micro-XRCE-DDS-Client.git
     GIT_TAG
         ${_client_tag}
     PREFIX

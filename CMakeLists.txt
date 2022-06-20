@@ -29,7 +29,7 @@ endif()
 
 project(microxrcedds VERSION "2.1.1")
 
-set(_client_tag develop)
+set(_client_tag fix-posix-transport-profiles)
 set(_client_version 2.1.1)
 set(_agent_tag develop)
 set(_gen_tag master)
@@ -87,7 +87,7 @@ include(ExternalProject)
 if(UXRCE_ENABLE_CLIENT)
     ExternalProject_Add(client
         GIT_REPOSITORY
-            https://github.com/eProsima/Micro-XRCE-DDS-Client.git
+            https://github.com/jseldent/Micro-XRCE-DDS-Client.git
         GIT_TAG
             ${_client_tag}
         PREFIX
