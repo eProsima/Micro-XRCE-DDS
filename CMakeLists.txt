@@ -31,7 +31,7 @@ project(microxrcedds VERSION "2.2.0")
 
 set(_client_tag develop)
 set(_client_version 2.2.0)
-set(_agent_tag develop)
+set(_agent_tag fix/exception_heartbeat_filter)
 set(_gen_tag master)
 
 ###############################################################################
