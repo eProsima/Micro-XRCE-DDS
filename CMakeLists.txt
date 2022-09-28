@@ -30,7 +30,7 @@ endif()
 project(microxrcedds VERSION "2.2.0")
 
 set(_client_tag develop)
-set(_client_version 2.2.0)
+set(_client_version 2.2.1)
 set(_agent_tag feature/bump_fastdds_fastcdr)
 set(_gen_tag master)
 
