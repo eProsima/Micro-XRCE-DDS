@@ -202,7 +202,13 @@ TEST_P(PublisherSubscriberUnitary, PubSub1WithPing)
     ASSERT_EQ(subscriber_.get_received_topics(), message_number);
 }
 
-INSTANTIATE_TEST_CASE_P(
+#ifdef INSTANTIATE_TEST_SUITE_P
+#define GTEST_INSTANTIATE_TEST_MACRO(x, y, z) INSTANTIATE_TEST_SUITE_P(x, y, z)
+#else
+#define GTEST_INSTANTIATE_TEST_MACRO(x, y, z) INSTANTIATE_TEST_CASE_P(x, y, z)
+#endif // ifdef INSTANTIATE_TEST_SUITE_P
+
+GTEST_INSTANTIATE_TEST_MACRO(
     PublisherSubscriberWithPing,
     PublisherSubscriberUnitary,
     ::testing::Combine(
@@ -211,7 +217,7 @@ INSTANTIATE_TEST_CASE_P(
         ::testing::Values(0.0f),
         ::testing::Values(XRCECreationMode::XRCE_BIN_CREATION)));
 
-INSTANTIATE_TEST_CASE_P(
+GTEST_INSTANTIATE_TEST_MACRO(
     TransportAndLost,
     PublisherSubscriberNoLost,
     ::testing::Combine(
@@ -220,7 +226,7 @@ INSTANTIATE_TEST_CASE_P(
         ::testing::Values(0.0f),
         ::testing::Values(XRCECreationMode::XRCE_XML_CREATION)));
 
-INSTANTIATE_TEST_CASE_P(
+GTEST_INSTANTIATE_TEST_MACRO(
     TransportAndLostCreationModes,
     PublisherSubscriberNoLost,
     ::testing::Combine(
@@ -229,7 +235,7 @@ INSTANTIATE_TEST_CASE_P(
         ::testing::Values(0.0f),
         ::testing::Values(XRCECreationMode::XRCE_XML_CREATION, XRCECreationMode::XRCE_BIN_CREATION)));
 
-INSTANTIATE_TEST_CASE_P(
+GTEST_INSTANTIATE_TEST_MACRO(
     TransportAndLostCustomTransports,
     PublisherSubscriberNoLost,
     ::testing::Combine(
@@ -262,7 +268,7 @@ TEST_P(PublisherSubscriberLost, PubSub3FragmentedTopic4Parts)
     check_messages(message, 3, 0x80);
 }
 
-INSTANTIATE_TEST_CASE_P(
+GTEST_INSTANTIATE_TEST_MACRO(
     TransportAndLost,
     PublisherSubscriberLost,
     ::testing::Combine(

@@ -11,6 +11,7 @@
 #include <gtest/gtest.h>
 #include <iostream>
 #include <thread>
+#include <algorithm>
 
 inline
 bool operator==(TransportLocator const & lhs, TransportLocator const & rhs)
