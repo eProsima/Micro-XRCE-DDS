@@ -384,14 +384,20 @@ TEST_P(ClientAgentInteraction, PingFromClientToAgent)
     ASSERT_NO_FATAL_FAILURE(client_.ping_agent(transport_kind));
 }
 
-INSTANTIATE_TEST_CASE_P(
+#ifdef INSTANTIATE_TEST_SUITE_P
+#define GTEST_INSTANTIATE_TEST_MACRO(x, y, z) INSTANTIATE_TEST_SUITE_P(x, y, z)
+#else
+#define GTEST_INSTANTIATE_TEST_MACRO(x, y, z) INSTANTIATE_TEST_CASE_P(x, y, z)
+#endif // ifdef INSTANTIATE_TEST_SUITE_P
+
+GTEST_INSTANTIATE_TEST_MACRO(
     Transports,
     ClientAgentInteraction,
     ::testing::Combine(
         ::testing::Values(Transport::UDP_IPV4_TRANSPORT, Transport::TCP_IPV4_TRANSPORT, Transport::UDP_IPV6_TRANSPORT, Transport::TCP_IPV6_TRANSPORT),
         ::testing::Values(MiddlewareKind::FASTDDS, MiddlewareKind::FASTRTPS, MiddlewareKind::CED)));
 
-INSTANTIATE_TEST_CASE_P(
+GTEST_INSTANTIATE_TEST_MACRO(
     CustomTransports,
     ClientAgentInteraction,
     ::testing::Combine(
