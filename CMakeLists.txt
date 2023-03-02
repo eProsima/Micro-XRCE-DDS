@@ -177,7 +177,7 @@ if(UXRCE_ENABLE_GEN)
         CONFIGURE_COMMAND
             ""
         BUILD_COMMAND
-            cd <SOURCE_DIR> && gradle build -Dbranch=${_client_tag}
+            cd <SOURCE_DIR> && ./gradlew assemble && ./gradlew test -Dbranch= -Dbranch=${_client_tag}
         INSTALL_COMMAND
             COMMAND ${CMAKE_COMMAND} -E make_directory <INSTALL_DIR>/${BIN_INSTALL_DIR}
             COMMAND ${CMAKE_COMMAND} -E copy <SOURCE_DIR>/scripts/microxrceddsgen <INSTALL_DIR>/${BIN_INSTALL_DIR}/
