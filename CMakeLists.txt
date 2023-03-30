@@ -27,12 +27,12 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
     set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
 endif()
 
-project(microxrcedds VERSION "2.3.0")
+project(microxrcedds VERSION "2.4.0")
 
-set(_client_tag v2.3.0)
-set(_client_version 2.3.0)
-set(_agent_tag v2.3.0)
-set(_gen_tag master)
+set(_client_tag v2.4.0)
+set(_client_version 2.4.0)
+set(_agent_tag v2.4.0)
+set(_gen_tag v2.0.0)
 
 ###############################################################################
 # Build options.
@@ -177,7 +177,7 @@ if(UXRCE_ENABLE_GEN)
         CONFIGURE_COMMAND
             ""
         BUILD_COMMAND
-            cd <SOURCE_DIR> && gradle build -Dbranch=${_client_tag}
+            cd <SOURCE_DIR> && ./gradlew assemble && ./gradlew test -Dbranch=${_client_tag}
         INSTALL_COMMAND
             COMMAND ${CMAKE_COMMAND} -E make_directory <INSTALL_DIR>/${BIN_INSTALL_DIR}
             COMMAND ${CMAKE_COMMAND} -E copy <SOURCE_DIR>/scripts/microxrceddsgen <INSTALL_DIR>/${BIN_INSTALL_DIR}/
