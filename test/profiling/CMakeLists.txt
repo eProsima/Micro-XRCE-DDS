@@ -31,7 +31,7 @@ ExternalProject_Add(clientlib
 
 ExternalProject_Add(agentlib
     GIT_REPOSITORY
-        https://github.com/eProsima/Micro-XRCE-DDS-Agent.git
+        https://github.com/boschresearch/Micro-XRCE-DDS-Agent.git
     GIT_TAG
         ${_agent_tag}
     PREFIX

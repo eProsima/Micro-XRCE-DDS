@@ -31,7 +31,7 @@ project(microxrcedds VERSION "2.4.0")
 
 set(_client_tag develop)
 set(_client_version 2.4.0)
-set(_agent_tag develop)
+set(_agent_tag master)
 set(_gen_tag develop)
 
 ###############################################################################
@@ -126,7 +126,7 @@ endif()
 if(UXRCE_ENABLE_AGENT)
     ExternalProject_Add(agent
         GIT_REPOSITORY
-            https://github.com/eProsima/Micro-XRCE-DDS-Agent.git
+            https://github.com/boschresearch/Micro-XRCE-DDS-Agent.git
         GIT_TAG
             ${_agent_tag}
         PREFIX
