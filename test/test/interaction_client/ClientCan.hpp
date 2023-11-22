@@ -22,7 +22,7 @@ public:
 
     void init_transport(const char* dev, const uint32_t can_id)
     {
-        mtu_ = UXR_CONFIG_CAN_TRANSPORT_MTU;
+        mtu_ = UXR_CAN_TRANSPORT_MTU;
         ASSERT_TRUE(uxr_init_can_transport(&can_transport_, dev, can_id));
         uxr_init_session(&session_, gateway_.monitorize(&can_transport_.comm), client_key_);
         init_common();
