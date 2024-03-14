@@ -31,7 +31,7 @@ project(microxrcedds VERSION "2.4.2")
 
 set(_client_tag v2.4.2)
 set(_client_version 2.4.2)
-set(_agent_tag v2.4.2)
+set(_agent_tag feature/porttocdr2_fast2_14)
 set(_gen_tag v2.0.2)
 
 ###############################################################################
