@@ -21,13 +21,25 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/DEFAULT_FASTRTPS_PROFILES.xml.in
 
 add_executable(discovery-test DiscoveryIntegration.cpp)
 
-add_gtest(discovery-test
+gtest_add_tests(
+    TARGET
+        discovery-test
     SOURCES
         DiscoveryIntegration.cpp
-    ENVIRONMENTS
-        $<$<PLATFORM_ID:Linux>:LD_LIBRARY_PATH=${CMAKE_PREFIX_PATH}/lib>
-        $<$<PLATFORM_ID:Windows>:PATH=${CMAKE_PREFIX_PATH}/bin>
+    TEST_LIST
+        allDiscoveryTest
     )
+
+if(WIN32)
+    set(PATH_ENV "$ENV{PATH}")
+    string(REPLACE ";" "\\;" PATH_ENV "${PATH_ENV}")
+
+    set_tests_properties(${allDiscoveryTest} PROPERTIES ENVIRONMENT
+        "PATH=${CMAKE_PREFIX_PATH}/bin\\;${PATH_ENV}")
+else()
+    set_tests_properties(${allDiscoveryTest} PROPERTIES ENVIRONMENT
+        "LD_LIBRARY_PATH=${CMAKE_PREFIX_PATH}/lib")
+endif()
 
 target_include_directories(discovery-test
     PRIVATE

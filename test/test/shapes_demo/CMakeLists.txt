@@ -25,13 +25,26 @@ endif()
 set(SRCS ShapesDemo.cpp)
 
 add_executable(shapes_demo_test ${SRCS})
-add_gtest(shapes_demo_test
+
+gtest_add_tests(
+    TARGET
+        shapes_demo_test
     SOURCES
         ${SRCS}
-    ENVIRONMENTS
-        $<$<PLATFORM_ID:Linux>:LD_LIBRARY_PATH=${CMAKE_PREFIX_PATH}/lib>
-        $<$<PLATFORM_ID:Windows>:PATH=${CMAKE_PREFIX_PATH}/bin>
+    TEST_LIST
+        allShapesDemoTests
     )
+
+if(WIN32)
+    set(PATH_ENV "$ENV{PATH}")
+    string(REPLACE ";" "\\;" PATH_ENV "${PATH_ENV}")
+
+    set_tests_properties(${allShapesDemoTests} PROPERTIES ENVIRONMENT
+        "PATH=${CMAKE_PREFIX_PATH}/bin\\;${PATH_ENV}")
+else()
+    set_tests_properties(${allShapesDemoTests} PROPERTIES ENVIRONMENT
+        "LD_LIBRARY_PATH=${CMAKE_PREFIX_PATH}/lib")
+endif()
 
 target_include_directories(shapes_demo_test
     PRIVATE
