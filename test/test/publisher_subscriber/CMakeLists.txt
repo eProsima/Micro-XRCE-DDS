@@ -28,13 +28,25 @@ endif()
 
 add_executable(publisher-subscriber-interaction-test ${SRCS})
 
-add_gtest(publisher-subscriber-interaction-test
+gtest_add_tests(
+    TARGET
+        publisher-subscriber-interaction-test
     SOURCES
         ${SRCS}
-    ENVIRONMENTS
-        $<$<PLATFORM_ID:Linux>:LD_LIBRARY_PATH=${CMAKE_PREFIX_PATH}/lib>
-        $<$<PLATFORM_ID:Windows>:PATH=${CMAKE_PREFIX_PATH}/bin>
+    TEST_LIST
+        allPublisherSubscriberInteractionTests
     )
+
+if(WIN32)
+    set(PATH_ENV "$ENV{PATH}")
+    string(REPLACE ";" "\\;" PATH_ENV "${PATH_ENV}")
+
+    set_tests_properties(${allPublisherSubscriberInteractionTests} PROPERTIES ENVIRONMENT
+        "PATH=${CMAKE_PREFIX_PATH}/bin\\;${PATH_ENV}")
+else()
+    set_tests_properties(${allPublisherSubscriberInteractionTests} PROPERTIES ENVIRONMENT
+        "LD_LIBRARY_PATH=${CMAKE_PREFIX_PATH}/lib")
+endif()
 
 target_include_directories(publisher-subscriber-interaction-test
     PRIVATE

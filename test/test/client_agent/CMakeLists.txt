@@ -28,13 +28,25 @@ endif()
 
 add_executable(client-agent-test ${SRCS})
 
-add_gtest(client-agent-test
+gtest_add_tests(
+    TARGET
+        client-agent-test
     SOURCES
         ${SRCS}
-    ENVIRONMENTS
-        $<$<PLATFORM_ID:Linux>:LD_LIBRARY_PATH=${CMAKE_PREFIX_PATH}/lib>
-        $<$<PLATFORM_ID:Windows>:PATH=${CMAKE_PREFIX_PATH}/bin>
+    TEST_LIST
+        allClientAgentTests
     )
+
+if(WIN32)
+    set(PATH_ENV "$ENV{PATH}")
+    string(REPLACE ";" "\\;" PATH_ENV "${PATH_ENV}")
+
+    set_tests_properties(${allClientAgentTests} PROPERTIES ENVIRONMENT
+        "PATH=${CMAKE_PREFIX_PATH}/bin\\;${PATH_ENV}")
+else()
+    set_tests_properties(${allClientAgentTests} PROPERTIES ENVIRONMENT
+        "LD_LIBRARY_PATH=${CMAKE_PREFIX_PATH}/lib")
+endif()
 
 target_include_directories(client-agent-test
     PRIVATE
