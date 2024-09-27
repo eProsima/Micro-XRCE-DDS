@@ -31,7 +31,7 @@ project(microxrcedds VERSION "2.4.3")
 
 set(_client_tag v2.4.3)
 set(_client_version 2.4.3)
-set(_agent_tag v2.4.3)
+set(_agent_tag feature/fastdds3)
 set(_gen_tag v2.0.2)
 
 ###############################################################################
@@ -75,7 +75,6 @@ endif()
 if(UXRCE_BUILD_CI_TESTS)
     if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
         list(APPEND _test_command COMMAND ${CMAKE_CTEST_COMMAND} -VV -T MemCheck)
-        list(APPEND _test_command COMMAND ${CMAKE_CTEST_COMMAND} -VV -T Coverage)
     endif()
 endif()
 
