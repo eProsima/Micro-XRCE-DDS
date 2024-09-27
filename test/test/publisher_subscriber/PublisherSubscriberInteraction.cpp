@@ -54,9 +54,6 @@ public:
                 case MiddlewareKind::FASTDDS:
                     ASSERT_NO_FATAL_FAILURE(Client::create_entities_xml<MiddlewareKind::FASTDDS>(1, 0x80, UXR_STATUS_OK, 0));
                     break;
-                case MiddlewareKind::FASTRTPS:
-                    ASSERT_NO_FATAL_FAILURE(Client::create_entities_xml<MiddlewareKind::FASTRTPS>(1, 0x80, UXR_STATUS_OK, 0));
-                    break;
                 case MiddlewareKind::CED:
                     ASSERT_NO_FATAL_FAILURE(Client::create_entities_xml<MiddlewareKind::CED>(1, 0x80, UXR_STATUS_OK, 0));
                     break;
@@ -222,7 +219,7 @@ GTEST_INSTANTIATE_TEST_MACRO(
     PublisherSubscriberNoLost,
     ::testing::Combine(
         ::testing::Values(Transport::UDP_IPV4_TRANSPORT, Transport::UDP_IPV6_TRANSPORT, Transport::TCP_IPV4_TRANSPORT, Transport::TCP_IPV6_TRANSPORT),
-        ::testing::Values(MiddlewareKind::FASTDDS, MiddlewareKind::FASTRTPS, MiddlewareKind::CED),
+        ::testing::Values(MiddlewareKind::FASTDDS, MiddlewareKind::CED),
         ::testing::Values(0.0f),
         ::testing::Values(XRCECreationMode::XRCE_XML_CREATION)));
 
