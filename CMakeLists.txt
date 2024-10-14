@@ -29,9 +29,9 @@ endif()
 
 project(microxrcedds VERSION "2.4.3")
 
-set(_client_tag v2.4.3)
-set(_client_version 2.4.3)
-set(_agent_tag feature/fastdds3)
+set(_client_tag v3.0.0)
+set(_client_version 3.0.0)
+set(_agent_tag v3.0.0)
 set(_gen_tag v2.0.2)
 
 ###############################################################################
