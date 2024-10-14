@@ -27,11 +27,11 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
     set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
 endif()
 
-project(microxrcedds VERSION "2.4.3")
+project(microxrcedds VERSION "3.0.0")
 
-set(_client_tag v2.4.3)
-set(_client_version 2.4.3)
-set(_agent_tag v2.4.3)
+set(_client_tag v3.0.0)
+set(_client_version 3.0.0)
+set(_agent_tag v3.0.0)
 set(_gen_tag v2.0.2)
 
 ###############################################################################
@@ -75,7 +75,6 @@ endif()
 if(UXRCE_BUILD_CI_TESTS)
     if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
         list(APPEND _test_command COMMAND ${CMAKE_CTEST_COMMAND} -VV -T MemCheck)
-        list(APPEND _test_command COMMAND ${CMAKE_CTEST_COMMAND} -VV -T Coverage)
     endif()
 endif()
 

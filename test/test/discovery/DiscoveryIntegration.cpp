@@ -34,9 +34,6 @@ public:
         case MiddlewareKind::FASTDDS:
             middleware_ = eprosima::uxr::Middleware::Kind::FASTDDS;
             break;
-        case MiddlewareKind::FASTRTPS:
-            middleware_ = eprosima::uxr::Middleware::Kind::FASTRTPS;
-            break;
         case MiddlewareKind::CED:
             middleware_ = eprosima::uxr::Middleware::Kind::CED;
             break;
@@ -177,7 +174,7 @@ GTEST_INSTANTIATE_TEST_MACRO(
     DiscoveryIntegration,
     ::testing::Combine(
         ::testing::Values(Transport::UDP_IPV4_TRANSPORT, Transport::UDP_IPV6_TRANSPORT, Transport::TCP_IPV4_TRANSPORT, Transport::TCP_IPV6_TRANSPORT),
-        ::testing::Values(MiddlewareKind::FASTDDS, MiddlewareKind::FASTRTPS, MiddlewareKind::CED)));
+        ::testing::Values(MiddlewareKind::FASTDDS, MiddlewareKind::CED)));
 
 int main(int args, char** argv)
 {

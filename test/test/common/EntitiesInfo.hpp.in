@@ -70,7 +70,6 @@ static constexpr const char* fast_datareader_xml =
 enum class MiddlewareKind : uint8_t
 {
     FASTDDS,
-    FASTRTPS,
     CED
 };
 
@@ -107,9 +106,6 @@ struct EntitiesInfo<MiddlewareKind::FASTDDS>
     static constexpr const char* datareader_ref = "bighelloworld_data_reader";
     static constexpr const char* datareader_xml = fast_datareader_xml;
 };
-
-template<>
-struct EntitiesInfo<MiddlewareKind::FASTRTPS> : public EntitiesInfo<MiddlewareKind::FASTDDS> {};
 
 template<>
 struct EntitiesInfo<MiddlewareKind::CED>
