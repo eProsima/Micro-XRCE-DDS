@@ -33,9 +33,6 @@ public:
                 case MiddlewareKind::FASTDDS:
                     ASSERT_NO_FATAL_FAILURE(ClientCan::create_entities_xml<MiddlewareKind::FASTDDS>(id_, 0x80, UXR_STATUS_OK, 0));
                     break;
-                case MiddlewareKind::FASTRTPS:
-                    ASSERT_NO_FATAL_FAILURE(ClientCan::create_entities_xml<MiddlewareKind::FASTRTPS>(id_, 0x80, UXR_STATUS_OK, 0));
-                    break;
                 case MiddlewareKind::CED:
                     ASSERT_NO_FATAL_FAILURE(ClientCan::create_entities_xml<MiddlewareKind::CED>(id_, 0x80, UXR_STATUS_OK, 0));
                     break;

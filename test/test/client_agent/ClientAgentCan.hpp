@@ -22,9 +22,6 @@ public:
             case MiddlewareKind::FASTDDS:
                 middleware_ = eprosima::uxr::Middleware::Kind::FASTDDS;
                 break;
-            case MiddlewareKind::FASTRTPS:
-                middleware_ = eprosima::uxr::Middleware::Kind::FASTRTPS;
-                break;
             case MiddlewareKind::CED:
                 middleware_ = eprosima::uxr::Middleware::Kind::CED;
                 break;
@@ -34,7 +31,7 @@ public:
     ~AgentCan()
     {}
 
-    bool is_interface_up(const char * interface) 
+    bool is_interface_up(const char * interface)
     {
         struct ifreq ifr;
         int sock = socket(PF_CAN, SOCK_RAW, CAN_RAW);

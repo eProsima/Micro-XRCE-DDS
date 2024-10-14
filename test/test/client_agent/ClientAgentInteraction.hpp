@@ -30,9 +30,6 @@ public:
             case MiddlewareKind::FASTDDS:
                 middleware_ = eprosima::uxr::Middleware::Kind::FASTDDS;
                 break;
-            case MiddlewareKind::FASTRTPS:
-                middleware_ = eprosima::uxr::Middleware::Kind::FASTRTPS;
-                break;
             case MiddlewareKind::CED:
                 middleware_ = eprosima::uxr::Middleware::Kind::CED;
                 break;
@@ -84,7 +81,7 @@ public:
                 {
                     // Do nothing
                 }
-                
+
 
                 agent_custom_.reset(new eprosima::uxr::CustomAgent(
                     "custom_agent",
@@ -123,7 +120,7 @@ public:
                 ASSERT_TRUE(agent_custom_->start());
                 break;
             }
-            
+
         }
     }
 
@@ -155,7 +152,7 @@ public:
             case Transport::CUSTOM_WITH_FRAMING:
             {
                 ASSERT_TRUE(agent_custom_->stop());
-                break;            
+                break;
             }
         }
     }
