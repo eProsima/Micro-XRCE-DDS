@@ -301,7 +301,7 @@ TEST_P(ClientAgentInteraction, ExistantEntitiesCreationReplaceReuseBINBINReliabl
 TEST_P(ClientAgentInteraction, PingFromClientToAgent)
 {
     const Transport transport_kind(std::get<0>(GetParam()));
-    ASSERT_NO_FATAL_FAILURE(client_.ping_agent(transport_kind));
+    ASSERT_NO_FATAL_FAILURE(client_.ping_agent(transport_kind, 1, 1));
 }
 
 #ifdef INSTANTIATE_TEST_SUITE_P

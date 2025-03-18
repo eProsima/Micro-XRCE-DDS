@@ -53,6 +53,7 @@ target_include_directories(publisher-subscriber-interaction-test
         ${GTEST_INCLUDE_DIR}
     )
 
+link_directories(${PROJECT_BINARY_DIR}/test/interaction_client)
 target_link_libraries(publisher-subscriber-interaction-test
     PRIVATE
         interaction_client
