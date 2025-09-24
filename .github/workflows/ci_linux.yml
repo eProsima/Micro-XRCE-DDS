@@ -64,6 +64,7 @@ jobs:
 
       # --- Run tests with newer CTest to produce JUnit ---
       - name: Run tests and export JUnit
+        if: always()
         shell: bash
         run: |
           ctest --test-dir build/microxrcedds-build/agent/src/agent-build \
