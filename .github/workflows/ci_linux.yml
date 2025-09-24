@@ -51,6 +51,32 @@ jobs:
           cmake --version
           ctest --version
 
+      - name: Install vcan kernel module (Azure runner)
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          # Try to install the exact extra-mods package for the running kernel,
+          # fall back to the Azure meta-package if needed.
+          if ! sudo apt-get install -y "linux-modules-extra-$(uname -r)"; then
+            sudo apt-get install -y linux-modules-extra-azure
+          fi
+          # Load the module (no-op if already built-in or loaded)
+          sudo modprobe vcan || {
+            echo "::error::Failed to load vcan on kernel $(uname -r)"
+            exit 1
+          }
+
+      - name: Setup vcan0 for CAN tests
+        run: |
+          sudo modprobe vcan || true
+          # Create if missing; ok if already exists
+          if ! ip link show vcan0 >/dev/null 2>&1; then
+            sudo ip link add dev vcan0 type vcan
+          fi
+          sudo ip link set vcan0 mtu 72
+          sudo ip link set dev vcan0 up
+          ip -details link show vcan0
+
       - name: Configure
         run: |
           mkdir -p build
