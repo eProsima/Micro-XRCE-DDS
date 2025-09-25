@@ -53,6 +53,7 @@ target_include_directories(client-agent-test
         ${GTEST_INCLUDE_DIR}
     )
 
+link_directories(${PROJECT_BINARY_DIR}/test/interaction_client)
 target_link_libraries(client-agent-test
     PRIVATE
         interaction_client

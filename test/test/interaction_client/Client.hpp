@@ -276,6 +276,11 @@ public:
         std::this_thread::sleep_for(std::chrono::milliseconds(2000));
         (void) uxr_run_session_time(&session_, 500);
 
+        publish_run(id, stream_id_raw, number, message);
+    }
+
+    void publish_run(uint8_t id, uint8_t stream_id_raw, size_t number, const std::string& message)
+    {
         uxrStreamId output_stream_id = uxr_stream_id_from_raw(stream_id_raw, UXR_OUTPUT_STREAM);
         uxrObjectId datawriter_id = uxr_object_id(id, UXR_DATAWRITER_ID);
 
@@ -299,6 +304,7 @@ public:
             ASSERT_TRUE(written);
             ASSERT_FALSE(ub.error);
             bool sent = uxr_run_session_until_confirm_delivery(&session_, timeout);
+            UXR_UNLOCK_STREAM_ID(&session_, output_stream_id);
             ASSERT_TRUE(sent);
         }
     }
@@ -463,7 +469,7 @@ public:
     }
 
     void ping_agent(
-            const Transport transport_kind)
+            const Transport transport_kind, size_t number, uint8_t attempts)
     {
         uxrCommunication* comm(nullptr);
 
@@ -491,7 +497,12 @@ public:
                 FAIL() << "Transport type not supported";
                 break;
         }
-        ASSERT_TRUE(uxr_ping_agent_attempts(comm, 1000, 1));
+
+        for(size_t i = 0; i < number; ++i)
+        {
+            ASSERT_TRUE(uxr_ping_agent_attempts(comm, 1000, attempts));
+            std::cout << "Ping sent: " << i << std::endl;
+        }
     }
 
     void ping_agent_session()
