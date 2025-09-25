@@ -26,6 +26,21 @@ jobs:
           fetch-depth: 0
           ref: ${{ github.ref }}
 
+      - name: Install vcan kernel module (Azure runner)
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          # Try to install the exact extra-mods package for the running kernel,
+          # fall back to the Azure meta-package if needed.
+          if ! sudo apt-get install -y "linux-modules-extra-$(uname -r)"; then
+            sudo apt-get install -y linux-modules-extra-azure
+          fi
+          # Load the module (no-op if already built-in or loaded)
+          sudo modprobe vcan || {
+            echo "::error::Failed to load vcan on kernel $(uname -r)"
+            exit 1
+          }
+
       - name: Install CMake and prerequisites
         shell: bash
         run: |
@@ -46,25 +61,12 @@ jobs:
           sudo tar -C /opt -xzf cmake-old.tgz
           echo "/opt/cmake-${CMAKE_VER}-linux-x86_64/bin" >> "$GITHUB_PATH"
 
-      - name: Show cmake version
+      - name: Show versions
         run: |
           cmake --version
           ctest --version
-
-      - name: Install vcan kernel module (Azure runner)
-        run: |
-          set -euo pipefail
-          sudo apt-get update
-          # Try to install the exact extra-mods package for the running kernel,
-          # fall back to the Azure meta-package if needed.
-          if ! sudo apt-get install -y "linux-modules-extra-$(uname -r)"; then
-            sudo apt-get install -y linux-modules-extra-azure
-          fi
-          # Load the module (no-op if already built-in or loaded)
-          sudo modprobe vcan || {
-            echo "::error::Failed to load vcan on kernel $(uname -r)"
-            exit 1
-          }
+          gcc --version
+          gcov --version
 
       - name: Setup vcan0 for CAN tests
         run: |
@@ -125,9 +127,11 @@ jobs:
             '--exclude' '.*/XRCETypes.*' \
             '--exclude' '.*/xrce_types.*' \
           )
-          gcovr -x -r . "${EXCLUDES[@]}" -o build/coverage.xml
-          gcovr --html-details -r . "${EXCLUDES[@]}" -o build/coverage.html
-          gcovr -r . "${EXCLUDES[@]}" # human-readable summary
+          IGNORE_ERR='--gcov-ignore-parse-errors=negative_hits.warn_once_per_file'
+
+          gcovr -x -r . "${EXCLUDES[@]}" $IGNORE_ERR -o build/coverage.xml
+          gcovr --html-details -r . "${EXCLUDES[@]}" $IGNORE_ERR -o build/coverage.html
+          gcovr -r . "${EXCLUDES[@]}" $IGNORE_ERR # human-readable summary
 
       - name: Upload artifacts (CTest & Coverage)
         uses: actions/upload-artifact@v4
